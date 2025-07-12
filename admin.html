@@ -1,0 +1,152 @@
+
+{% extends "base.html" %}
+
+{% block title %}Painel Admin - AGRI.vendasMz{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-cog"></i> Painel de Administração</h2>
+    <span class="badge bg-danger">ADMIN</span>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-users fa-2x mb-2"></i>
+                <h4>{{ stats.total_usuarios }}</h4>
+                <p>Total de Usuários</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-warning text-dark">
+            <div class="card-body text-center">
+                <i class="fas fa-crown fa-2x mb-2"></i>
+                <h4>{{ stats.usuarios_premium }}</h4>
+                <p>Usuários Premium</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-box fa-2x mb-2"></i>
+                <h4>{{ stats.total_produtos }}</h4>
+                <p>Produtos Ativos</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-users"></i> Gerenciar Usuários</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>Premium</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for usuario in usuarios %}
+                                <tr>
+                                    <td>{{ usuario[1][:20] }}...</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ usuario[4] }}</span>
+                                    </td>
+                                    <td>
+                                        {% if usuario[5] %}
+                                            <span class="badge bg-warning">Premium</span>
+                                        {% else %}
+                                            <span class="badge bg-light text-dark">Grátis</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if usuario[5] %}
+                                            <a href="{{ url_for('desativar_premium', user_id=usuario[0]) }}"
+                                               class="btn btn-sm btn-outline-danger">
+                                                Desativar
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ url_for('ativar_premium', user_id=usuario[0]) }}"
+                                               class="btn btn-sm btn-outline-warning">
+                                                Ativar Premium
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-box"></i> Gerenciar Produtos</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Vendedor</th>
+                                <th>Preço</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for produto in produtos %}
+                                <tr>
+                                    <td>{{ produto[2][:15] }}...</td>
+                                    <td>{{ produto[9][:15] }}...</td>
+                                    <td>{{ "%.0f"|format(produto[3]) }} MT</td>
+                                    <td>
+                                        <a href="{{ url_for('remover_produto', produto_id=produto[0]) }}"
+                                           class="btn btn-sm btn-outline-danger"
+                                           onclick="return confirm('Remover produto?')">
+                                            Remover
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h5><i class="fas fa-paint-brush"></i> Personalização Visual</h5>
+    </div>
+    <div class="card-body">
+        <p>Funcionalidades de personalização serão implementadas em versões futuras:</p>
+        <ul>
+            <li>Editor visual de cores e logo</li>
+            <li>Customização de textos</li>
+            <li>Temas personalizados</li>
+        </ul>
+        <button class="btn btn-secondary" disabled>
+            <i class="fas fa-palette"></i> Em desenvolvimento
+        </button>
+    </div>
+</div>
+{% endblock %}

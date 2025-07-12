@@ -1,0 +1,134 @@
+
+{% extends "base.html" %}
+
+{% block title %}Consultoria Agrícola - AGRI.vendasMz{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="fas fa-leaf"></i> Consultoria Agrícola
+                </h2>
+
+                <form id="consultoriaForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Cultura *</label>
+                                <select class="form-select" name="cultura" required>
+                                    <option value="">Selecione a cultura</option>
+                                    <option value="milho">Milho</option>
+                                    <option value="feijao">Feijão</option>
+                                    <option value="tomate">Tomate</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Hectares *</label>
+                                <input type="number" step="0.1" class="form-control" name="hectares" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-calculator"></i> Calcular Plantio
+                    </button>
+                </form>
+
+                <div id="resultado" class="mt-4" style="display: none;">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5>Resultado da Consultoria</h5>
+                            <div id="resultadoConteudo"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5><i class="fas fa-info-circle"></i> Sobre a Consultoria</h5>
+                <p>Nossa consultoria oferece:</p>
+                <ul>
+                    <li>Cálculo de sementes necessárias</li>
+                    <li>Recomendações de fertilizantes</li>
+                    <li>Cronograma de irrigação</li>
+                    <li>Previsão de colheita</li>
+                </ul>
+
+                {% if not session.is_premium %}
+                    <div class="alert alert-warning">
+                        <strong>Premium:</strong> Informações detalhadas, alertas SMS e dicas especializadas.
+                        <a href="{{ url_for('premium') }}" class="btn btn-sm btn-warning mt-2">
+                            Upgrade <i class="fas fa-crown"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('consultoriaForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    fetch('/calcular_plantio', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.erro) {
+            alert(data.erro);
+            return;
+        }
+
+        let html = `
+            <h6>Cultura: ${data.cultura.toUpperCase()}</h6>
+            <p><strong>Área:</strong> ${data.hectares} hectares</p>
+            <p><strong>Sementes necessárias:</strong> ${data.sementes_necessarias} kg</p>
+            <p><strong>Fertilizante NPK:</strong> ${data.fertilizante_npk} kg</p>
+            <p><strong>Dias para colheita:</strong> ${data.dias_para_colheita} dias</p>
+
+            <h6>Cronograma de Irrigação (dias após plantio):</h6>
+            <ul>
+        `;
+
+        data.cronograma_irrigacao.forEach(dia => {
+            html += `<li>Dia ${dia}</li>`;
+        });
+
+        html += '</ul>';
+
+        if (data.detalhes_premium) {
+            html += `
+                <div class="alert alert-success">
+                    <h6><i class="fas fa-crown"></i> Informações Premium</h6>
+                    <p><strong>Densidade:</strong> ${data.detalhes_premium.densidade_plantio}</p>
+                    <p><strong>Fertilização:</strong> Dias ${data.detalhes_premium.cronograma_fertilizacao.join(', ')}</p>
+                    <p><strong>Pragas comuns:</strong> ${data.detalhes_premium.pragas_comuns.join(', ')}</p>
+                    <p><strong>Dicas:</strong> ${data.detalhes_premium.dicas_extras}</p>
+                </div>
+            `;
+        }
+
+        document.getElementById('resultadoConteudo').innerHTML = html;
+        document.getElementById('resultado').style.display = 'block';
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao calcular plantio');
+    });
+});
+</script>
+{% endblock %}

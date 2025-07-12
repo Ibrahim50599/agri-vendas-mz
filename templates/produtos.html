@@ -1,0 +1,100 @@
+
+{% extends "base.html" %}
+
+{% block title %}Produtos - AGRI.vendasMz{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-box"></i> Produtos Disponíveis</h2>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5><i class="fas fa-filter"></i> Filtros</h5>
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <select class="form-select" name="categoria">
+                    <option value="">Todas as categorias</option>
+                    <option value="Cereais">Cereais</option>
+                    <option value="Legumes">Legumes</option>
+                    <option value="Frutas">Frutas</option>
+                    <option value="Tubérculos">Tubérculos</option>
+                    <option value="Sementes">Sementes</option>
+                    <option value="Fertilizantes">Fertilizantes</option>
+                    <option value="Equipamentos">Equipamentos</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <input type="number" class="form-control" name="preco_max" placeholder="Preço máximo (MT)">
+            </div>
+
+            <div class="col-md-3">
+                <input type="text" class="form-control" name="regiao" placeholder="Região">
+            </div>
+
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
+                <a href="{{ url_for('listar_produtos') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if produtos %}
+    <div class="row">
+        {% for produto in produtos %}
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card product-card h-100">
+                    {% if produto[6] %}
+                        <img src="{{ url_for('static', filename=produto[6]) }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="fas fa-image fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
+
+                    <div class="card-body">
+                        <h6 class="card-title">{{ produto[2] }}</h6>
+                        <p class="text-success fw-bold">{{ "%.2f"|format(produto[3]) }} MT</p>
+
+                        {% if produto[7] %}
+                            <span class="badge bg-secondary mb-2">{{ produto[7] }}</span>
+                        {% endif %}
+
+                        <p class="card-text small">{{ produto[4][:80] }}{% if produto[4]|length > 80 %}...{% endif %}</p>
+
+                        <p class="text-muted small">
+                            <i class="fas fa-map-marker-alt"></i> {{ produto[5] }}
+                        </p>
+
+                        <p class="text-muted small">
+                            <i class="fas fa-user"></i> {{ produto[9] }}
+                        </p>
+                    </div>
+
+                    <div class="card-footer">
+                        <a href="{{ url_for('contato_whatsapp', vendedor_id=produto[1]) }}"
+                           class="btn btn-success btn-sm w-100">
+                            <i class="fab fa-whatsapp"></i> Contatar Vendedor
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h4>Nenhum produto encontrado</h4>
+        <p>Tente ajustar os filtros ou navegue pelas categorias.</p>
+        <a href="{{ url_for('listar_produtos') }}" class="btn btn-primary">
+            Ver Todos os Produtos
+        </a>
+    </div>
+{% endif %}
+{% endblock %}

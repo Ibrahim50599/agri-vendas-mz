@@ -1,0 +1,98 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard - AGRI.vendasMz{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2>
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+            {% if session.is_premium %}
+                <span class="badge premium-badge">PREMIUM</span>
+            {% endif %}
+        </h2>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-user fa-2x text-primary mb-2"></i>
+                        <h6>Bem-vindo</h6>
+                        <p>{{ session.user_name }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {% if session.user_type in ['vendedor', 'admin'] %}
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-box fa-2x text-success mb-2"></i>
+                            <h6>Meus Produtos</h6>
+                            <h4>{{ meus_produtos|length }}</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-plus fa-2x text-warning mb-2"></i>
+                            <h6>Publicar</h6>
+                            <a href="{{ url_for('publicar_produto') }}" class="btn btn-sm btn-warning">
+                                Novo Produto
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if not session.is_premium %}
+                <div class="col-md-3">
+                    <div class="card text-center border-warning">
+                        <div class="card-body">
+                            <i class="fas fa-crown fa-2x text-warning mb-2"></i>
+                            <h6>Upgrade</h6>
+                            <a href="{{ url_for('premium') }}" class="btn btn-sm btn-warning">
+                                Premium
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if session.user_type in ['vendedor', 'admin'] and meus_produtos %}
+            <h4>Meus Produtos</h4>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Preço</th>
+                            <th>Categoria</th>
+                            <th>Data</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for produto in meus_produtos %}
+                            <tr>
+                                <td>{{ produto[2] }}</td>
+                                <td>{{ "%.2f"|format(produto[3]) }} MT</td>
+                                <td>{{ produto[7] or 'N/A' }}</td>
+                                <td>{{ produto[8] }}</td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-primary">Editar</a>
+                                    <a href="#" class="btn btn-sm btn-danger">Remover</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

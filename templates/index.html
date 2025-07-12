@@ -1,0 +1,106 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section bg-success text-white p-5 rounded mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h1><i class="fas fa-seedling"></i> AGRI.vendasMz</h1>
+            <p class="lead">Plataforma de vendas agrícolas de Moçambique</p>
+            <p>Conecte-se com compradores e vendedores agrícolas. Consultoria técnica especializada.</p>
+
+            {% if not session.user_id %}
+                <a href="{{ url_for('cadastro') }}" class="btn btn-warning btn-lg me-2">
+                    <i class="fas fa-user-plus"></i> Cadastrar
+                </a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </a>
+            {% endif %}
+        </div>
+        <div class="col-md-6 text-center">
+            <i class="fas fa-tractor fa-5x"></i>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-store fa-3x text-success mb-3"></i>
+                <h5>Venda Produtos</h5>
+                <p>Publique seus produtos agrícolas com facilidade</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                <h5>Encontre Produtos</h5>
+                <p>Busque por categoria, preço e região</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-leaf fa-3x text-warning mb-3"></i>
+                <h5>Consultoria Técnica</h5>
+                <p>Orientações especializadas para seu cultivo</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="mb-4">Produtos Recentes</h2>
+
+{% if produtos %}
+    <div class="row">
+        {% for produto in produtos %}
+            <div class="col-md-4 mb-4">
+                <div class="card product-card h-100">
+                    {% if produto[6] %}
+                        <img src="{{ url_for('static', filename=produto[6]) }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="fas fa-image fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{ produto[2] }}</h5>
+                        <p class="text-success fw-bold">{{ "%.2f"|format(produto[3]) }} MT</p>
+                        <p class="card-text">{{ produto[4][:100] }}...</p>
+                        <p class="text-muted">
+                            <i class="fas fa-map-marker-alt"></i> {{ produto[5] }}
+                        </p>
+                        <p class="text-muted">
+                            <i class="fas fa-user"></i> {{ produto[8] }}
+                        </p>
+                    </div>
+
+                    <div class="card-footer">
+                        <a href="{{ url_for('contato_whatsapp', vendedor_id=produto[1]) }}"
+                           class="btn btn-success btn-sm">
+                            <i class="fab fa-whatsapp"></i> Contatar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+        <p>Nenhum produto disponível no momento.</p>
+    </div>
+{% endif %}
+
+<div class="text-center mt-4">
+    <a href="{{ url_for('listar_produtos') }}" class="btn btn-primary">
+        Ver Todos os Produtos <i class="fas fa-arrow-right"></i>
+    </a>
+</div>
+{% endblock %}
