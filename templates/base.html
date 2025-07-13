@@ -1,81 +1,466 @@
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AGRI.vendasMz{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>{% block title %}AGRI.vendasMz - Marketplace Agrícola{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        .navbar-brand { font-weight: bold; color: #28a745 !important; }
-        .premium-badge { background: linear-gradient(45deg, #ffd700, #ffed4e); color: #000; }
-        .product-card { transition: transform 0.3s; }
-        .product-card:hover { transform: translateY(-5px); }
-        .footer { background-color: #2c5530; color: white; }
+        :root {
+            --primary-color: #1B5E20;
+            --secondary-color: #2E7D32;
+            --accent-color: #4CAF50;
+            --text-color: #1A1A1A;
+            --background-color: #FAFAFA;
+            --border-color: #E0E0E0;
+            --shadow-light: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-medium: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-size: 16px;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-color);
+        }
+
+        .text-muted {
+            color: #666666 !important;
+            font-size: 14px;
+        }
+
+        .small {
+            font-size: 14px !important;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--accent-color) !important;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--accent-color);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #F8F9FA 0%, #E8F5E8 100%);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-text {
+            font-size: 15px;
+            color: #555555;
+            line-height: 1.6;
+        }
+
+        .product-card {
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+            border-color: var(--secondary-color);
+        }
+
+        .alert {
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            transition: left 0.3s ease;
+            z-index: 1050;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1040;
+            display: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul li a:hover {
+            background: rgba(255,255,255,0.1);
+            padding-left: 10px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 50px;
+        }
+
+        .badge {
+            font-weight: 500;
+        }
+
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table th {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+
+        .modal-header {
+            border-radius: 15px 15px 0 0;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+
+            .card {
+                margin-bottom: 20px;
+            }
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
+            <button class="menu-toggle me-3" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+
             <a class="navbar-brand" href="{{ url_for('index') }}">
                 <i class="fas fa-seedling"></i> AGRI.vendasMz
             </a>
 
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ url_for('index') }}">Início</a>
-                <a class="nav-link" href="{{ url_for('listar_produtos') }}">Produtos</a>
-
                 {% if session.user_id %}
-                    <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
-                    <a class="nav-link" href="{{ url_for('consultoria') }}">Consultoria</a>
-
-                    {% if not session.is_premium %}
-                        <a class="nav-link text-warning" href="{{ url_for('premium') }}">
-                            <i class="fas fa-crown"></i> Premium
-                        </a>
-                    {% else %}
-                        <span class="nav-link premium-badge">
-                            <i class="fas fa-crown"></i> Premium
-                        </span>
-                    {% endif %}
-
-                    {% if session.user_type == 'admin' %}
-                        <a class="nav-link text-danger" href="{{ url_for('admin_panel') }}">
-                            <i class="fas fa-cog"></i> Admin
-                        </a>
-                    {% endif %}
-
-                    <a class="nav-link" href="{{ url_for('logout') }}">Sair</a>
+                    <span class="nav-link">
+                        <i class="fas fa-user"></i>
+                        Olá, {{ session.user_name.split()[0] }}!
+                        {% if session.is_premium %}
+                            <span class="badge bg-warning text-dark ms-1">Premium</span>
+                        {% endif %}
+                    </span>
                 {% else %}
-                    <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-                    <a class="nav-link" href="{{ url_for('cadastro') }}">Cadastro</a>
+                    <a class="nav-link" href="{{ url_for('login') }}">
+                        <i class="fas fa-sign-in-alt"></i> Entrar
+                    </a>
                 {% endif %}
             </div>
         </div>
     </nav>
 
+    <!-- Sidebar -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5><i class="fas fa-seedling"></i> Menu</h5>
+            <button class="btn btn-sm btn-outline-light" onclick="toggleSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <ul>
+            <li>
+                <a href="{{ url_for('index') }}">
+                    <i class="fas fa-home me-3"></i> Início
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('listar_produtos') }}">
+                    <i class="fas fa-shopping-cart me-3"></i> Produtos
+                </a>
+            </li>
+
+            {% if session.user_id %}
+                <li>
+                    <a href="{{ url_for('dashboard') }}">
+                        <i class="fas fa-tachometer-alt me-3"></i> Meu Painel
+                    </a>
+                </li>
+
+                {% if session.user_type in ['vendedor', 'admin'] %}
+                    <li>
+                        <a href="{{ url_for('publicar_produto') }}">
+                            <i class="fas fa-plus-circle me-3"></i> Publicar
+                        </a>
+                    </li>
+                {% endif %}
+
+                <li>
+                    <a href="{{ url_for('consultoria') }}">
+                        <i class="fas fa-leaf me-3"></i> Consultoria
+                    </a>
+                </li>
+
+                {% if not session.is_premium %}
+                    <li>
+                        <a href="{{ url_for('premium') }}">
+                            <i class="fas fa-crown me-3"></i> Premium
+                        </a>
+                    </li>
+                {% endif %}
+
+                <li>
+                    <a href="{{ url_for('logout') }}">
+                        <i class="fas fa-sign-out-alt me-3"></i> Sair
+                    </a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="{{ url_for('login') }}">
+                        <i class="fas fa-sign-in-alt me-3"></i> Fazer Login
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('cadastro') }}">
+                        <i class="fas fa-user-plus me-3"></i> Criar Conta
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+
+        <hr class="my-4">
+
+        <div class="mb-3">
+            <h6><i class="fas fa-headset"></i> Suporte</h6>
+            <p class="small mb-2">
+                <i class="fas fa-phone"></i> 878312890
+            </p>
+            <p class="small">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </p>
+        </div>
+
+        <button class="btn btn-outline-light btn-sm w-100" onclick="acessoAdmin()">
+            <i class="fas fa-key me-2"></i> Acesso Administrativo
+        </button>
+    </div>
+
+    <!-- Main Content -->
     <main class="container my-4">
+        <!-- Flash Messages -->
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-info alert-dismissible fade show">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="row">
+                    <div class="col-12">
+                        {% for message in messages %}
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
+                </div>
             {% endif %}
         {% endwith %}
 
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="footer mt-5 py-4">
-        <div class="container text-center">
-            <p>&copy; 2024 AGRI.vendasMz - Conectando Agricultura e Comércio</p>
-            <p>Suporte: <a href="https://wa.me/258868312890" class="text-light">+258 868312890</a></p>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-seedling"></i> AGRI.vendasMz</h5>
+                    <p>Conectando agricultores e compradores em Moçambique</p>
+                </div>
+                <div class="col-md-3">
+                    <h6>Links Rápidos</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('index') }}" class="text-light">Início</a></li>
+                        <li><a href="{{ url_for('listar_produtos') }}" class="text-light">Produtos</a></li>
+                        <li><a href="{{ url_for('consultoria') }}" class="text-light">Consultoria</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>Contato</h6>
+                    <p><i class="fas fa-phone"></i> 878312890</p>
+                    <p><i class="fab fa-whatsapp"></i> WhatsApp</p>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="text-center">
+                <small>&copy; 2024 AGRI.vendasMz. Todos os direitos reservados.</small>
+            </div>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function acessoAdmin() {
+            const codigo = prompt('Digite o código de acesso administrativo:');
+            if (codigo) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ url_for("validar_acesso_admin") }}';
+
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'codigo';
+                input.value = codigo;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+
+            if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+                document.querySelector('.sidebar-overlay').classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>

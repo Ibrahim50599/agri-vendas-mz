@@ -1,90 +1,159 @@
 
 {% extends "base.html" %}
 
-{% block content %}
-<div class="hero-section bg-success text-white p-5 rounded mb-4">
-    <div class="row align-items-center">
-        <div class="col-md-6">
-            <h1><i class="fas fa-seedling"></i> AGRI.vendasMz</h1>
-            <p class="lead">Plataforma de vendas agrícolas de Moçambique</p>
-            <p>Conecte-se com compradores e vendedores agrícolas. Consultoria técnica especializada.</p>
+{% block title %}AGRI.vendasMz - Marketplace Agrícola de Moçambique{% endblock %}
 
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section py-5 mb-5" style="background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #4CAF50 100%); border-radius: 20px;">
+    <div class="container text-center text-white py-4">
+        <h1 class="display-4 fw-bold mb-4">
+            <i class="fas fa-seedling me-3"></i>AGRI.vendasMz
+        </h1>
+        <p class="lead fs-3 mb-4">O Maior Marketplace Agrícola de Moçambique</p>
+        <p class="fs-5 mb-4 opacity-90">
+            Conectamos agricultores e compradores em todo o país. Encontre os melhores produtos agrícolas e receba consultoria especializada.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{{ url_for('listar_produtos') }}" class="btn btn-light btn-lg px-4 py-3">
+                <i class="fas fa-shopping-cart me-2"></i> Explorar Produtos
+            </a>
             {% if not session.user_id %}
-                <a href="{{ url_for('cadastro') }}" class="btn btn-warning btn-lg me-2">
-                    <i class="fas fa-user-plus"></i> Cadastrar
-                </a>
-                <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
-                    <i class="fas fa-sign-in-alt"></i> Entrar
+                <a href="{{ url_for('cadastro') }}" class="btn btn-outline-light btn-lg px-4 py-3">
+                    <i class="fas fa-user-plus me-2"></i> Criar Conta
                 </a>
             {% endif %}
         </div>
-        <div class="col-md-6 text-center">
-            <i class="fas fa-tractor fa-5x"></i>
+    </div>
+</div>
+
+<!-- Funcionalidades Principais -->
+<div class="row mb-5">
+    <div class="col-12 text-center mb-4">
+        <h2 class="fw-bold text-dark mb-3">Como Funciona o AGRI.vendasMz</h2>
+        <p class="text-muted fs-5">Uma plataforma completa para o setor agrícola moçambicano</p>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card text-center h-100 shadow-sm border-0" style="transition: all 0.3s ease;">
+            <div class="card-body p-4">
+                <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+                     style="width: 80px; height: 80px;">
+                    <i class="fas fa-store fa-2x text-white"></i>
+                </div>
+                <h5 class="card-title fw-bold mb-3">Compre & Venda</h5>
+                <p class="card-text text-muted fs-6 lh-base">
+                    Publique seus produtos agrícolas ou encontre exatamente o que precisa.
+                    Sistema de filtros avançados por categoria, preço e localização.
+                </p>
+                <a href="{{ url_for('listar_produtos') }}" class="btn btn-success btn-lg mt-3">
+                    Ver Marketplace
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card text-center h-100 shadow-sm border-0" style="transition: all 0.3s ease;">
+            <div class="card-body p-4">
+                <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+                     style="width: 80px; height: 80px;">
+                    <i class="fas fa-search fa-2x text-white"></i>
+                </div>
+                <h5 class="card-title fw-bold mb-3">Busca Inteligente</h5>
+                <p class="card-text text-muted fs-6 lh-base">
+                    Encontre produtos por categoria, faixa de preço e região.
+                    Filtros avançados para resultados precisos e relevantes.
+                </p>
+                <a href="{{ url_for('listar_produtos') }}" class="btn btn-primary btn-lg mt-3">
+                    Buscar Agora
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card text-center h-100 shadow-sm border-0" style="transition: all 0.3s ease;">
+            <div class="card-body p-4">
+                <div class="bg-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+                     style="width: 80px; height: 80px;">
+                    <i class="fas fa-leaf fa-2x text-white"></i>
+                </div>
+                <h5 class="card-title fw-bold mb-3">Consultoria Técnica</h5>
+                <p class="card-text text-muted fs-6 lh-base">
+                    Acesso a consultores agrícolas especializados, guias de cultivo,
+                    diagnóstico de pragas e muito mais.
+                </p>
+                {% if session.user_id %}
+                    <a href="{{ url_for('consultoria') }}" class="btn btn-warning btn-lg mt-3">
+                        Acessar Consultoria
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-warning btn-lg mt-3">
+                        Fazer Login
+                    </a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="fas fa-store fa-3x text-success mb-3"></i>
-                <h5>Venda Produtos</h5>
-                <p>Publique seus produtos agrícolas com facilidade</p>
-            </div>
+<!-- Produtos em Destaque -->
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-2">Produtos em Destaque</h2>
+            <p class="text-muted mb-0">Os melhores produtos do nosso marketplace</p>
         </div>
+        <a href="{{ url_for('listar_produtos') }}" class="btn btn-outline-success">
+            Ver Todos <i class="fas fa-arrow-right ms-1"></i>
+        </a>
     </div>
-    <div class="col-md-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="fas fa-search fa-3x text-primary mb-3"></i>
-                <h5>Encontre Produtos</h5>
-                <p>Busque por categoria, preço e região</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="fas fa-leaf fa-3x text-warning mb-3"></i>
-                <h5>Consultoria Técnica</h5>
-                <p>Orientações especializadas para seu cultivo</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<h2 class="mb-4">Produtos Recentes</h2>
 
 {% if produtos %}
-    <div class="row">
+    <div class="row g-4">
         {% for produto in produtos %}
-            <div class="col-md-4 mb-4">
-                <div class="card product-card h-100">
-                    {% if produto[6] %}
-                        <img src="{{ url_for('static', filename=produto[6]) }}" class="card-img-top" style="height: 200px; object-fit: cover;">
-                    {% else %}
-                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                            <i class="fas fa-image fa-3x text-muted"></i>
-                        </div>
-                    {% endif %}
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="card product-card h-100 shadow-sm">
+                    <div class="position-relative overflow-hidden" style="height: 200px;">
+                        {% if produto[6] %}
+                            <img src="{{ url_for('static', filename=produto[6]) }}"
+                                 class="card-img-top w-100 h-100"
+                                 style="object-fit: cover;">
+                        {% else %}
+                            <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
+                                <i class="fas fa-image fa-3x text-muted"></i>
+                            </div>
+                        {% endif %}
 
-                    <div class="card-body">
-                        <h5 class="card-title">{{ produto[2] }}</h5>
-                        <p class="text-success fw-bold">{{ "%.2f"|format(produto[3]) }} MT</p>
-                        <p class="card-text">{{ produto[4][:100] }}...</p>
-                        <p class="text-muted">
-                            <i class="fas fa-map-marker-alt"></i> {{ produto[5] }}
-                        </p>
-                        <p class="text-muted">
-                            <i class="fas fa-user"></i> {{ produto[8] }}
-                        </p>
+                        {% if produto[7] %}
+                            <span class="position-absolute top-0 start-0 m-2 badge bg-success">
+                                {{ produto[7] }}
+                            </span>
+                        {% endif %}
                     </div>
 
-                    <div class="card-footer">
+                    <div class="card-body">
+                        <h6 class="card-title fw-bold">{{ produto[2] }}</h6>
+                        <p class="text-success fw-bold fs-5 mb-2">{{ "%.2f"|format(produto[3]) }} MT</p>
+                        <p class="card-text text-muted small">{{ produto[4][:100] }}...</p>
+
+                        <div class="mt-3">
+                            <p class="text-muted mb-1">
+                                <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                                <strong>{{ produto[5] }}</strong>
+                            </p>
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-user-circle text-primary me-2"></i>
+                                <strong>{{ produto[8] }}</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-white border-top">
                         <a href="{{ url_for('contato_whatsapp', vendedor_id=produto[1]) }}"
-                           class="btn btn-success btn-sm">
-                            <i class="fab fa-whatsapp"></i> Contatar
+                           class="btn btn-success w-100">
+                            <i class="fab fa-whatsapp me-2"></i> Contactar Vendedor
                         </a>
                     </div>
                 </div>
@@ -93,14 +162,54 @@
     </div>
 {% else %}
     <div class="text-center py-5">
-        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-        <p>Nenhum produto disponível no momento.</p>
+        <i class="fas fa-seedling fa-4x text-muted mb-3"></i>
+        <h4 class="text-muted">Novos produtos chegando em breve!</h4>
+        <p class="text-muted">Seja o primeiro a publicar produtos na nossa plataforma.</p>
     </div>
 {% endif %}
+</div>
 
-<div class="text-center mt-4">
-    <a href="{{ url_for('listar_produtos') }}" class="btn btn-primary">
-        Ver Todos os Produtos <i class="fas fa-arrow-right"></i>
-    </a>
+<!-- Estatísticas -->
+<div class="card shadow-sm border-0 mb-5" style="background: linear-gradient(135deg, #E8F5E8 0%, #F1F8E9 100%);">
+    <div class="card-body py-5">
+        <div class="row text-center">
+            <div class="col-md-3 mb-4">
+                <h2 class="text-success fw-bold display-6">{{ produtos|length }}+</h2>
+                <p class="fw-semibold text-dark mb-0">Produtos Disponíveis</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h2 class="text-success fw-bold display-6">100+</h2>
+                <p class="fw-semibold text-dark mb-0">Vendedores Ativos</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h2 class="text-success fw-bold display-6">11</h2>
+                <p class="fw-semibold text-dark mb-0">Províncias</p>
+            </div>
+            <div class="col-md-3 mb-4">
+                <h2 class="text-success fw-bold display-6">24/7</h2>
+                <p class="fw-semibold text-dark mb-0">Suporte Online</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="text-center">
+    <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #1B5E20 0%, #4CAF50 100%);">
+        <div class="card-body py-5 text-white">
+            <h3 class="fw-bold mb-3">Pronto para começar?</h3>
+            <p class="fs-5 mb-4">Junte-se à maior comunidade agrícola de Moçambique</p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                {% if not session.user_id %}
+                    <a href="{{ url_for('cadastro') }}" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-user-plus me-2"></i> Criar Conta Grátis
+                    </a>
+                {% endif %}
+                <a href="{{ url_for('listar_produtos') }}" class="btn btn-outline-light btn-lg px-4">
+                    <i class="fas fa-shopping-cart me-2"></i> Explorar Marketplace
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -4,46 +4,95 @@
 {% block title %}Consultoria Agrícola - AGRI.vendasMz{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-body">
-                <h2 class="card-title">
-                    <i class="fas fa-leaf"></i> Consultoria Agrícola
-                </h2>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-5 mb-3">
+                <i class="fas fa-leaf text-success"></i> Consultoria Agrícola Completa
+            </h1>
+            <p class="lead">Sistema completo de assistência técnica para produtores</p>
+        </div>
+    </div>
 
-                <form id="consultoriaForm">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Cultura *</label>
-                                <select class="form-select" name="cultura" required>
-                                    <option value="">Selecione a cultura</option>
-                                    <option value="milho">Milho</option>
-                                    <option value="feijao">Feijão</option>
-                                    <option value="tomate">Tomate</option>
-                                </select>
-                            </div>
+    <!-- Módulos principais -->
+    <div class="row">
+        <!-- 1. Guia de Cultivos -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-seedling"></i> 1. Guia Completo de Cultivos</h5>
+                </div>
+                <div class="card-body">
+                    <form id="cultivoForm">
+                        <div class="mb-3">
+                            <label class="form-label">Categoria da Cultura</label>
+                            <select class="form-select" name="categoria" id="categoria">
+                                <option value="">Selecione a categoria</option>
+                                <option value="cereais">🌾 Cereais</option>
+                                <option value="horticolas">🥕 Hortícolas</option>
+                                <option value="fruticolas">🍌 Frutícolas</option>
+                                <option value="tuberculos">🥔 Tubérculos</option>
+                                <option value="leguminosas">🫘 Leguminosas</option>
+                                <option value="oleaginosas">🌻 Oleaginosas</option>
+                                <option value="medicinais">🌿 Medicinais</option>
+                                <option value="regionais">🌽 Regionais (Moçambique)</option>
+                            </select>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Hectares *</label>
-                                <input type="number" step="0.1" class="form-control" name="hectares" required>
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Cultura Específica</label>
+                            <select class="form-select" name="cultura" id="cultura">
+                                <option value="">Primeiro selecione a categoria</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Hectares a cultivar</label>
+                            <input type="number" step="0.1" class="form-control" name="hectares" placeholder="Ex: 2.5">
+                        </div>
+
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-search"></i> Consultar Cultura
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Calculadoras Agrícolas -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="fas fa-calculator"></i> 2. Calculadoras Agrícolas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 mb-2">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="abrirCalculadora('adubacao')">
+                                NPK & Adubação
+                            </button>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="abrirCalculadora('densidade')">
+                                Densidade Plantio
+                            </button>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="abrirCalculadora('irrigacao')">
+                                Irrigação
+                            </button>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="abrirCalculadora('custos')">
+                                Custos Produção
+                            </button>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-calculator"></i> Calcular Plantio
-                    </button>
-                </form>
-
-                <div id="resultado" class="mt-4" style="display: none;">
-                    <div class="card bg-light">
-                        <div class="card-body">
-                            <h5>Resultado da Consultoria</h5>
-                            <div id="resultadoConteudo"></div>
+                    <div id="calculadoraArea" class="mt-3" style="display: none;">
+                        <div class="border p-3 rounded bg-light">
+                            <div id="calculadoraConteudo"></div>
                         </div>
                     </div>
                 </div>
@@ -51,33 +100,338 @@
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5><i class="fas fa-info-circle"></i> Sobre a Consultoria</h5>
-                <p>Nossa consultoria oferece:</p>
-                <ul>
-                    <li>Cálculo de sementes necessárias</li>
-                    <li>Recomendações de fertilizantes</li>
-                    <li>Cronograma de irrigação</li>
-                    <li>Previsão de colheita</li>
-                </ul>
-
-                {% if not session.is_premium %}
-                    <div class="alert alert-warning">
-                        <strong>Premium:</strong> Informações detalhadas, alertas SMS e dicas especializadas.
-                        <a href="{{ url_for('premium') }}" class="btn btn-sm btn-warning mt-2">
-                            Upgrade <i class="fas fa-crown"></i>
-                        </a>
+    <div class="row">
+        <!-- 3. Clima e Alertas -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="fas fa-cloud-rain"></i> 3. Clima & Alertas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Sua Localização</label>
+                        <select class="form-select" id="provincia">
+                            <option value="maputo">Maputo</option>
+                            <option value="gaza">Gaza</option>
+                            <option value="inhambane">Inhambane</option>
+                            <option value="sofala">Sofala</option>
+                            <option value="manica">Manica</option>
+                            <option value="tete">Tete</option>
+                            <option value="zambézia">Zambézia</option>
+                            <option value="nampula">Nampula</option>
+                            <option value="cabo-delgado">Cabo Delgado</option>
+                            <option value="niassa">Niassa</option>
+                        </select>
                     </div>
-                {% endif %}
+
+                    <button class="btn btn-info" onclick="obterClima()">
+                        <i class="fas fa-thermometer-half"></i> Ver Previsão
+                    </button>
+
+                    <div id="climaInfo" class="mt-3" style="display: none;">
+                        <div class="alert alert-info">
+                            <strong>Previsão será exibida aqui</strong>
+                            {% if not session.is_premium %}
+                                <hr>
+                                <small>Alertas SMS apenas para Premium</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Diagnóstico de Pragas -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5><i class="fas fa-bug"></i> 4. Diagnóstico de Pragas</h5>
+                </div>
+                <div class="card-body">
+                    {% if session.is_premium %}
+                        <form id="pragasForm">
+                            <div class="mb-3">
+                                <label class="form-label">Cultura Afetada</label>
+                                <select class="form-select" name="cultura_praga">
+                                    <option value="milho">Milho</option>
+                                    <option value="feijao">Feijão</option>
+                                    <option value="tomate">Tomate</option>
+                                    <option value="mandioca">Mandioca</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Sintomas Observados</label>
+                                <select class="form-select" name="sintoma">
+                                    <option value="folhas-amarelas">Folhas amareladas</option>
+                                    <option value="manchas">Manchas nas folhas</option>
+                                    <option value="furos">Furos nas folhas</option>
+                                    <option value="murcha">Murcha da planta</option>
+                                    <option value="crescimento-lento">Crescimento lento</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-search"></i> Diagnosticar
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="text-center">
+                            <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                            <p>Diagnóstico de pragas e doenças</p>
+                            <p class="text-muted">Recurso Premium</p>
+                            <a href="{{ url_for('premium') }}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-crown"></i> Upgrade
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Preços de Mercado -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-chart-line"></i> 5. Preços de Mercado</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Produto</label>
+                        <select class="form-select" id="produto_preco">
+                            <option value="milho">Milho (MT/kg)</option>
+                            <option value="feijao">Feijão (MT/kg)</option>
+                            <option value="arroz">Arroz (MT/kg)</option>
+                            <option value="tomate">Tomate (MT/kg)</option>
+                            <option value="cebola">Cebola (MT/kg)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-success" onclick="consultarPrecos()">
+                        <i class="fas fa-money-bill-wave"></i> Ver Preços
+                    </button>
+
+                    <div id="precosInfo" class="mt-3">
+                        <div class="alert alert-light">
+                            <small><strong>Preços Estimados Atuais:</strong></small>
+                            <ul class="mb-0 mt-2">
+                                <li>Milho: 30-35 MT/kg</li>
+                                <li>Feijão: 80-90 MT/kg</li>
+                                <li>Arroz: 45-50 MT/kg</li>
+                                <li>Tomate: 60-70 MT/kg</li>
+                            </ul>
+                            {% if not session.is_premium %}
+                                <hr>
+                                <small class="text-muted">Histórico e tendências: Premium</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seções Premium -->
+    {% if session.is_premium %}
+    <div class="row">
+        <!-- 6. Minha Fazenda -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5><i class="fas fa-farm"></i> 6. Minha Fazenda (Premium)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <button class="btn btn-outline-warning btn-sm w-100 mb-2" onclick="abrirMenor('registrar-atividade')">
+                                <i class="fas fa-plus"></i> Registrar Atividade
+                            </button>
+                            <button class="btn btn-outline-warning btn-sm w-100 mb-2" onclick="abrirMenor('historico')">
+                                <i class="fas fa-history"></i> Histórico
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-warning btn-sm w-100 mb-2" onclick="abrirMenor('gastos')">
+                                <i class="fas fa-money-bill"></i> Gastos/Safra
+                            </button>
+                            <button class="btn btn-outline-warning btn-sm w-100 mb-2" onclick="gerarRelatorioPDF()">
+                                <i class="fas fa-file-pdf"></i> Relatório PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Chat IA Premium -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-robot"></i> 7. Assistência Virtual (Premium)</h5>
+                </div>
+                <div class="card-body">
+                    <div id="chatArea" style="height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; background: #f8f9fa;">
+                        <div class="text-muted text-center">
+                            <i class="fas fa-comments"></i><br>
+                            Digite sua pergunta agrícola abaixo
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="perguntaIA" placeholder="Ex: Como controlar pragas no milho?">
+                        <button class="btn btn-success" onclick="enviarPerguntaIA()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Calendário Agrícola -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5><i class="fas fa-calendar-alt"></i> 8. Calendário Agrícola Personalizado</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Cultura</th>
+                                    <th>Jan-Mar</th>
+                                    <th>Abr-Jun</th>
+                                    <th>Jul-Set</th>
+                                    <th>Out-Dez</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Milho</strong></td>
+                                    <td><span class="badge bg-success">Colheita</span></td>
+                                    <td><span class="badge bg-warning">Preparação</span></td>
+                                    <td><span class="badge bg-info">Plantio</span></td>
+                                    <td><span class="badge bg-primary">Crescimento</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Feijão</strong></td>
+                                    <td><span class="badge bg-success">Colheita</span></td>
+                                    <td><span class="badge bg-warning">Preparação</span></td>
+                                    <td><span class="badge bg-info">Plantio</span></td>
+                                    <td><span class="badge bg-primary">Crescimento</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tomate</strong></td>
+                                    <td><span class="badge bg-info">Plantio</span></td>
+                                    <td><span class="badge bg-primary">Crescimento</span></td>
+                                    <td><span class="badge bg-success">Colheita</span></td>
+                                    <td><span class="badge bg-warning">Descanso</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if not session.is_premium %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Premium:</strong> Calendário personalizado por região, notificações SMS e alertas automáticos
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resultados -->
+    <div id="resultadoConsultoria" class="row" style="display: none;">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="fas fa-clipboard-check"></i> Resultado da Consultoria</h5>
+                </div>
+                <div class="card-body">
+                    <div id="resultadoConteudo"></div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-document.getElementById('consultoriaForm').addEventListener('submit', function(e) {
+// Dados das culturas organizados por categoria
+const culturasPorCategoria = {
+    cereais: {
+        'milho': 'Milho',
+        'arroz': 'Arroz',
+        'trigo': 'Trigo',
+        'sorgo': 'Sorgo',
+        'aveia': 'Aveia',
+        'cevada': 'Cevada'
+    },
+    horticolas: {
+        'tomate': 'Tomate',
+        'alface': 'Alface',
+        'cenoura': 'Cenoura',
+        'couve': 'Couve',
+        'cebola': 'Cebola',
+        'pimento': 'Pimento'
+    },
+    fruticolas: {
+        'manga': 'Manga',
+        'banana': 'Banana',
+        'citrinos': 'Citrinos',
+        'maca': 'Maçã',
+        'uva': 'Uva',
+        'abacate': 'Abacate'
+    },
+    tuberculos: {
+        'mandioca': 'Mandioca',
+        'batata': 'Batata',
+        'batata-doce': 'Batata-doce',
+        'inhame': 'Inhame'
+    },
+    leguminosas: {
+        'feijao': 'Feijão',
+        'soja': 'Soja',
+        'grao-de-bico': 'Grão-de-bico',
+        'amendoim': 'Amendoim'
+    },
+    oleaginosas: {
+        'girassol': 'Girassol',
+        'gergelim': 'Gergelim',
+        'coco': 'Coco'
+    },
+    medicinais: {
+        'aloe-vera': 'Aloe Vera',
+        'manjericao': 'Manjericão',
+        'hortelã': 'Hortelã'
+    },
+    regionais: {
+        'mapira': 'Mapira',
+        'mexoeira': 'Mexoeira',
+        'mucuna': 'Mucuna'
+    }
+};
+
+// Atualizar culturas quando categoria muda
+document.getElementById('categoria').addEventListener('change', function() {
+    const categoria = this.value;
+    const culturaSelect = document.getElementById('cultura');
+
+    culturaSelect.innerHTML = '<option value="">Selecione a cultura</option>';
+
+    if (categoria && culturasPorCategoria[categoria]) {
+        for (let key in culturasPorCategoria[categoria]) {
+            culturaSelect.innerHTML += `<option value="${key}">${culturasPorCategoria[categoria][key]}</option>`;
+        }
+    }
+});
+
+// Formulário principal de cultivos
+document.getElementById('cultivoForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
     const formData = new FormData(this);
@@ -93,42 +447,248 @@ document.getElementById('consultoriaForm').addEventListener('submit', function(e
             return;
         }
 
-        let html = `
-            <h6>Cultura: ${data.cultura.toUpperCase()}</h6>
-            <p><strong>Área:</strong> ${data.hectares} hectares</p>
-            <p><strong>Sementes necessárias:</strong> ${data.sementes_necessarias} kg</p>
-            <p><strong>Fertilizante NPK:</strong> ${data.fertilizante_npk} kg</p>
-            <p><strong>Dias para colheita:</strong> ${data.dias_para_colheita} dias</p>
-
-            <h6>Cronograma de Irrigação (dias após plantio):</h6>
-            <ul>
-        `;
-
-        data.cronograma_irrigacao.forEach(dia => {
-            html += `<li>Dia ${dia}</li>`;
-        });
-
-        html += '</ul>';
-
-        if (data.detalhes_premium) {
-            html += `
-                <div class="alert alert-success">
-                    <h6><i class="fas fa-crown"></i> Informações Premium</h6>
-                    <p><strong>Densidade:</strong> ${data.detalhes_premium.densidade_plantio}</p>
-                    <p><strong>Fertilização:</strong> Dias ${data.detalhes_premium.cronograma_fertilizacao.join(', ')}</p>
-                    <p><strong>Pragas comuns:</strong> ${data.detalhes_premium.pragas_comuns.join(', ')}</p>
-                    <p><strong>Dicas:</strong> ${data.detalhes_premium.dicas_extras}</p>
-                </div>
-            `;
-        }
-
-        document.getElementById('resultadoConteudo').innerHTML = html;
-        document.getElementById('resultado').style.display = 'block';
+        exibirResultadoCultivo(data);
     })
     .catch(error => {
         console.error('Erro:', error);
-        alert('Erro ao calcular plantio');
+        alert('Erro ao processar consultoria');
     });
 });
+
+function exibirResultadoCultivo(data) {
+    let html = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6><i class="fas fa-info-circle text-primary"></i> Informações da Cultura</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <tr><td><strong>Cultura:</strong></td><td>${data.cultura.toUpperCase()}</td></tr>
+                        <tr><td><strong>Área:</strong></td><td>${data.hectares} hectares</td></tr>
+                        <tr><td><strong>Sementes:</strong></td><td>${data.sementes_necessarias.toLocaleString()} kg</td></tr>
+                        <tr><td><strong>Fertilizante NPK:</strong></td><td>${data.fertilizante_npk} kg</td></tr>
+                        <tr><td><strong>Dias p/ colheita:</strong></td><td>${data.dias_para_colheita} dias</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h6><i class="fas fa-chart-line text-success"></i> Análise Econômica</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <tr><td><strong>Rendimento esperado:</strong></td><td>${data.rendimento_esperado.toLocaleString()} kg</td></tr>
+                        <tr><td><strong>Custo estimado:</strong></td><td>${data.custo_estimado.toLocaleString()} MT</td></tr>
+                        <tr><td><strong>Receita estimada:</strong></td><td>${data.receita_estimada.toLocaleString()} MT</td></tr>
+                        <tr><td><strong>Lucro estimado:</strong></td><td class="text-${data.lucro_estimado > 0 ? 'success' : 'danger'}">${data.lucro_estimado.toLocaleString()} MT</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12">
+                <h6><i class="fas fa-tint text-info"></i> Cronograma de Irrigação</h6>
+                <div class="d-flex flex-wrap gap-2">
+    `;
+
+    data.cronograma_irrigacao.forEach((dia, index) => {
+        html += `<span class="badge bg-info">${dia} dias</span>`;
+    });
+
+    html += '</div></div></div>';
+
+    // Detalhes Premium
+    if (data.detalhes_premium) {
+        html += `
+            <div class="alert alert-warning mt-4">
+                <h6><i class="fas fa-crown text-warning"></i> Informações Técnicas Detalhadas (Premium)</h6>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Densidade plantio:</strong> ${data.detalhes_premium.densidade_plantio}</p>
+                        <p><strong>Solo ideal:</strong> ${data.detalhes_premium.solo_ideal}</p>
+                        <p><strong>Altitude ideal:</strong> ${data.detalhes_premium.altitude_ideal}</p>
+                        <p><strong>Temperatura:</strong> ${data.detalhes_premium.temperatura_ideal}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Pragas comuns:</strong><br>
+                        <small>${data.detalhes_premium.pragas_comuns.join(', ')}</small></p>
+                        <p><strong>Doenças comuns:</strong><br>
+                        <small>${data.detalhes_premium.doencas_comuns.join(', ')}</small></p>
+                    </div>
+                </div>
+
+                <h6 class="mt-3"><i class="fas fa-calendar-check"></i> Cronograma Detalhado</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item py-1"><strong>Preparação:</strong> ${data.detalhes_premium.calendario_completo.preparacao_solo}</li>
+                            <li class="list-group-item py-1"><strong>Plantio:</strong> ${data.detalhes_premium.calendario_completo.plantio}</li>
+                            <li class="list-group-item py-1"><strong>1ª Adubação:</strong> ${data.detalhes_premium.calendario_completo.primeira_adubacao}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item py-1"><strong>2ª Adubação:</strong> ${data.detalhes_premium.calendario_completo.segunda_adubacao}</li>
+                            <li class="list-group-item py-1"><strong>Controle pragas:</strong> ${data.detalhes_premium.calendario_completo.controle_pragas}</li>
+                            <li class="list-group-item py-1"><strong>Colheita:</strong> ${data.detalhes_premium.calendario_completo.colheita}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    document.getElementById('resultadoConteudo').innerHTML = html;
+    document.getElementById('resultadoConsultoria').style.display = 'block';
+
+    // Scroll para resultado
+    document.getElementById('resultadoConsultoria').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Funções auxiliares
+function abrirCalculadora(tipo) {
+    const area = document.getElementById('calculadoraArea');
+    const conteudo = document.getElementById('calculadoraConteudo');
+
+    area.style.display = 'block';
+
+    switch(tipo) {
+        case 'adubacao':
+            conteudo.innerHTML = `
+                <h6>Calculadora de Adubação NPK</h6>
+                <div class="row">
+                    <div class="col-6">
+                        <input type="number" class="form-control form-control-sm mb-2" placeholder="Hectares" id="calc_hectares">
+                        <select class="form-select form-select-sm" id="calc_solo">
+                            <option>Solo arenoso</option>
+                            <option>Solo argiloso</option>
+                            <option>Solo franco</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-primary btn-sm w-100" onclick="calcularNPK()">Calcular NPK</button>
+                        <div id="resultNPK" class="mt-2 small"></div>
+                    </div>
+                </div>
+            `;
+            break;
+        case 'densidade':
+            conteudo.innerHTML = `
+                <h6>Densidade de Plantio</h6>
+                <p class="small mb-2">Distâncias recomendadas:</p>
+                <ul class="small mb-0">
+                    <li>Milho: 80cm x 30cm (41.666 plantas/ha)</li>
+                    <li>Feijão: 40cm x 15cm (166.666 plantas/ha)</li>
+                    <li>Tomate: 100cm x 50cm (20.000 plantas/ha)</li>
+                </ul>
+            `;
+            break;
+        default:
+            conteudo.innerHTML = `<p>Calculadora em desenvolvimento...</p>`;
+    }
+}
+
+function calcularNPK() {
+    const hectares = document.getElementById('calc_hectares').value;
+    if (hectares) {
+        const npk = hectares * 150; // kg base
+        document.getElementById('resultNPK').innerHTML = `
+            <strong>Recomendação:</strong><br>
+            NPK 4-14-8: ${npk} kg<br>
+            Ureia: ${hectares * 50} kg
+        `;
+    }
+}
+
+function obterClima() {
+    document.getElementById('climaInfo').style.display = 'block';
+    document.getElementById('climaInfo').innerHTML = `
+        <div class="alert alert-info">
+            <strong>📅 Previsão 7 dias:</strong><br>
+            🌤️ Hoje: 28°C, parcialmente nublado<br>
+            ⛅ Amanhã: 26°C, possível chuva<br>
+            <small class="text-muted">Dados simulados - integração climática em desenvolvimento</small>
+        </div>
+    `;
+}
+
+function consultarPrecos() {
+    // Simular consulta de preços
+    alert('Consultando preços atualizados...\n\nEm desenvolvimento: integração com mercados locais');
+}
+
+function enviarPerguntaIA() {
+    const pergunta = document.getElementById('perguntaIA').value;
+    if (!pergunta) return;
+
+    const chatArea = document.getElementById('chatArea');
+
+    // Adicionar pergunta do usuário
+    chatArea.innerHTML += `
+        <div class="mb-2">
+            <small class="text-muted">Você:</small><br>
+            <strong>${pergunta}</strong>
+        </div>
+    `;
+
+    // Simular resposta da IA
+    setTimeout(() => {
+        chatArea.innerHTML += `
+            <div class="mb-2 p-2 bg-success text-white rounded">
+                <small>IA Agrícola:</small><br>
+                Baseado na sua pergunta sobre "${pergunta}", recomendo consultar o guia específico da cultura.
+                Para problemas com pragas, verifique se não há excesso de umidade e considere tratamento preventivo.
+            </div>
+        `;
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }, 1500);
+
+    document.getElementById('perguntaIA').value = '';
+    chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function gerarRelatorioPDF() {
+    alert('📄 Funcionalidade Premium: Relatório PDF\n\nEm desenvolvimento - permitirá exportar histórico completo da fazenda');
+}
+
+// Formulário de pragas
+{% if session.is_premium %}
+document.getElementById('pragasForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const cultura = this.cultura_praga.value;
+    const sintoma = this.sintoma.value;
+
+    let diagnostico = '';
+
+    if (cultura === 'milho' && sintoma === 'folhas-amarelas') {
+        diagnostico = `
+            <div class="alert alert-warning">
+                <h6>🐛 Diagnóstico: Possível Deficiência Nutricional</h6>
+                <p><strong>Causa provável:</strong> Falta de nitrogênio ou excesso de água</p>
+                <p><strong>Tratamento:</strong></p>
+                <ul>
+                    <li>Aplicar ureia: 50kg/ha</li>
+                    <li>Melhorar drenagem</li>
+                    <li>Monitorar pragas secundárias</li>
+                </ul>
+                <p><strong>Produtos recomendados:</strong> Ureia 46%, Sulfato de amônio</p>
+            </div>
+        `;
+    } else {
+        diagnostico = `
+            <div class="alert alert-info">
+                <h6>Diagnóstico em análise...</h6>
+                <p>Baseado nos sintomas, consulte um técnico agrícola local ou envie fotos para análise mais detalhada.</p>
+            </div>
+        `;
+    }
+
+    // Mostrar resultado no final da página
+    document.getElementById('resultadoConteudo').innerHTML = diagnostico;
+    document.getElementById('resultadoConsultoria').style.display = 'block';
+    document.getElementById('resultadoConsultoria').scrollIntoView({ behavior: 'smooth' });
+});
+{% endif %}
 </script>
 {% endblock %}

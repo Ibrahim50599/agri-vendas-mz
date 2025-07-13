@@ -5,12 +5,19 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-cog"></i> Painel de Administração</h2>
-    <span class="badge bg-danger">ADMIN</span>
+    <h2><i class="fas fa-shield-alt"></i> Painel de Administração</h2>
+    <div>
+        {% if admin_level == 'superadmin' %}
+            <span class="badge bg-danger fs-6"><i class="fas fa-crown"></i> SUPER ADMIN</span>
+        {% else %}
+            <span class="badge bg-warning fs-6"><i class="fas fa-user-shield"></i> ADMIN</span>
+        {% endif %}
+    </div>
 </div>
 
+<!-- Estatísticas -->
 <div class="row mb-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card bg-primary text-white">
             <div class="card-body text-center">
                 <i class="fas fa-users fa-2x mb-2"></i>
@@ -20,7 +27,7 @@
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card bg-warning text-dark">
             <div class="card-body text-center">
                 <i class="fas fa-crown fa-2x mb-2"></i>
@@ -30,7 +37,7 @@
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card bg-success text-white">
             <div class="card-body text-center">
                 <i class="fas fa-box fa-2x mb-2"></i>
@@ -39,51 +46,130 @@
             </div>
         </div>
     </div>
+
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-user-shield fa-2x mb-2"></i>
+                <h4>{{ stats.total_admins }}</h4>
+                <p>Administradores</p>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="row">
-    <div class="col-md-6">
+<!-- Navegação por abas -->
+<ul class="nav nav-tabs" id="adminTabs">
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#usuarios">
+            <i class="fas fa-users"></i> Usuários
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#produtos">
+            <i class="fas fa-box"></i> Produtos
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#configuracoes">
+            <i class="fas fa-cog"></i> Configurações
+        </a>
+    </li>
+    {% if admin_level == 'superadmin' %}
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#administradores">
+            <i class="fas fa-user-shield"></i> Administradores
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#seguranca">
+            <i class="fas fa-shield-alt"></i> Segurança
+        </a>
+    </li>
+    {% endif %}
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('relatorios_admin') }}">
+            <i class="fas fa-chart-bar"></i> Relatórios
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content mt-3">
+    <!-- Aba Usuários -->
+    <div class="tab-pane fade show active" id="usuarios">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5><i class="fas fa-users"></i> Gerenciar Usuários</h5>
+                <small class="text-muted">Total: {{ usuarios|length }} usuários</small>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
                             <tr>
+                                <th>ID</th>
                                 <th>Nome</th>
+                                <th>Contato</th>
                                 <th>Tipo</th>
                                 <th>Premium</th>
+                                <th>Cadastro</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for usuario in usuarios %}
                                 <tr>
-                                    <td>{{ usuario[1][:20] }}...</td>
+                                    <td><span class="badge bg-secondary">{{ usuario[0] }}</span></td>
+                                    <td><strong>{{ usuario[1] }}</strong></td>
                                     <td>
-                                        <span class="badge bg-secondary">{{ usuario[4] }}</span>
+                                        {% if usuario[2] %}<small class="d-block">📧 {{ usuario[2] }}</small>{% endif %}
+                                        {% if usuario[3] %}<small class="d-block">📱 {{ usuario[3] }}</small>{% endif %}
                                     </td>
                                     <td>
-                                        {% if usuario[5] %}
-                                            <span class="badge bg-warning">Premium</span>
+                                        {% if usuario[4] == 'admin' %}
+                                            <span class="badge bg-danger">Admin</span>
+                                        {% elif usuario[4] == 'vendedor' %}
+                                            <span class="badge bg-info">Vendedor</span>
                                         {% else %}
-                                            <span class="badge bg-light text-dark">Grátis</span>
+                                            <span class="badge bg-secondary">Comprador</span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         {% if usuario[5] %}
+                                            <span class="badge bg-warning text-dark">✨ Premium</span>
+                                            <br>
                                             <a href="{{ url_for('desativar_premium', user_id=usuario[0]) }}"
-                                               class="btn btn-sm btn-outline-danger">
+                                               class="btn btn-xs btn-outline-danger mt-1">
                                                 Desativar
                                             </a>
                                         {% else %}
+                                            <span class="badge bg-light text-dark">Grátis</span>
+                                            <br>
                                             <a href="{{ url_for('ativar_premium', user_id=usuario[0]) }}"
-                                               class="btn btn-sm btn-outline-warning">
-                                                Ativar Premium
+                                               class="btn btn-xs btn-outline-warning mt-1">
+                                                Ativar
                                             </a>
                                         {% endif %}
+                                    </td>
+                                    <td><small>{{ usuario[6][:10] }}</small></td>
+                                    <td>
+                                        <div class="btn-group-vertical" role="group">
+                                            {% if usuario[4] != 'admin' %}
+                                                <a href="{{ url_for('banir_usuario', user_id=usuario[0]) }}"
+                                                   class="btn btn-sm btn-outline-danger mb-1"
+                                                   onclick="return confirm('Banir usuário {{ usuario[1] }}?')">
+                                                    <i class="fas fa-ban"></i> Banir
+                                                </a>
+                                                {% if admin_level == 'superadmin' %}
+                                                    <button class="btn btn-sm btn-outline-info"
+                                                            onclick="nomearAdmin({{ usuario[0] }}, '{{ usuario[1] }}')">
+                                                        <i class="fas fa-user-shield"></i> Admin
+                                                    </button>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-secondary">Protegido</span>
+                                            {% endif %}
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -94,33 +180,60 @@
         </div>
     </div>
 
-    <div class="col-md-6">
+    <!-- Aba Produtos -->
+    <div class="tab-pane fade" id="produtos">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5><i class="fas fa-box"></i> Gerenciar Produtos</h5>
+                <small class="text-muted">Total: {{ produtos|length }} produtos</small>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
                             <tr>
+                                <th>ID</th>
                                 <th>Produto</th>
                                 <th>Vendedor</th>
                                 <th>Preço</th>
+                                <th>Categoria</th>
+                                <th>Localização</th>
+                                <th>Data</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for produto in produtos %}
                                 <tr>
-                                    <td>{{ produto[2][:15] }}...</td>
-                                    <td>{{ produto[9][:15] }}...</td>
-                                    <td>{{ "%.0f"|format(produto[3]) }} MT</td>
+                                    <td><span class="badge bg-primary">{{ produto[0] }}</span></td>
+                                    <td>
+                                        <strong>{{ produto[2][:30] }}{% if produto[2]|length > 30 %}...{% endif %}</strong>
+                                        {% if produto[6] %}
+                                            <br><small class="text-muted">📷 Com foto</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ produto[9][:20] }}{% if produto[9]|length > 20 %}...{% endif %}</td>
+                                    <td><strong>{{ "%.0f"|format(produto[3]) }} MT</strong></td>
+                                    <td>
+                                        {% if produto[7] %}
+                                            <span class="badge bg-info">{{ produto[7] }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if produto[5] %}
+                                            <small>{{ produto[5][:20] }}{% if produto[5]|length > 20 %}...{% endif %}</small>
+                                        {% else %}
+                                            <small class="text-muted">N/A</small>
+                                        {% endif %}
+                                    </td>
+                                    <td><small>{{ produto[8][:10] }}</small></td>
                                     <td>
                                         <a href="{{ url_for('remover_produto', produto_id=produto[0]) }}"
                                            class="btn btn-sm btn-outline-danger"
-                                           onclick="return confirm('Remover produto?')">
-                                            Remover
+                                           onclick="return confirm('Remover produto {{ produto[2][:20] }}?')">
+                                            <i class="fas fa-trash"></i> Remover
                                         </a>
                                     </td>
                                 </tr>
@@ -131,22 +244,318 @@
             </div>
         </div>
     </div>
+
+    <!-- Aba Configurações -->
+    <div class="tab-pane fade" id="configuracoes">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-cog"></i> Configurações do Sistema</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for config in configuracoes %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-left-primary">
+                                <div class="card-body">
+                                    <h6 class="card-title text-primary">
+                                        <i class="fas fa-cog"></i> {{ config[3] }}
+                                    </h6>
+                                    <form method="POST" action="{{ url_for('atualizar_configuracao') }}" class="d-flex">
+                                        <input type="hidden" name="chave" value="{{ config[1] }}">
+                                        <input type="text" class="form-control me-2" name="valor"
+                                               value="{{ config[2] }}"
+                                               {% if config[1] in ['numero_emola', 'numero_mpesa'] and admin_level != 'superadmin' %}disabled{% endif %}>
+                                        <button type="submit" class="btn btn-primary btn-sm"
+                                                {% if config[1] in ['numero_emola', 'numero_mpesa'] and admin_level != 'superadmin' %}disabled{% endif %}>
+                                            <i class="fas fa-save"></i> Salvar
+                                        </button>
+                                    </form>
+                                    {% if config[1] in ['numero_emola', 'numero_mpesa'] and admin_level != 'superadmin' %}
+                                        <small class="text-warning">
+                                            <i class="fas fa-lock"></i> Apenas super admin pode alterar
+                                        </small>
+                                    {% endif %}
+                                    {% if config[4] %}
+                                        <small class="text-muted d-block mt-1">
+                                            Última alteração: {{ config[4][:16] }}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aba Administradores (apenas para super admin) -->
+    {% if admin_level == 'superadmin' %}
+    <div class="tab-pane fade" id="administradores">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-user-shield"></i> Gerenciar Administradores</h5>
+                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalNomearAdmin">
+                    <i class="fas fa-plus"></i> Nomear Admin
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Nome</th>
+                                <th>Telefone</th>
+                                <th>Nível</th>
+                                <th>Nomeado por</th>
+                                <th>Data</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for admin in administradores %}
+                                <tr>
+                                    <td><strong>{{ admin[4] }}</strong></td>
+                                    <td>{{ admin[5] }}</td>
+                                    <td>
+                                        {% if admin[2] == 'superadmin' %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-crown"></i> Super Admin
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-user-shield"></i> Admin
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ admin[6] or 'Sistema' }}</td>
+                                    <td><small>{{ admin[3][:10] }}</small></td>
+                                    <td>
+                                        {% if admin[2] != 'superadmin' %}
+                                            <a href="{{ url_for('remover_admin', admin_id=admin[0]) }}"
+                                               class="btn btn-sm btn-outline-danger"
+                                               onclick="return confirm('Remover administrador {{ admin[4] }}?')">
+                                                <i class="fas fa-user-minus"></i> Remover
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">
+                                                <i class="fas fa-lock"></i> Intocável
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Aba Segurança (apenas para super admin) -->
+    {% if admin_level == 'superadmin' %}
+    <div class="tab-pane fade" id="seguranca">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-shield-alt"></i> Configurações de Segurança</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Atenção:</strong> Estas configurações são críticas para a segurança do sistema. Guarde bem seus dados de recuperação!
+                </div>
+
+                <form method="POST" action="{{ url_for('configurar_codigo_admin') }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-key"></i> Novo Código de Acesso
+                                </label>
+                                <input type="text" class="form-control" name="novo_codigo" required
+                                       placeholder="Digite o novo código de acesso">
+                                <small class="text-muted">Mantenha seguro e complexo</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-user"></i> Nome Completo
+                                </label>
+                                <input type="text" class="form-control" name="nome_completo" required
+                                       placeholder="Seu nome completo">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-envelope"></i> Email de Recuperação
+                                </label>
+                                <input type="email" class="form-control" name="email_recuperacao" required
+                                       placeholder="seu@email.com">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-phone"></i> Telefone de Recuperação
+                                </label>
+                                <input type="text" class="form-control" name="telefone_recuperacao" required
+                                       placeholder="Seu número de telefone">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-question-circle"></i> Pergunta de Segurança
+                                </label>
+                                <input type="text" class="form-control" name="pergunta_seguranca" required
+                                       placeholder="Ex: Qual é o nome da sua primeira empresa?">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-reply"></i> Resposta de Segurança
+                                </label>
+                                <input type="text" class="form-control" name="resposta_seguranca" required
+                                       placeholder="Sua resposta">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="fas fa-save"></i> Atualizar Configurações de Segurança
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
-<div class="card mt-4">
-    <div class="card-header">
-        <h5><i class="fas fa-paint-brush"></i> Personalização Visual</h5>
-    </div>
-    <div class="card-body">
-        <p>Funcionalidades de personalização serão implementadas em versões futuras:</p>
-        <ul>
-            <li>Editor visual de cores e logo</li>
-            <li>Customização de textos</li>
-            <li>Temas personalizados</li>
-        </ul>
-        <button class="btn btn-secondary" disabled>
-            <i class="fas fa-palette"></i> Em desenvolvimento
-        </button>
+<!-- Modal para nomear administrador -->
+{% if admin_level == 'superadmin' %}
+<div class="modal fade" id="modalNomearAdmin" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-shield"></i> Nomear Administrador
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('nomear_admin') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i> Selecionar Usuário
+                        </label>
+                        <select class="form-select" name="user_id" required>
+                            <option value="">Escolha um usuário para promover...</option>
+                            {% for usuario in usuarios %}
+                                {% if usuario[4] != 'admin' %}
+                                    <option value="{{ usuario[0] }}">
+                                        {{ usuario[1] }}
+                                        ({{ usuario[3] or usuario[2] }})
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-award"></i> Nível de Administração
+                        </label>
+                        <select class="form-select" name="nivel" required>
+                            <option value="admin">Administrador Secundário</option>
+                        </select>
+                        <div class="alert alert-info mt-2">
+                            <small>
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Administradores secundários</strong> têm todas as funcionalidades exceto nomear/remover outros administradores.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check"></i> Nomear Administrador
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+{% endif %}
+
+<script>
+function nomearAdmin(userId, userName) {
+    if (confirm(`Nomear ${userName} como administrador?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("nomear_admin") }}';
+
+        const userIdInput = document.createElement('input');
+        userIdInput.type = 'hidden';
+        userIdInput.name = 'user_id';
+        userIdInput.value = userId;
+
+        const nivelInput = document.createElement('input');
+        nivelInput.type = 'hidden';
+        nivelInput.name = 'nivel';
+        nivelInput.value = 'admin';
+
+        form.appendChild(userIdInput);
+        form.appendChild(nivelInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Melhorar a experiência do usuário
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide alerts
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = 'opacity 0.5s';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        }, 5000);
+    });
+});
+</script>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.075);
+}
+
+.border-left-primary {
+    border-left: 0.25rem solid #007bff !important;
+}
+
+.btn-xs {
+    padding: 0.125rem 0.25rem;
+    font-size: 0.75rem;
+}
+</style>
 {% endblock %}
