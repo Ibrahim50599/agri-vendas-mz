@@ -2,7 +2,5 @@ services:
   - type: web
     name: agri-vendas-mz
     env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn main:app --bind 0.0.0.0:$PORT"
-    branch: master
-    region: frankfurt
+    buildCommand: ""
+    startCommand: gunicorn main:app --bind 0.0.0.0:$PORT
