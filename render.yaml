@@ -2,6 +2,7 @@ services:
   - type: web
     name: agri-vendas-mz
     env: python
-    buildCommand: ""
-    startCommand: python start.py
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn main:app
+
 
