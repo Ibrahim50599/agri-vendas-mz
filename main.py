@@ -930,9 +930,7 @@ def contato_whatsapp(vendedor_id):
     flash('Vendedor não encontrado')
     return redirect(url_for('index'))
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+
 
 if __name__ == '__main__':
     init_db()
