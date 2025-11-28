@@ -1595,6 +1595,76 @@ def relatorios_admin():
                            vendedores=vendedores_ativos)
 
 
+# ===================== ROTAS ADMINISTRADORES ESPECIALIZADOS =====================
+
+@app.route('/admin/produtos')
+@nivel_admin_required('produtos')
+def admin_produtos():
+    conn = sqlite3.connect('agri_vendas.db')
+    c = conn.cursor()
+    
+    c.execute("SELECT COUNT(*) FROM produtos WHERE ativo = 1")
+    total_produtos = c.fetchone()[0]
+    
+    c.execute('''SELECT p.*, u.nome_completo 
+                FROM produtos p 
+                JOIN usuarios u ON p.vendedor_id = u.id 
+                WHERE p.ativo = 1
+                ORDER BY p.data_publicacao DESC''')
+    produtos = c.fetchall()
+    
+    stats = {
+        'total_produtos': total_produtos,
+        'produtos_pendentes': 0,
+        'produtos_inativos': 0,
+        'produtos_mes': 0
+    }
+    
+    conn.close()
+    return render_template('admin_produtos.html', produtos=produtos, stats=stats)
+
+
+@app.route('/admin/financeiro')
+@nivel_admin_required('financeiro')
+def admin_financeiro():
+    conn = sqlite3.connect('agri_vendas.db')
+    c = conn.cursor()
+    
+    c.execute("SELECT COUNT(*) FROM usuarios WHERE premium = 1 AND ativo = 1")
+    usuarios_premium = c.fetchone()[0]
+    
+    c.execute("SELECT valor FROM configuracoes_sistema WHERE chave = 'numero_emola'")
+    numero_emola = c.fetchone()
+    
+    c.execute("SELECT valor FROM configuracoes_sistema WHERE chave = 'numero_mpesa'")
+    numero_mpesa = c.fetchone()
+    
+    stats = {
+        'usuarios_premium': usuarios_premium,
+        'receita_total': usuarios_premium * 500,
+        'receita_mes': usuarios_premium * 500
+    }
+    
+    configuracoes_pagamento = {
+        'numero_emola': numero_emola[0] if numero_emola else '878312890',
+        'numero_mpesa': numero_mpesa[0] if numero_mpesa else '847214191'
+    }
+    
+    conn.close()
+    return render_template('admin_financeiro.html', stats=stats, configuracoes_pagamento=configuracoes_pagamento)
+
+
+@app.route('/admin/equipamentos-gestao')
+@nivel_admin_required('equipamentos')
+def admin_equipamentos_gestao():
+    conn = sqlite3.connect('agri_vendas.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM equipamentos WHERE ativo = 1 ORDER BY data_criacao DESC")
+    equipamentos = c.fetchall()
+    conn.close()
+    return render_template('admin_equipamentos.html', equipamentos=equipamentos)
+
+
 @app.route('/contato/<int:vendedor_id>')
 def contato_whatsapp(vendedor_id):
     conn = sqlite3.connect('agri_vendas.db')
