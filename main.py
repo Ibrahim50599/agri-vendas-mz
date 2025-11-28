@@ -1561,6 +1561,54 @@ def configurar_codigo_admin():
     return redirect(url_for('admin_panel'))
 
 
+@app.route('/api/stats')
+@admin_required
+def api_stats():
+    """API endpoint para estatísticas em tempo real"""
+    conn = sqlite3.connect('agri_vendas.db')
+    c = conn.cursor()
+    
+    c.execute("SELECT COUNT(*) FROM usuarios WHERE ativo = 1")
+    usuarios = c.fetchone()[0]
+    
+    c.execute("SELECT COUNT(*) FROM produtos WHERE ativo = 1")
+    produtos = c.fetchone()[0]
+    
+    c.execute("SELECT COUNT(*) FROM usuarios WHERE premium = 1 AND ativo = 1")
+    premium = c.fetchone()[0]
+    
+    conn.close()
+    
+    return jsonify({
+        'usuarios': usuarios,
+        'produtos': produtos,
+        'premium': premium,
+        'timestamp': datetime.datetime.now().isoformat()
+    })
+
+
+@app.route('/admin/supervisor')
+@nivel_admin_required('supervisor')
+def admin_supervisor():
+    """Painel para administradores supervisores"""
+    conn = sqlite3.connect('agri_vendas.db')
+    c = conn.cursor()
+    
+    c.execute("SELECT COUNT(*) FROM usuarios WHERE ativo = 1")
+    total_usuarios = c.fetchone()[0]
+    
+    c.execute("SELECT COUNT(*) FROM produtos WHERE ativo = 1")
+    total_produtos = c.fetchone()[0]
+    
+    stats = {
+        'total_usuarios': total_usuarios,
+        'total_produtos': total_produtos
+    }
+    
+    conn.close()
+    return render_template('admin_supervisor.html', stats=stats)
+
+
 @app.route('/admin/relatorios')
 @admin_required
 def relatorios_admin():
