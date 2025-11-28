@@ -1665,6 +1665,37 @@ def admin_equipamentos_gestao():
     return render_template('admin_equipamentos.html', equipamentos=equipamentos)
 
 
+@app.route('/admin/usuarios')
+@nivel_admin_required('usuarios')
+def admin_usuarios():
+    conn = sqlite3.connect('agri_vendas.db')
+    c = conn.cursor()
+    
+    c.execute("SELECT COUNT(*) FROM usuarios WHERE ativo = 1")
+    total_usuarios = c.fetchone()[0]
+    
+    c.execute("SELECT COUNT(*) FROM usuarios WHERE premium = 1 AND ativo = 1")
+    usuarios_premium = c.fetchone()[0]
+    
+    c.execute("SELECT COUNT(*) FROM usuarios WHERE tipo = 'vendedor' AND ativo = 1")
+    vendedores = c.fetchone()[0]
+    
+    c.execute('''SELECT id, nome_completo, email, telefone, tipo, premium, data_premium_expira, data_cadastro, ativo
+                FROM usuarios 
+                ORDER BY data_cadastro DESC''')
+    usuarios = c.fetchall()
+    
+    stats = {
+        'total_usuarios': total_usuarios,
+        'usuarios_premium': usuarios_premium,
+        'vendedores': vendedores,
+        'usuarios_ativos': total_usuarios
+    }
+    
+    conn.close()
+    return render_template('admin_usuarios.html', usuarios=usuarios, stats=stats)
+
+
 @app.route('/contato/<int:vendedor_id>')
 def contato_whatsapp(vendedor_id):
     conn = sqlite3.connect('agri_vendas.db')
