@@ -111,6 +111,56 @@ def init_db():
               ('numero_emola', '878312890', 'Número E-MOLA para pagamentos'))
     c.execute("INSERT OR IGNORE INTO configuracoes_sistema (chave, valor, descricao) VALUES (?, ?, ?)",
               ('numero_mpesa', '847214191', 'Número M-PESA para pagamentos'))
+
+
+# Códigos de acesso para diferentes níveis administrativos
+CODIGOS_ADMIN = {
+    'AGRI2024ADMIN': 'superadmin',  # Super Administrador (Ibrahim)
+    'VIGIA001': 'supervisor',  # Administrador Supervisor (2 pessoas)
+    'VIGIA002': 'supervisor',
+    'USUARIOS001': 'usuarios',  # Gestor de Usuários
+    'PRODUTOS001': 'produtos',  # Gestor de Produtos
+    'FINANCEIRO001': 'financeiro',  # Gestor Financeiro
+    'EQUIPAMENTOS001': 'equipamentos'  # Gestor de Equipamentos
+}
+
+# Decorador para diferentes níveis de admin
+def nivel_admin_required(nivel_minimo):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if session.get('admin_access_code'):
+                codigo = session.get('admin_access_code')
+                if codigo in CODIGOS_ADMIN:
+                    nivel_usuario = CODIGOS_ADMIN[codigo]
+                    niveis_hierarquia = ['equipamentos', 'financeiro', 'produtos', 'usuarios', 'supervisor', 'superadmin']
+                    if niveis_hierarquia.index(nivel_usuario) >= niveis_hierarquia.index(nivel_minimo):
+                        return f(*args, **kwargs)
+            
+            if 'user_id' not in session:
+                flash('Acesso negado.')
+                return redirect(url_for('login'))
+            
+            conn = sqlite3.connect('agri_vendas.db')
+            c = conn.cursor()
+            c.execute("SELECT nivel_acesso FROM administradores WHERE usuario_id = ? AND ativo = 1", (session['user_id'],))
+            admin = c.fetchone()
+            conn.close()
+            
+            if not admin:
+                flash('Acesso negado.')
+                return redirect(url_for('index'))
+            
+            niveis_hierarquia = ['equipamentos', 'financeiro', 'produtos', 'usuarios', 'supervisor', 'superadmin']
+            if niveis_hierarquia.index(admin[0]) >= niveis_hierarquia.index(nivel_minimo):
+                return f(*args, **kwargs)
+            
+            flash('Você não tem permissão para acessar esta área.')
+            return redirect(url_for('admin_panel'))
+        return decorated_function
+    return decorator
+
+
     c.execute("INSERT OR IGNORE INTO configuracoes_sistema (chave, valor, descricao) VALUES (?, ?, ?)",
               ('numero_suporte', '878312890', 'Número de suporte técnico'))
 
@@ -144,6 +194,23 @@ def init_db():
         if not c.fetchone():
             c.execute("INSERT INTO administradores (usuario_id, nivel_acesso, nomeado_por) VALUES (?, ?, ?)",
                       (admin_id, 'superadmin', admin_id))
+    
+    # Inserir equipamentos de exemplo
+    c.execute("SELECT COUNT(*) FROM equipamentos")
+    if c.fetchone()[0] == 0:
+        equipamentos_exemplo = [
+            ('Trator Agrícola 75HP', 'Trator robusto ideal para preparação de solo, aração e cultivo. Motor diesel de 75HP, tração 4x4.', 
+             450000, 'Tratores', 2, '', 'Maputo', '878312890', 'disponivel', admin_id),
+            ('Sistema de Irrigação por Aspersão', 'Sistema completo para irrigação de até 5 hectares. Inclui bomba, tubos e aspersores.', 
+             85000, 'Irrigação', 5, '', 'Matola', '878312890', 'disponivel', admin_id),
+            ('Pulverizador Costal 20L', 'Pulverizador manual de alta pressão, ideal para aplicação de defensivos agrícolas.', 
+             3500, 'Pulverizadores', 15, '', 'Beira', '878312890', 'disponivel', admin_id)
+        ]
+        
+        for equip in equipamentos_exemplo:
+            c.execute('''INSERT INTO equipamentos 
+                        (nome, descricao, preco, categoria, estoque, foto_url, localizacao, contato, status, criado_por)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', equip)
 
     conn.commit()
     conn.close()
