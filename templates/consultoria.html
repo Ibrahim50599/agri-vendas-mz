@@ -1,32 +1,209 @@
-
 {% extends "base.html" %}
 
 {% block title %}Consultoria Agrícola - AGRI.vendasMz{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12 text-center">
-            <h1 class="display-5 mb-3">
-                <i class="fas fa-leaf text-success"></i> Consultoria Agrícola Completa
-            </h1>
-            <p class="lead">Sistema completo de assistência técnica para produtores</p>
-        </div>
-    </div>
+<style>
+    .consultoria-hero {
+        background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #43A047 100%);
+        color: white;
+        padding: 50px 0;
+        margin: -24px -12px 30px -12px;
+        text-align: center;
+        position: relative;
+    }
+    
+    .consultoria-hero::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50px;
+        background: linear-gradient(to top, var(--background-color), transparent);
+    }
+    
+    .module-card {
+        border: none;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        transition: all 0.4s ease;
+        height: 100%;
+    }
+    
+    .module-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+    }
+    
+    .module-card .card-header {
+        padding: 20px 25px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .module-card .card-header i {
+        font-size: 1.3rem;
+    }
+    
+    .module-card .card-body {
+        padding: 25px;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #4CAF50;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
+    }
+    
+    .btn-consultar {
+        background: linear-gradient(135deg, #1B5E20, #4CAF50);
+        border: none;
+        padding: 12px 25px;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-consultar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(27, 94, 32, 0.3);
+    }
+    
+    .result-card {
+        background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+        border-radius: 16px;
+        padding: 30px;
+        margin-top: 30px;
+        animation: slideInUp 0.5s ease;
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .stat-box {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    
+    .stat-box .value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1B5E20;
+    }
+    
+    .stat-box .label {
+        font-size: 0.9rem;
+        color: #666;
+    }
+    
+    .unit-toggle {
+        display: flex;
+        background: #f0f0f0;
+        border-radius: 10px;
+        padding: 4px;
+    }
+    
+    .unit-toggle .btn {
+        flex: 1;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .unit-toggle .btn.active {
+        background: linear-gradient(135deg, #1B5E20, #4CAF50);
+        color: white;
+    }
+    
+    .unit-toggle .btn:not(.active) {
+        background: transparent;
+        color: #666;
+    }
+    
+    .calendar-table {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .calendar-table th {
+        background: linear-gradient(135deg, #1B5E20, #2E7D32) !important;
+    }
+    
+    .premium-feature {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .premium-feature::before {
+        content: 'PREMIUM';
+        position: absolute;
+        top: 10px;
+        right: -30px;
+        background: linear-gradient(135deg, #FFD700, #FFA000);
+        color: white;
+        padding: 5px 40px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        transform: rotate(45deg);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    .locked-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255,255,255,0.9);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+    }
+</style>
 
-    <!-- Módulos principais -->
-    <div class="row">
-        <!-- 1. Guia de Cultivos -->
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100">
+<div class="consultoria-hero">
+    <h1><i class="fas fa-leaf me-3"></i>Consultoria Agrícola Completa</h1>
+    <p class="mb-0 mt-2 opacity-90">Sistema inteligente de assistência técnica para produtores moçambicanos</p>
+</div>
+
+<div class="container-fluid px-4">
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card module-card">
                 <div class="card-header bg-success text-white">
-                    <h5><i class="fas fa-seedling"></i> 1. Guia Completo de Cultivos</h5>
+                    <i class="fas fa-seedling"></i>
+                    <span>1. Guia Completo de Cultivos</span>
                 </div>
                 <div class="card-body">
                     <form id="cultivoForm">
                         <div class="mb-3">
-                            <label class="form-label">Categoria da Cultura</label>
+                            <label class="form-label fw-semibold">Categoria da Cultura</label>
                             <select class="form-select" name="categoria" id="categoria">
                                 <option value="">Selecione a categoria</option>
                                 <option value="cereais">🌾 Cereais</option>
@@ -41,57 +218,76 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Cultura Específica</label>
+                            <label class="form-label fw-semibold">Cultura Específica</label>
                             <select class="form-select" name="cultura" id="cultura">
                                 <option value="">Primeiro selecione a categoria</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Hectares a cultivar</label>
-                            <input type="number" step="0.1" class="form-control" name="hectares" placeholder="Ex: 2.5">
+                            <label class="form-label fw-semibold">Unidade de Área</label>
+                            <div class="unit-toggle" id="unitToggle">
+                                <button type="button" class="btn active" data-unit="hectares">
+                                    <i class="fas fa-mountain me-1"></i> Hectares
+                                </button>
+                                <button type="button" class="btn" data-unit="metros">
+                                    <i class="fas fa-ruler-combined me-1"></i> Metros²
+                                </button>
+                            </div>
                         </div>
 
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-search"></i> Consultar Cultura
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold" id="areaLabel">Área em Hectares</label>
+                            <input type="number" step="0.01" class="form-control" name="area_valor" id="areaInput" 
+                                   placeholder="Ex: 2.5 hectares">
+                            <small class="text-muted" id="areaHelp">1 hectare = 10.000 m²</small>
+                            <input type="hidden" name="unidade_area" id="unidadeArea" value="hectares">
+                        </div>
+
+                        <button type="submit" class="btn btn-consultar btn-success w-100">
+                            <i class="fas fa-search me-2"></i>Consultar Cultura
                         </button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- 2. Calculadoras Agrícolas -->
-        <div class="col-lg-6 mb-4">
-            <div class="card h-100">
+        <div class="col-lg-6">
+            <div class="card module-card">
                 <div class="card-header bg-primary text-white">
-                    <h5><i class="fas fa-calculator"></i> 2. Calculadoras Agrícolas</h5>
+                    <i class="fas fa-calculator"></i>
+                    <span>2. Calculadoras Agrícolas</span>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-6 mb-2">
-                            <button class="btn btn-outline-primary btn-sm w-100" onclick="abrirCalculadora('adubacao')">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100 py-3" onclick="abrirCalculadora('adubacao')">
+                                <i class="fas fa-flask d-block mb-2 fs-4"></i>
                                 NPK & Adubação
                             </button>
                         </div>
-                        <div class="col-6 mb-2">
-                            <button class="btn btn-outline-primary btn-sm w-100" onclick="abrirCalculadora('densidade')">
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100 py-3" onclick="abrirCalculadora('densidade')">
+                                <i class="fas fa-th d-block mb-2 fs-4"></i>
                                 Densidade Plantio
                             </button>
                         </div>
-                        <div class="col-6 mb-2">
-                            <button class="btn btn-outline-primary btn-sm w-100" onclick="abrirCalculadora('irrigacao')">
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100 py-3" onclick="abrirCalculadora('irrigacao')">
+                                <i class="fas fa-tint d-block mb-2 fs-4"></i>
                                 Irrigação
                             </button>
                         </div>
-                        <div class="col-6 mb-2">
-                            <button class="btn btn-outline-primary btn-sm w-100" onclick="abrirCalculadora('custos')">
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100 py-3" onclick="abrirCalculadora('custos')">
+                                <i class="fas fa-coins d-block mb-2 fs-4"></i>
                                 Custos Produção
                             </button>
                         </div>
                     </div>
 
-                    <div id="calculadoraArea" class="mt-3" style="display: none;">
-                        <div class="border p-3 rounded bg-light">
+                    <div id="calculadoraArea" class="mt-4" style="display: none;">
+                        <div class="border rounded-3 p-4 bg-light">
                             <div id="calculadoraConteudo"></div>
                         </div>
                     </div>
@@ -100,16 +296,16 @@
         </div>
     </div>
 
-    <div class="row">
-        <!-- 3. Clima e Alertas -->
-        <div class="col-lg-4 mb-4">
-            <div class="card h-100">
+    <div class="row g-4 mt-2">
+        <div class="col-lg-4">
+            <div class="card module-card">
                 <div class="card-header bg-info text-white">
-                    <h5><i class="fas fa-cloud-rain"></i> 3. Clima & Alertas</h5>
+                    <i class="fas fa-cloud-sun"></i>
+                    <span>3. Clima & Alertas</span>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label">Sua Localização</label>
+                        <label class="form-label fw-semibold">Sua Localização</label>
                         <select class="form-select" id="provincia">
                             <option value="maputo">Maputo</option>
                             <option value="gaza">Gaza</option>
@@ -117,23 +313,21 @@
                             <option value="sofala">Sofala</option>
                             <option value="manica">Manica</option>
                             <option value="tete">Tete</option>
-                            <option value="zambézia">Zambézia</option>
+                            <option value="zambezia">Zambézia</option>
                             <option value="nampula">Nampula</option>
                             <option value="cabo-delgado">Cabo Delgado</option>
                             <option value="niassa">Niassa</option>
                         </select>
                     </div>
-
-                    <button class="btn btn-info" onclick="obterClima()">
-                        <i class="fas fa-thermometer-half"></i> Ver Previsão
+                    <button class="btn btn-info w-100" onclick="obterClima()">
+                        <i class="fas fa-thermometer-half me-2"></i>Ver Previsão
                     </button>
-
                     <div id="climaInfo" class="mt-3" style="display: none;">
-                        <div class="alert alert-info">
+                        <div class="alert alert-info mb-0">
                             <strong>Previsão será exibida aqui</strong>
                             {% if not session.is_premium %}
-                                <hr>
-                                <small>Alertas SMS apenas para Premium</small>
+                            <hr>
+                            <small><i class="fas fa-crown text-warning me-1"></i>Alertas SMS: Premium</small>
                             {% endif %}
                         </div>
                     </div>
@@ -141,88 +335,88 @@
             </div>
         </div>
 
-        <!-- 4. Diagnóstico de Pragas -->
-        <div class="col-lg-4 mb-4">
-            <div class="card h-100">
+        <div class="col-lg-4">
+            <div class="card module-card {% if not session.is_premium %}premium-feature{% endif %}">
                 <div class="card-header bg-warning text-dark">
-                    <h5><i class="fas fa-bug"></i> 4. Diagnóstico de Pragas</h5>
+                    <i class="fas fa-bug"></i>
+                    <span>4. Diagnóstico de Pragas</span>
                 </div>
-                <div class="card-body">
+                <div class="card-body position-relative">
                     {% if session.is_premium %}
-                        <form id="pragasForm">
-                            <div class="mb-3">
-                                <label class="form-label">Cultura Afetada</label>
-                                <select class="form-select" name="cultura_praga">
-                                    <option value="milho">Milho</option>
-                                    <option value="feijao">Feijão</option>
-                                    <option value="tomate">Tomate</option>
-                                    <option value="mandioca">Mandioca</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Sintomas Observados</label>
-                                <select class="form-select" name="sintoma">
-                                    <option value="folhas-amarelas">Folhas amareladas</option>
-                                    <option value="manchas">Manchas nas folhas</option>
-                                    <option value="furos">Furos nas folhas</option>
-                                    <option value="murcha">Murcha da planta</option>
-                                    <option value="crescimento-lento">Crescimento lento</option>
-                                </select>
-                            </div>
-
-                            <button type="submit" class="btn btn-warning">
-                                <i class="fas fa-search"></i> Diagnosticar
-                            </button>
-                        </form>
-                    {% else %}
-                        <div class="text-center">
-                            <i class="fas fa-lock fa-3x text-muted mb-3"></i>
-                            <p>Diagnóstico de pragas e doenças</p>
-                            <p class="text-muted">Recurso Premium</p>
-                            <a href="{{ url_for('premium') }}" class="btn btn-warning btn-sm">
-                                <i class="fas fa-crown"></i> Upgrade
-                            </a>
+                    <form id="pragasForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Cultura Afetada</label>
+                            <select class="form-select" name="cultura_praga" id="culturaPraga">
+                                <option value="milho">Milho</option>
+                                <option value="feijao">Feijão</option>
+                                <option value="tomate">Tomate</option>
+                                <option value="arroz">Arroz</option>
+                                <option value="mandioca">Mandioca</option>
+                                <option value="batata">Batata</option>
+                                <option value="banana">Banana</option>
+                                <option value="cebola">Cebola</option>
+                            </select>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Sintomas Observados</label>
+                            <select class="form-select" name="sintoma">
+                                <option value="folhas-amarelas">Folhas amareladas</option>
+                                <option value="manchas">Manchas nas folhas</option>
+                                <option value="furos">Furos nas folhas</option>
+                                <option value="murcha">Murcha da planta</option>
+                                <option value="crescimento-lento">Crescimento lento</option>
+                                <option value="podridao">Podridão</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="fas fa-search me-2"></i>Diagnosticar
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="locked-overlay">
+                        <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                        <p class="mb-2">Recurso Premium</p>
+                        <a href="{{ url_for('premium') }}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-crown me-1"></i>Fazer Upgrade
+                        </a>
+                    </div>
+                    <div style="visibility: hidden;">
+                        <div class="mb-3"><input class="form-control" disabled></div>
+                        <div class="mb-3"><input class="form-control" disabled></div>
+                    </div>
                     {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- 5. Preços de Mercado -->
-        <div class="col-lg-4 mb-4">
-            <div class="card h-100">
+        <div class="col-lg-4">
+            <div class="card module-card">
                 <div class="card-header bg-success text-white">
-                    <h5><i class="fas fa-chart-line"></i> 5. Preços de Mercado</h5>
+                    <i class="fas fa-chart-line"></i>
+                    <span>5. Preços de Mercado</span>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Produto</label>
-                        <select class="form-select" id="produto_preco">
-                            <option value="milho">Milho (MT/kg)</option>
-                            <option value="feijao">Feijão (MT/kg)</option>
-                            <option value="arroz">Arroz (MT/kg)</option>
-                            <option value="tomate">Tomate (MT/kg)</option>
-                            <option value="cebola">Cebola (MT/kg)</option>
-                        </select>
-                    </div>
-
-                    <button class="btn btn-success" onclick="consultarPrecos()">
-                        <i class="fas fa-money-bill-wave"></i> Ver Preços
-                    </button>
-
-                    <div id="precosInfo" class="mt-3">
-                        <div class="alert alert-light">
-                            <small><strong>Preços Estimados Atuais:</strong></small>
-                            <ul class="mb-0 mt-2">
-                                <li>Milho: 30-35 MT/kg</li>
-                                <li>Feijão: 80-90 MT/kg</li>
-                                <li>Arroz: 45-50 MT/kg</li>
-                                <li>Tomate: 60-70 MT/kg</li>
-                            </ul>
+                    <div id="precosInfo">
+                        <div class="alert alert-light border mb-0">
+                            <h6 class="mb-3"><i class="fas fa-money-bill-wave text-success me-2"></i>Preços Estimados (MT/kg)</h6>
+                            <div class="d-flex justify-content-between py-2 border-bottom">
+                                <span>🌽 Milho</span><strong>30-35 MT</strong>
+                            </div>
+                            <div class="d-flex justify-content-between py-2 border-bottom">
+                                <span>🫘 Feijão</span><strong>80-90 MT</strong>
+                            </div>
+                            <div class="d-flex justify-content-between py-2 border-bottom">
+                                <span>🍚 Arroz</span><strong>45-50 MT</strong>
+                            </div>
+                            <div class="d-flex justify-content-between py-2 border-bottom">
+                                <span>🍅 Tomate</span><strong>60-70 MT</strong>
+                            </div>
+                            <div class="d-flex justify-content-between py-2">
+                                <span>🧅 Cebola</span><strong>35-40 MT</strong>
+                            </div>
                             {% if not session.is_premium %}
-                                <hr>
-                                <small class="text-muted">Histórico e tendências: Premium</small>
+                            <hr>
+                            <small class="text-muted"><i class="fas fa-crown text-warning me-1"></i>Histórico e tendências: Premium</small>
                             {% endif %}
                         </div>
                     </div>
@@ -231,31 +425,38 @@
         </div>
     </div>
 
-    <!-- Seções Premium -->
     {% if session.is_premium %}
-    <div class="row">
-        <!-- 6. Minha Fazenda -->
-        <div class="col-lg-6 mb-4">
-            <div class="card border-warning">
-                <div class="card-header bg-warning text-dark">
-                    <h5><i class="fas fa-farm"></i> 6. Minha Fazenda (Premium)</h5>
+    <div class="row g-4 mt-2">
+        <div class="col-lg-6">
+            <div class="card module-card border-warning">
+                <div class="card-header bg-gradient text-dark" style="background: linear-gradient(135deg, #FFD700, #FFA000) !important;">
+                    <i class="fas fa-tractor text-white"></i>
+                    <span class="text-white">6. Minha Fazenda (Premium)</span>
                 </div>
                 <div class="card-body">
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-6">
-                            <button class="btn btn-outline-warning btn-sm w-100 mb-2" onclick="abrirMenor('registrar-atividade')">
-                                <i class="fas fa-plus"></i> Registrar Atividade
-                            </button>
-                            <button class="btn btn-outline-warning btn-sm w-100 mb-2" onclick="abrirMenor('historico')">
-                                <i class="fas fa-history"></i> Histórico
+                            <button class="btn btn-outline-warning w-100 py-3" onclick="abrirMenor('registrar-atividade')">
+                                <i class="fas fa-plus d-block mb-2 fs-4"></i>
+                                Registrar Atividade
                             </button>
                         </div>
                         <div class="col-6">
-                            <button class="btn btn-outline-warning btn-sm w-100 mb-2" onclick="abrirMenor('gastos')">
-                                <i class="fas fa-money-bill"></i> Gastos/Safra
+                            <button class="btn btn-outline-warning w-100 py-3" onclick="abrirMenor('historico')">
+                                <i class="fas fa-history d-block mb-2 fs-4"></i>
+                                Histórico
                             </button>
-                            <button class="btn btn-outline-warning btn-sm w-100 mb-2" onclick="gerarRelatorioPDF()">
-                                <i class="fas fa-file-pdf"></i> Relatório PDF
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-warning w-100 py-3" onclick="abrirMenor('gastos')">
+                                <i class="fas fa-money-bill d-block mb-2 fs-4"></i>
+                                Gastos/Safra
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-warning w-100 py-3" onclick="gerarRelatorioPDF()">
+                                <i class="fas fa-file-pdf d-block mb-2 fs-4"></i>
+                                Relatório PDF
                             </button>
                         </div>
                     </div>
@@ -263,20 +464,19 @@
             </div>
         </div>
 
-        <!-- 7. Chat IA Premium -->
-        <div class="col-lg-6 mb-4">
-            <div class="card border-success">
+        <div class="col-lg-6">
+            <div class="card module-card border-success">
                 <div class="card-header bg-success text-white">
-                    <h5><i class="fas fa-robot"></i> 7. Assistência Virtual (Premium)</h5>
+                    <i class="fas fa-robot"></i>
+                    <span>7. Assistência Virtual (Premium)</span>
                 </div>
                 <div class="card-body">
-                    <div id="chatArea" style="height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; background: #f8f9fa;">
-                        <div class="text-muted text-center">
-                            <i class="fas fa-comments"></i><br>
-                            Digite sua pergunta agrícola abaixo
+                    <div id="chatArea" class="border rounded-3 p-3 mb-3" style="height: 200px; overflow-y: auto; background: #f8f9fa;">
+                        <div class="text-muted text-center py-4">
+                            <i class="fas fa-comments fa-2x mb-2"></i>
+                            <p class="mb-0">Digite sua pergunta agrícola abaixo</p>
                         </div>
                     </div>
-
                     <div class="input-group">
                         <input type="text" class="form-control" id="perguntaIA" placeholder="Ex: Como controlar pragas no milho?">
                         <button class="btn btn-success" onclick="enviarPerguntaIA()">
@@ -289,19 +489,19 @@
     </div>
     {% endif %}
 
-    <!-- Calendário Agrícola -->
-    <div class="row">
-        <div class="col-12 mb-4">
-            <div class="card">
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card module-card">
                 <div class="card-header bg-dark text-white">
-                    <h5><i class="fas fa-calendar-alt"></i> 8. Calendário Agrícola Personalizado</h5>
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>8. Calendário Agrícola de Moçambique</span>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead class="table-success">
-                                <tr>
-                                    <th>Cultura</th>
+                        <table class="table table-bordered calendar-table mb-0">
+                            <thead>
+                                <tr class="text-white text-center">
+                                    <th style="width: 20%;">Cultura</th>
                                     <th>Jan-Mar</th>
                                     <th>Abr-Jun</th>
                                     <th>Jul-Set</th>
@@ -309,120 +509,128 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><strong>Milho</strong></td>
+                                <tr class="text-center">
+                                    <td class="fw-semibold">🌽 Milho</td>
                                     <td><span class="badge bg-success">Colheita</span></td>
-                                    <td><span class="badge bg-warning">Preparação</span></td>
+                                    <td><span class="badge bg-secondary">Preparação</span></td>
                                     <td><span class="badge bg-info">Plantio</span></td>
                                     <td><span class="badge bg-primary">Crescimento</span></td>
                                 </tr>
-                                <tr>
-                                    <td><strong>Feijão</strong></td>
+                                <tr class="text-center">
+                                    <td class="fw-semibold">🫘 Feijão</td>
                                     <td><span class="badge bg-success">Colheita</span></td>
-                                    <td><span class="badge bg-warning">Preparação</span></td>
+                                    <td><span class="badge bg-secondary">Descanso</span></td>
                                     <td><span class="badge bg-info">Plantio</span></td>
                                     <td><span class="badge bg-primary">Crescimento</span></td>
                                 </tr>
-                                <tr>
-                                    <td><strong>Tomate</strong></td>
+                                <tr class="text-center">
+                                    <td class="fw-semibold">🍅 Tomate</td>
                                     <td><span class="badge bg-info">Plantio</span></td>
                                     <td><span class="badge bg-primary">Crescimento</span></td>
                                     <td><span class="badge bg-success">Colheita</span></td>
-                                    <td><span class="badge bg-warning">Descanso</span></td>
+                                    <td><span class="badge bg-secondary">Descanso</span></td>
+                                </tr>
+                                <tr class="text-center">
+                                    <td class="fw-semibold">🍚 Arroz</td>
+                                    <td><span class="badge bg-primary">Crescimento</span></td>
+                                    <td><span class="badge bg-success">Colheita</span></td>
+                                    <td><span class="badge bg-secondary">Preparação</span></td>
+                                    <td><span class="badge bg-info">Plantio</span></td>
+                                </tr>
+                                <tr class="text-center">
+                                    <td class="fw-semibold">🥔 Mandioca</td>
+                                    <td><span class="badge bg-primary">Crescimento</span></td>
+                                    <td><span class="badge bg-primary">Crescimento</span></td>
+                                    <td><span class="badge bg-success">Colheita</span></td>
+                                    <td><span class="badge bg-info">Plantio</span></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-
                     {% if not session.is_premium %}
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i>
-                            <strong>Premium:</strong> Calendário personalizado por região, notificações SMS e alertas automáticos
-                        </div>
+                    <div class="alert alert-info mt-3 mb-0">
+                        <i class="fas fa-crown text-warning me-2"></i>
+                        <strong>Premium:</strong> Calendário personalizado por região, notificações SMS e alertas automáticos
+                    </div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Resultados -->
-    <div id="resultadoConsultoria" class="row" style="display: none;">
+    <div id="resultadoConsultoria" class="row mt-4" style="display: none;">
         <div class="col-12">
-            <div class="card border-primary">
-                <div class="card-header bg-primary text-white">
-                    <h5><i class="fas fa-clipboard-check"></i> Resultado da Consultoria</h5>
-                </div>
-                <div class="card-body">
-                    <div id="resultadoConteudo"></div>
-                </div>
+            <div class="result-card">
+                <h4 class="mb-4"><i class="fas fa-clipboard-check text-success me-2"></i>Resultado da Consultoria</h4>
+                <div id="resultadoConteudo"></div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-// Dados das culturas organizados por categoria
 const culturasPorCategoria = {
     cereais: {
-        'milho': 'Milho',
-        'arroz': 'Arroz',
-        'trigo': 'Trigo',
-        'sorgo': 'Sorgo',
-        'aveia': 'Aveia',
-        'cevada': 'Cevada'
+        'milho': 'Milho', 'arroz': 'Arroz', 'trigo': 'Trigo',
+        'sorgo': 'Sorgo', 'aveia': 'Aveia', 'cevada': 'Cevada'
     },
     horticolas: {
-        'tomate': 'Tomate',
-        'alface': 'Alface',
-        'cenoura': 'Cenoura',
-        'couve': 'Couve',
-        'cebola': 'Cebola',
-        'pimento': 'Pimento'
+        'tomate': 'Tomate', 'alface': 'Alface', 'cenoura': 'Cenoura',
+        'couve': 'Couve', 'cebola': 'Cebola', 'pimento': 'Pimento',
+        'repolho': 'Repolho', 'pepino': 'Pepino', 'abobora': 'Abóbora'
     },
     fruticolas: {
-        'manga': 'Manga',
-        'banana': 'Banana',
-        'citrinos': 'Citrinos',
-        'maca': 'Maçã',
-        'uva': 'Uva',
-        'abacate': 'Abacate'
+        'manga': 'Manga', 'banana': 'Banana', 'citrinos': 'Citrinos (Laranja/Limão)',
+        'maca': 'Maçã', 'uva': 'Uva', 'abacate': 'Abacate',
+        'papaia': 'Papaia', 'ananas': 'Ananás (Abacaxi)'
     },
     tuberculos: {
-        'mandioca': 'Mandioca',
-        'batata': 'Batata',
-        'batata-doce': 'Batata-doce',
-        'inhame': 'Inhame'
+        'mandioca': 'Mandioca', 'batata': 'Batata',
+        'batata-doce': 'Batata-doce', 'inhame': 'Inhame'
     },
     leguminosas: {
-        'feijao': 'Feijão',
-        'soja': 'Soja',
-        'grao-de-bico': 'Grão-de-bico',
-        'amendoim': 'Amendoim'
+        'feijao': 'Feijão', 'soja': 'Soja', 'grao-de-bico': 'Grão-de-bico',
+        'amendoim': 'Amendoim', 'ervilha': 'Ervilha', 'feijao-nhemba': 'Feijão Nhemba (Caupi)'
     },
     oleaginosas: {
-        'girassol': 'Girassol',
-        'gergelim': 'Gergelim',
-        'coco': 'Coco'
+        'girassol': 'Girassol', 'gergelim': 'Gergelim', 'coco': 'Coco'
     },
     medicinais: {
-        'aloe-vera': 'Aloe Vera',
-        'manjericao': 'Manjericão',
-        'hortelã': 'Hortelã'
+        'aloe-vera': 'Aloe Vera', 'manjericao': 'Manjericão',
+        'hortela': 'Hortelã', 'moringa': 'Moringa'
     },
     regionais: {
-        'mapira': 'Mapira',
-        'mexoeira': 'Mexoeira',
-        'mucuna': 'Mucuna'
+        'mapira': 'Mapira (Sorgo local)', 'mexoeira': 'Mexoeira (Milheto)',
+        'mucuna': 'Mucuna', 'cajueiro': 'Cajueiro', 'algodao': 'Algodão'
     }
 };
 
-// Atualizar culturas quando categoria muda
+let unidadeAtual = 'hectares';
+
+document.querySelectorAll('#unitToggle .btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('#unitToggle .btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        unidadeAtual = this.dataset.unit;
+        document.getElementById('unidadeArea').value = unidadeAtual;
+        
+        if (unidadeAtual === 'metros') {
+            document.getElementById('areaLabel').textContent = 'Área em Metros Quadrados (m²)';
+            document.getElementById('areaInput').placeholder = 'Ex: 5000 m²';
+            document.getElementById('areaHelp').textContent = '10.000 m² = 1 hectare';
+        } else {
+            document.getElementById('areaLabel').textContent = 'Área em Hectares';
+            document.getElementById('areaInput').placeholder = 'Ex: 2.5 hectares';
+            document.getElementById('areaHelp').textContent = '1 hectare = 10.000 m²';
+        }
+    });
+});
+
 document.getElementById('categoria').addEventListener('change', function() {
     const categoria = this.value;
     const culturaSelect = document.getElementById('cultura');
-
     culturaSelect.innerHTML = '<option value="">Selecione a cultura</option>';
-
+    
     if (categoria && culturasPorCategoria[categoria]) {
         for (let key in culturasPorCategoria[categoria]) {
             culturaSelect.innerHTML += `<option value="${key}">${culturasPorCategoria[categoria][key]}</option>`;
@@ -430,12 +638,10 @@ document.getElementById('categoria').addEventListener('change', function() {
     }
 });
 
-// Formulário principal de cultivos
 document.getElementById('cultivoForm').addEventListener('submit', function(e) {
     e.preventDefault();
-
     const formData = new FormData(this);
-
+    
     fetch('/calcular_plantio', {
         method: 'POST',
         body: formData
@@ -446,7 +652,6 @@ document.getElementById('cultivoForm').addEventListener('submit', function(e) {
             alert(data.erro);
             return;
         }
-
         exibirResultadoCultivo(data);
     })
     .catch(error => {
@@ -456,239 +661,262 @@ document.getElementById('cultivoForm').addEventListener('submit', function(e) {
 });
 
 function exibirResultadoCultivo(data) {
+    let areaInfo = data.unidade_usada === 'metros' 
+        ? `${data.metros_quadrados.toLocaleString()} m² (${data.hectares.toFixed(4)} ha)`
+        : `${data.hectares} hectares (${data.metros_quadrados.toLocaleString()} m²)`;
+    
     let html = `
-        <div class="row">
-            <div class="col-md-6">
-                <h6><i class="fas fa-info-circle text-primary"></i> Informações da Cultura</h6>
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <tr><td><strong>Cultura:</strong></td><td>${data.cultura.toUpperCase()}</td></tr>
-                        <tr><td><strong>Área:</strong></td><td>${data.hectares} hectares</td></tr>
-                        <tr><td><strong>Sementes:</strong></td><td>${data.sementes_necessarias.toLocaleString()} kg</td></tr>
-                        <tr><td><strong>Fertilizante NPK:</strong></td><td>${data.fertilizante_npk} kg</td></tr>
-                        <tr><td><strong>Dias p/ colheita:</strong></td><td>${data.dias_para_colheita} dias</td></tr>
-                    </table>
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+                <div class="stat-box">
+                    <div class="value">${data.sementes_necessarias.toLocaleString()}</div>
+                    <div class="label">kg Sementes</div>
                 </div>
             </div>
-
-            <div class="col-md-6">
-                <h6><i class="fas fa-chart-line text-success"></i> Análise Econômica</h6>
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <tr><td><strong>Rendimento esperado:</strong></td><td>${data.rendimento_esperado.toLocaleString()} kg</td></tr>
-                        <tr><td><strong>Custo estimado:</strong></td><td>${data.custo_estimado.toLocaleString()} MT</td></tr>
-                        <tr><td><strong>Receita estimada:</strong></td><td>${data.receita_estimada.toLocaleString()} MT</td></tr>
-                        <tr><td><strong>Lucro estimado:</strong></td><td class="text-${data.lucro_estimado > 0 ? 'success' : 'danger'}">${data.lucro_estimado.toLocaleString()} MT</td></tr>
-                    </table>
+            <div class="col-md-3 col-6">
+                <div class="stat-box">
+                    <div class="value">${data.fertilizante_npk.toLocaleString()}</div>
+                    <div class="label">kg Fertilizante</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-box">
+                    <div class="value">${data.dias_para_colheita}</div>
+                    <div class="label">Dias p/ Colheita</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-box">
+                    <div class="value">${data.rendimento_esperado.toLocaleString()}</div>
+                    <div class="label">kg Rendimento</div>
                 </div>
             </div>
         </div>
-
-        <div class="row mt-3">
-            <div class="col-12">
-                <h6><i class="fas fa-tint text-info"></i> Cronograma de Irrigação</h6>
-                <div class="d-flex flex-wrap gap-2">
-    `;
-
-    data.cronograma_irrigacao.forEach((dia, index) => {
-        html += `<span class="badge bg-info">${dia} dias</span>`;
-    });
-
-    html += '</div></div></div>';
-
-    // Detalhes Premium
-    if (data.detalhes_premium) {
-        html += `
-            <div class="alert alert-warning mt-4">
-                <h6><i class="fas fa-crown text-warning"></i> Informações Técnicas Detalhadas (Premium)</h6>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Densidade plantio:</strong> ${data.detalhes_premium.densidade_plantio}</p>
-                        <p><strong>Solo ideal:</strong> ${data.detalhes_premium.solo_ideal}</p>
-                        <p><strong>Altitude ideal:</strong> ${data.detalhes_premium.altitude_ideal}</p>
-                        <p><strong>Temperatura:</strong> ${data.detalhes_premium.temperatura_ideal}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Pragas comuns:</strong><br>
-                        <small>${data.detalhes_premium.pragas_comuns.join(', ')}</small></p>
-                        <p><strong>Doenças comuns:</strong><br>
-                        <small>${data.detalhes_premium.doencas_comuns.join(', ')}</small></p>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="text-success"><i class="fas fa-info-circle me-2"></i>Informações da Cultura</h6>
+                        <table class="table table-sm mb-0">
+                            <tr><td><strong>Cultura:</strong></td><td>${data.cultura}</td></tr>
+                            <tr><td><strong>Área:</strong></td><td>${areaInfo}</td></tr>
+                            <tr><td><strong>Categoria:</strong></td><td>${data.categoria}</td></tr>
+                            <tr><td><strong>Preço estimado:</strong></td><td>${data.preco_venda_kg} MT/kg</td></tr>
+                        </table>
                     </div>
                 </div>
-
-                <h6 class="mt-3"><i class="fas fa-calendar-check"></i> Cronograma Detalhado</h6>
-                <div class="row">
-                    <div class="col-md-6">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item py-1"><strong>Preparação:</strong> ${data.detalhes_premium.calendario_completo.preparacao_solo}</li>
-                            <li class="list-group-item py-1"><strong>Plantio:</strong> ${data.detalhes_premium.calendario_completo.plantio}</li>
-                            <li class="list-group-item py-1"><strong>1ª Adubação:</strong> ${data.detalhes_premium.calendario_completo.primeira_adubacao}</li>
-                        </ul>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="text-success"><i class="fas fa-chart-line me-2"></i>Análise Económica</h6>
+                        <table class="table table-sm mb-0">
+                            <tr><td><strong>Custo estimado:</strong></td><td>${data.custo_estimado.toLocaleString()} MT</td></tr>
+                            <tr><td><strong>Receita estimada:</strong></td><td>${data.receita_estimada.toLocaleString()} MT</td></tr>
+                            <tr><td><strong>Lucro estimado:</strong></td>
+                                <td class="fw-bold ${data.lucro_estimado > 0 ? 'text-success' : 'text-danger'}">${data.lucro_estimado.toLocaleString()} MT</td></tr>
+                        </table>
                     </div>
-                    <div class="col-md-6">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item py-1"><strong>2ª Adubação:</strong> ${data.detalhes_premium.calendario_completo.segunda_adubacao}</li>
-                            <li class="list-group-item py-1"><strong>Controle pragas:</strong> ${data.detalhes_premium.calendario_completo.controle_pragas}</li>
-                            <li class="list-group-item py-1"><strong>Colheita:</strong> ${data.detalhes_premium.calendario_completo.colheita}</li>
-                        </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="text-info"><i class="fas fa-tint me-2"></i>Cronograma de Irrigação</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    ${data.cronograma_irrigacao.map(dia => `<span class="badge bg-info">${dia} dias</span>`).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    if (data.detalhes_basico) {
+        html += `
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="text-primary"><i class="fas fa-seedling me-2"></i>Informações de Plantio</h6>
+                    <p class="mb-1"><strong>Densidade:</strong> ${data.detalhes_basico.densidade_plantio}</p>
+                    <p class="mb-0"><strong>Época ideal:</strong> ${data.detalhes_basico.epoca_plantio}</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    if (data.detalhes_premium) {
+        html += `
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <i class="fas fa-crown me-2"></i>Informações Técnicas Detalhadas (Premium)
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Solo ideal:</strong> ${data.detalhes_premium.solo_ideal}</p>
+                            <p><strong>Altitude ideal:</strong> ${data.detalhes_premium.altitude_ideal}</p>
+                            <p><strong>Temperatura:</strong> ${data.detalhes_premium.temperatura_ideal}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Pragas comuns:</strong><br>
+                            <small>${data.detalhes_premium.pragas_comuns.join(', ')}</small></p>
+                            <p><strong>Doenças comuns:</strong><br>
+                            <small>${data.detalhes_premium.doencas_comuns.join(', ')}</small></p>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
     }
-
+    
     document.getElementById('resultadoConteudo').innerHTML = html;
     document.getElementById('resultadoConsultoria').style.display = 'block';
-
-    // Scroll para resultado
     document.getElementById('resultadoConsultoria').scrollIntoView({ behavior: 'smooth' });
 }
 
-// Funções auxiliares
 function abrirCalculadora(tipo) {
     const area = document.getElementById('calculadoraArea');
     const conteudo = document.getElementById('calculadoraConteudo');
-
-    area.style.display = 'block';
-
+    
+    let html = '';
     switch(tipo) {
         case 'adubacao':
-            conteudo.innerHTML = `
-                <h6>Calculadora de Adubação NPK</h6>
-                <div class="row">
-                    <div class="col-6">
-                        <input type="number" class="form-control form-control-sm mb-2" placeholder="Hectares" id="calc_hectares">
-                        <select class="form-select form-select-sm" id="calc_solo">
-                            <option>Solo arenoso</option>
-                            <option>Solo argiloso</option>
-                            <option>Solo franco</option>
-                        </select>
-                    </div>
-                    <div class="col-6">
-                        <button class="btn btn-primary btn-sm w-100" onclick="calcularNPK()">Calcular NPK</button>
-                        <div id="resultNPK" class="mt-2 small"></div>
-                    </div>
+            html = `
+                <h6><i class="fas fa-flask text-primary me-2"></i>Calculadora NPK</h6>
+                <div class="mb-3">
+                    <label class="form-label">Área (hectares)</label>
+                    <input type="number" class="form-control" id="calcArea" value="1">
                 </div>
+                <div class="mb-3">
+                    <label class="form-label">Cultura</label>
+                    <select class="form-select" id="calcCultura">
+                        <option value="milho">Milho</option>
+                        <option value="feijao">Feijão</option>
+                        <option value="tomate">Tomate</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="calcularNPK()">Calcular</button>
+                <div id="resultNPK" class="mt-3"></div>
             `;
             break;
         case 'densidade':
-            conteudo.innerHTML = `
-                <h6>Densidade de Plantio</h6>
-                <p class="small mb-2">Distâncias recomendadas:</p>
-                <ul class="small mb-0">
-                    <li>Milho: 80cm x 30cm (41.666 plantas/ha)</li>
-                    <li>Feijão: 40cm x 15cm (166.666 plantas/ha)</li>
-                    <li>Tomate: 100cm x 50cm (20.000 plantas/ha)</li>
-                </ul>
+            html = `
+                <h6><i class="fas fa-th text-primary me-2"></i>Densidade de Plantio</h6>
+                <div class="mb-3">
+                    <label class="form-label">Espaçamento entre linhas (m)</label>
+                    <input type="number" step="0.1" class="form-control" id="espacLinhas" value="0.8">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Espaçamento entre plantas (m)</label>
+                    <input type="number" step="0.1" class="form-control" id="espacPlantas" value="0.2">
+                </div>
+                <button class="btn btn-primary" onclick="calcularDensidade()">Calcular</button>
+                <div id="resultDensidade" class="mt-3"></div>
             `;
             break;
-        default:
-            conteudo.innerHTML = `<p>Calculadora em desenvolvimento...</p>`;
+        case 'irrigacao':
+            html = `
+                <h6><i class="fas fa-tint text-primary me-2"></i>Necessidade de Irrigação</h6>
+                <div class="mb-3">
+                    <label class="form-label">Área (hectares)</label>
+                    <input type="number" class="form-control" id="irrigArea" value="1">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tipo de solo</label>
+                    <select class="form-select" id="tipoSolo">
+                        <option value="arenoso">Arenoso</option>
+                        <option value="argiloso">Argiloso</option>
+                        <option value="franco">Franco</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="calcularIrrigacao()">Calcular</button>
+                <div id="resultIrrig" class="mt-3"></div>
+            `;
+            break;
+        case 'custos':
+            html = `
+                <h6><i class="fas fa-coins text-primary me-2"></i>Estimativa de Custos</h6>
+                <div class="mb-3">
+                    <label class="form-label">Área (hectares)</label>
+                    <input type="number" class="form-control" id="custoArea" value="1">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Cultura</label>
+                    <select class="form-select" id="custoCultura">
+                        <option value="15000">Milho (15.000 MT/ha)</option>
+                        <option value="12000">Feijão (12.000 MT/ha)</option>
+                        <option value="25000">Tomate (25.000 MT/ha)</option>
+                        <option value="18000">Arroz (18.000 MT/ha)</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="calcularCustos()">Calcular</button>
+                <div id="resultCustos" class="mt-3"></div>
+            `;
+            break;
     }
+    
+    conteudo.innerHTML = html;
+    area.style.display = 'block';
 }
 
 function calcularNPK() {
-    const hectares = document.getElementById('calc_hectares').value;
-    if (hectares) {
-        const npk = hectares * 150; // kg base
-        document.getElementById('resultNPK').innerHTML = `
-            <strong>Recomendação:</strong><br>
-            NPK 4-14-8: ${npk} kg<br>
-            Ureia: ${hectares * 50} kg
-        `;
-    }
+    const area = parseFloat(document.getElementById('calcArea').value);
+    const npk = { milho: 150, feijao: 200, tomate: 300 };
+    const cultura = document.getElementById('calcCultura').value;
+    const total = area * npk[cultura];
+    document.getElementById('resultNPK').innerHTML = `
+        <div class="alert alert-success mb-0">
+            <strong>Resultado:</strong> Você precisa de <strong>${total} kg</strong> de NPK para ${area} hectare(s) de ${cultura}.
+        </div>
+    `;
+}
+
+function calcularDensidade() {
+    const linhas = parseFloat(document.getElementById('espacLinhas').value);
+    const plantas = parseFloat(document.getElementById('espacPlantas').value);
+    const densidade = Math.round(10000 / (linhas * plantas));
+    document.getElementById('resultDensidade').innerHTML = `
+        <div class="alert alert-success mb-0">
+            <strong>Resultado:</strong> Densidade de <strong>${densidade.toLocaleString()} plantas/ha</strong>
+        </div>
+    `;
+}
+
+function calcularIrrigacao() {
+    const area = parseFloat(document.getElementById('irrigArea').value);
+    const solos = { arenoso: 35, argiloso: 25, franco: 30 };
+    const solo = document.getElementById('tipoSolo').value;
+    const litros = area * solos[solo] * 1000;
+    document.getElementById('resultIrrig').innerHTML = `
+        <div class="alert alert-success mb-0">
+            <strong>Resultado:</strong> Necessidade diária estimada: <strong>${litros.toLocaleString()} litros/dia</strong> (${solos[solo]} mm/dia)
+        </div>
+    `;
+}
+
+function calcularCustos() {
+    const area = parseFloat(document.getElementById('custoArea').value);
+    const custo = parseFloat(document.getElementById('custoCultura').value);
+    const total = area * custo;
+    document.getElementById('resultCustos').innerHTML = `
+        <div class="alert alert-success mb-0">
+            <strong>Resultado:</strong> Custo estimado: <strong>${total.toLocaleString()} MT</strong> para ${area} hectare(s)
+        </div>
+    `;
 }
 
 function obterClima() {
-    document.getElementById('climaInfo').style.display = 'block';
-    document.getElementById('climaInfo').innerHTML = `
-        <div class="alert alert-info">
-            <strong>📅 Previsão 7 dias:</strong><br>
-            🌤️ Hoje: 28°C, parcialmente nublado<br>
-            ⛅ Amanhã: 26°C, possível chuva<br>
-            <small class="text-muted">Dados simulados - integração climática em desenvolvimento</small>
+    const provincia = document.getElementById('provincia').value;
+    const climaInfo = document.getElementById('climaInfo');
+    climaInfo.style.display = 'block';
+    climaInfo.innerHTML = `
+        <div class="alert alert-info mb-0">
+            <h6><i class="fas fa-cloud-sun me-2"></i>Previsão para ${provincia.charAt(0).toUpperCase() + provincia.slice(1)}</h6>
+            <p class="mb-2"><strong>Hoje:</strong> 28°C - Parcialmente nublado</p>
+            <p class="mb-2"><strong>Amanhã:</strong> 30°C - Ensolarado</p>
+            <p class="mb-0"><strong>Probabilidade de chuva:</strong> 20%</p>
         </div>
     `;
 }
-
-function consultarPrecos() {
-    // Simular consulta de preços
-    alert('Consultando preços atualizados...\n\nEm desenvolvimento: integração com mercados locais');
-}
-
-function enviarPerguntaIA() {
-    const pergunta = document.getElementById('perguntaIA').value;
-    if (!pergunta) return;
-
-    const chatArea = document.getElementById('chatArea');
-
-    // Adicionar pergunta do usuário
-    chatArea.innerHTML += `
-        <div class="mb-2">
-            <small class="text-muted">Você:</small><br>
-            <strong>${pergunta}</strong>
-        </div>
-    `;
-
-    // Simular resposta da IA
-    setTimeout(() => {
-        chatArea.innerHTML += `
-            <div class="mb-2 p-2 bg-success text-white rounded">
-                <small>IA Agrícola:</small><br>
-                Baseado na sua pergunta sobre "${pergunta}", recomendo consultar o guia específico da cultura.
-                Para problemas com pragas, verifique se não há excesso de umidade e considere tratamento preventivo.
-            </div>
-        `;
-        chatArea.scrollTop = chatArea.scrollHeight;
-    }, 1500);
-
-    document.getElementById('perguntaIA').value = '';
-    chatArea.scrollTop = chatArea.scrollHeight;
-}
-
-function gerarRelatorioPDF() {
-    alert('📄 Funcionalidade Premium: Relatório PDF\n\nEm desenvolvimento - permitirá exportar histórico completo da fazenda');
-}
-
-// Formulário de pragas
-{% if session.is_premium %}
-document.getElementById('pragasForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const cultura = this.cultura_praga.value;
-    const sintoma = this.sintoma.value;
-
-    let diagnostico = '';
-
-    if (cultura === 'milho' && sintoma === 'folhas-amarelas') {
-        diagnostico = `
-            <div class="alert alert-warning">
-                <h6>🐛 Diagnóstico: Possível Deficiência Nutricional</h6>
-                <p><strong>Causa provável:</strong> Falta de nitrogênio ou excesso de água</p>
-                <p><strong>Tratamento:</strong></p>
-                <ul>
-                    <li>Aplicar ureia: 50kg/ha</li>
-                    <li>Melhorar drenagem</li>
-                    <li>Monitorar pragas secundárias</li>
-                </ul>
-                <p><strong>Produtos recomendados:</strong> Ureia 46%, Sulfato de amônio</p>
-            </div>
-        `;
-    } else {
-        diagnostico = `
-            <div class="alert alert-info">
-                <h6>Diagnóstico em análise...</h6>
-                <p>Baseado nos sintomas, consulte um técnico agrícola local ou envie fotos para análise mais detalhada.</p>
-            </div>
-        `;
-    }
-
-    // Mostrar resultado no final da página
-    document.getElementById('resultadoConteudo').innerHTML = diagnostico;
-    document.getElementById('resultadoConsultoria').style.display = 'block';
-    document.getElementById('resultadoConsultoria').scrollIntoView({ behavior: 'smooth' });
-});
-{% endif %}
 </script>
 {% endblock %}

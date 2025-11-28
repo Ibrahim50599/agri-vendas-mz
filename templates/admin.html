@@ -16,46 +16,70 @@
 </div>
 
 <!-- Estatísticas -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card bg-primary text-white">
-            <div class="card-body text-center">
+<div class="row mb-4 g-3">
+    <div class="{% if admin_level == 'superadmin' %}col-lg-2 col-md-4{% else %}col-md-3{% endif %}">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body text-center py-3">
                 <i class="fas fa-users fa-2x mb-2"></i>
-                <h4>{{ stats.total_usuarios }}</h4>
-                <p>Total de Usuários</p>
+                <h4 class="mb-1">{{ stats.total_usuarios }}</h4>
+                <small>Usuários</small>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card bg-warning text-dark">
-            <div class="card-body text-center">
+    <div class="{% if admin_level == 'superadmin' %}col-lg-2 col-md-4{% else %}col-md-3{% endif %}">
+        <div class="card bg-warning text-dark h-100">
+            <div class="card-body text-center py-3">
                 <i class="fas fa-crown fa-2x mb-2"></i>
-                <h4>{{ stats.usuarios_premium }}</h4>
-                <p>Usuários Premium</p>
+                <h4 class="mb-1">{{ stats.usuarios_premium }}</h4>
+                <small>Premium</small>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card bg-success text-white">
-            <div class="card-body text-center">
+    <div class="{% if admin_level == 'superadmin' %}col-lg-2 col-md-4{% else %}col-md-3{% endif %}">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body text-center py-3">
                 <i class="fas fa-box fa-2x mb-2"></i>
-                <h4>{{ stats.total_produtos }}</h4>
-                <p>Produtos Ativos</p>
+                <h4 class="mb-1">{{ stats.total_produtos }}</h4>
+                <small>Produtos</small>
             </div>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card bg-info text-white">
-            <div class="card-body text-center">
+    <div class="{% if admin_level == 'superadmin' %}col-lg-2 col-md-4{% else %}col-md-3{% endif %}">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body text-center py-3">
                 <i class="fas fa-user-shield fa-2x mb-2"></i>
-                <h4>{{ stats.total_admins }}</h4>
-                <p>Administradores</p>
+                <h4 class="mb-1">{{ stats.total_admins }}</h4>
+                <small>Admins</small>
             </div>
         </div>
     </div>
+
+    {% if admin_level == 'superadmin' %}
+    <div class="col-lg-4 col-md-8">
+        <div class="card h-100" style="background: linear-gradient(135deg, #1B5E20, #4CAF50); color: white;">
+            <div class="card-body py-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <i class="fas fa-tractor fa-2x mb-2"></i>
+                        <h4 class="mb-1">{{ stats.total_equipamentos }}</h4>
+                        <small>Equipamentos na Loja</small>
+                    </div>
+                    <div class="text-end">
+                        <a href="{{ url_for('novo_equipamento') }}" class="btn btn-light btn-sm mb-2 d-block">
+                            <i class="fas fa-plus"></i> Novo
+                        </a>
+                        <a href="{{ url_for('loja_equipamentos') }}" class="btn btn-outline-light btn-sm d-block">
+                            <i class="fas fa-store"></i> Ver Loja
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <!-- Navegação por abas -->
@@ -79,6 +103,11 @@
     <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#administradores">
             <i class="fas fa-user-shield"></i> Administradores
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#equipamentos">
+            <i class="fas fa-tractor"></i> Equipamentos
         </a>
     </li>
     <li class="nav-item">
@@ -348,6 +377,93 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Aba Equipamentos (apenas para super admin) -->
+    {% if admin_level == 'superadmin' %}
+    <div class="tab-pane fade" id="equipamentos">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-gradient text-white d-flex justify-content-between align-items-center" 
+                 style="background: linear-gradient(135deg, #1B5E20, #4CAF50) !important;">
+                <h5 class="mb-0"><i class="fas fa-tractor me-2"></i>Gerenciar Equipamentos</h5>
+                <div>
+                    <span class="badge bg-light text-success me-2">{{ equipamentos|length }} equipamentos</span>
+                    <a href="{{ url_for('novo_equipamento') }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus me-1"></i>Novo Equipamento
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if equipamentos %}
+                <div class="row g-4">
+                    {% for equip in equipamentos %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card h-100 border-0 shadow-sm" style="border-radius: 15px; overflow: hidden; transition: all 0.3s ease;">
+                            <div class="position-relative">
+                                {% if equip[6] %}
+                                    <img src="{{ url_for('static', filename=equip[6]) }}" class="card-img-top" 
+                                         alt="{{ equip[1] }}" style="height: 180px; object-fit: cover;">
+                                {% else %}
+                                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                                        <i class="fas fa-tractor fa-4x text-muted opacity-50"></i>
+                                    </div>
+                                {% endif %}
+                                <span class="position-absolute top-0 start-0 m-2 badge" 
+                                      style="background: linear-gradient(135deg, #1B5E20, #4CAF50);">
+                                    {{ equip[4] or 'Geral' }}
+                                </span>
+                                <span class="position-absolute top-0 end-0 m-2 badge 
+                                      {% if equip[9] == 'disponivel' %}bg-success{% elif equip[9] == 'reservado' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                    {{ equip[9]|capitalize if equip[9] else 'Disponível' }}
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title fw-bold text-success mb-2">{{ equip[1] }}</h6>
+                                <p class="card-text text-muted small mb-2">
+                                    {{ equip[2][:80] if equip[2] else 'Sem descrição' }}{% if equip[2] and equip[2]|length > 80 %}...{% endif %}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fs-5 fw-bold text-success">{{ "%.2f"|format(equip[3]) }} MT</span>
+                                    <span class="badge bg-light text-dark">
+                                        <i class="fas fa-boxes me-1"></i>{{ equip[5] }} un.
+                                    </span>
+                                </div>
+                                {% if equip[7] %}
+                                <small class="text-muted d-block mb-1">
+                                    <i class="fas fa-map-marker-alt me-1"></i>{{ equip[7] }}
+                                </small>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0">
+                                <div class="btn-group w-100">
+                                    <a href="{{ url_for('editar_equipamento', equip_id=equip[0]) }}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </a>
+                                    <a href="{{ url_for('remover_equipamento', equip_id=equip[0]) }}" 
+                                       class="btn btn-outline-danger btn-sm"
+                                       onclick="return confirm('Remover equipamento {{ equip[1] }}?')">
+                                        <i class="fas fa-trash"></i> Remover
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-tractor fa-4x text-muted opacity-50 mb-3"></i>
+                    <h5 class="text-muted">Nenhum equipamento cadastrado</h5>
+                    <p class="text-muted">Clique no botão acima para adicionar o primeiro equipamento</p>
+                    <a href="{{ url_for('novo_equipamento') }}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Adicionar Equipamento
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
