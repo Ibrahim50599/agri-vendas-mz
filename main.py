@@ -503,7 +503,8 @@ def calcular_plantio():
             'pragas_comuns': ['Lagarta-do-cartucho', 'Broca-do-colmo', 'Curuquerê', 'Pulgão'],
             'doencas_comuns': ['Ferrugem', 'Mancha-branca', 'Podridão-do-colmo', 'Cercosporiose'],
             'densidade_plantio': '60.000-80.000 plantas/ha', 'categoria': 'cereais',
-            'recomenda_solo': 'Realizar calagem se pH < 5.5. Adicionar matéria orgânica.'
+            'recomenda_solo': 'Realizar calagem se pH < 5.5. Adicionar matéria orgânica.',
+            'pos_colheita': 'Secagem até 13% de umidade. Armazenar em silos arejados ou sacos tratados contra caruncho.'
         },
         'arroz': {
             'nome': 'Arroz', 'sementes_por_ha': 120, 'fertilizante_npk': 180, 
@@ -515,7 +516,8 @@ def calcular_plantio():
             'pragas_comuns': ['Broca-do-colmo', 'Percevejo-do-grão', 'Lagarta-das-folhas'],
             'doencas_comuns': ['Brusone', 'Queima-das-bainhas', 'Mancha-parda'],
             'densidade_plantio': '100-150 kg sementes/ha', 'categoria': 'cereais',
-            'recomenda_solo': 'Manter lâmina de água constante. NPK rico em Nitrogênio.'
+            'recomenda_solo': 'Manter lâmina de água constante. NPK rico em Nitrogênio.',
+            'pos_colheita': 'Secagem imediata após colheita para evitar fungos. Limpeza de impurezas antes do armazenamento.'
         },
         'trigo': {
             'nome': 'Trigo', 'sementes_por_ha': 150, 'fertilizante_npk': 200, 
@@ -985,7 +987,9 @@ def calcular_plantio():
         'receita_estimada': round(dados['rendimento_medio'] * hectares * preco_venda, 2),
         'lucro_estimado': round((dados['rendimento_medio'] * hectares * preco_venda) - (dados['custo_por_ha'] * hectares), 2),
         'preco_venda_kg': preco_venda,
-        'categoria': dados.get('categoria', 'geral')
+        'categoria': dados.get('categoria', 'geral'),
+        'recomenda_solo': dados.get('recomenda_solo', 'Prepare o solo com matéria orgânica e verifique o pH.'),
+        'pos_colheita': dados.get('pos_colheita', 'Armazene em local seco e arejado após a secagem.')
     }
 
     # Informações detalhadas para todos (básico) e premium (completo)
@@ -1004,6 +1008,8 @@ def calcular_plantio():
             'doencas_comuns': dados['doencas_comuns'],
             'epoca_plantio': dados['epoca_plantio'],
             'densidade_plantio': dados.get('densidade_plantio', 'Consulte um técnico'),
+            'recomenda_solo': dados.get('recomenda_solo', 'Informação detalhada em breve.'),
+            'pos_colheita': dados.get('pos_colheita', 'Informação detalhada em breve.'),
             'calendario_completo': {
                 'plantio': dados['epoca_plantio'],
                 'irrigacao': f"Irrigar nos dias: {', '.join(map(str, dados['irrigacao_dias']))}",
