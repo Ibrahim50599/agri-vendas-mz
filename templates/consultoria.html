@@ -789,63 +789,71 @@ function exibirResultadoCultivo(data) {
         `;
     }
     
-    if (data.detalhes_premium) {
+    if (data.recomenda_solo) {
         html += `
-            <div class="card border-warning mb-3">
-                <div class="card-header bg-warning text-dark">
-                    <i class="fas fa-crown me-2"></i>Informações Técnicas Detalhadas (Premium)
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Solo ideal:</strong> ${data.detalhes_premium.solo_ideal}</p>
-                            <p><strong>Altitude ideal:</strong> ${data.detalhes_premium.altitude_ideal}</p>
-                            <p><strong>Temperatura:</strong> ${data.detalhes_premium.temperatura_ideal}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p><strong>Pragas comuns:</strong><br>
-                            <small>${data.detalhes_premium.pragas_comuns.join(', ')}</small></p>
-                            <p><strong>Doenças comuns:</strong><br>
-                            <small>${data.detalhes_premium.doencas_comuns.join(', ')}</small></p>
-                        </div>
+        <div class="mt-4">
+            <h5 class="text-success"><i class="fas fa-flask me-2"></i>Plano de Adubação Personalizado (N-P-K)</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="stat-box border-top border-success border-4">
+                        <div class="value text-success">${data.npk_recomendado.N}kg</div>
+                        <div class="label">Nitrogênio (N)</div>
                     </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="text-success"><i class="fas fa-vial me-2"></i>Manejo do Solo</h6>
-                            <p class="small">${data.detalhes_premium.recomenda_solo}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-danger"><i class="fas fa-box-open me-2"></i>Manejo Pós-Colheita</h6>
-                            <p class="small">${data.detalhes_premium.pos_colheita}</p>
-                        </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-box border-top border-primary border-4">
+                        <div class="value text-primary">${data.npk_recomendado.P}kg</div>
+                        <div class="label">Fósforo (P)</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-box border-top border-warning border-4">
+                        <div class="value text-warning">${data.npk_recomendado.K}kg</div>
+                        <div class="label">Potássio (K)</div>
                     </div>
                 </div>
             </div>
-        `;
-    } else {
-        // Mostrar recomendações básicas se não for premium
-        html += `
-        <div class="row g-3 mb-3">
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h6 class="text-success"><i class="fas fa-vial me-2"></i>Preparo do Solo</h6>
-                        <p class="small mb-0">${data.recomenda_solo}</p>
-                    </div>
-                </div>
+            
+            <h5 class="text-warning mt-4"><i class="fas fa-shield-virus me-2"></i>Gestão de Riscos e Pragas</h5>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover border">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Estágio</th>
+                            <th>Risco Principal</th>
+                            <th>Ação Recomendada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.alerta_pragas.map(p => `
+                            <tr>
+                                <td><span class="badge bg-secondary">${p.estagio}</span></td>
+                                <td class="text-danger fw-bold">${p.risco}</td>
+                                <td>${p.acao}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
             </div>
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h6 class="text-danger"><i class="fas fa-box-open me-2"></i>Pós-Colheita</h6>
-                        <p class="small mb-0">${data.pos_colheita}</p>
-                    </div>
-                </div>
+
+            <h5 class="text-success mt-4"><i class="fas fa-vial me-2"></i>Preparo do Solo</h5>
+            <div class="alert alert-light border-start border-success border-4">
+                ${data.recomenda_solo}
             </div>
-        </div>
-        `;
+        </div>`;
     }
+
+    if (data.pos_colheita) {
+        html += `
+        <div class="mt-4">
+            <h5 class="text-danger"><i class="fas fa-box-open me-2"></i>Cuidados Pós-Colheita</h5>
+            <div class="alert alert-light border-start border-danger border-4">
+                ${data.pos_colheita}
+            </div>
+        </div>`;
+    }
+
+    html += '</div>';
     
     document.getElementById('resultadoConteudo').innerHTML = html;
     document.getElementById('resultadoConsultoria').style.display = 'block';

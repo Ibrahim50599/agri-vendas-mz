@@ -989,7 +989,17 @@ def calcular_plantio():
         'preco_venda_kg': preco_venda,
         'categoria': dados.get('categoria', 'geral'),
         'recomenda_solo': dados.get('recomenda_solo', 'Prepare o solo com matéria orgânica e verifique o pH.'),
-        'pos_colheita': dados.get('pos_colheita', 'Armazene em local seco e arejado após a secagem.')
+        'pos_colheita': dados.get('pos_colheita', 'Armazene em local seco e arejado após a secagem.'),
+        'npk_recomendado': {
+            'N': round(dados['fertilizante_npk'] * 0.4 * hectares, 1),
+            'P': round(dados['fertilizante_npk'] * 0.3 * hectares, 1),
+            'K': round(dados['fertilizante_npk'] * 0.3 * hectares, 1)
+        },
+        'alerta_pragas': [
+            {'estagio': 'Germinação', 'risco': 'Lagarta-rosca', 'acao': 'Monitorar solo e umidade'},
+            {'estagio': 'Crescimento', 'risco': 'Pulgões', 'acao': 'Aplicação de óleo de neem se necessário'},
+            {'estagio': 'Floração', 'risco': 'Percevejos', 'acao': 'Monitoramento rigoroso matinal'}
+        ]
     }
 
     # Informações detalhadas para todos (básico) e premium (completo)
