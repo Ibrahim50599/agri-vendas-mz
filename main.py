@@ -502,7 +502,8 @@ def calcular_plantio():
             'temperatura_ideal': '18-32°C', 'epoca_plantio': 'Out-Dez (época chuvosa)',
             'pragas_comuns': ['Lagarta-do-cartucho', 'Broca-do-colmo', 'Curuquerê', 'Pulgão'],
             'doencas_comuns': ['Ferrugem', 'Mancha-branca', 'Podridão-do-colmo', 'Cercosporiose'],
-            'densidade_plantio': '60.000-80.000 plantas/ha', 'categoria': 'cereais'
+            'densidade_plantio': '60.000-80.000 plantas/ha', 'categoria': 'cereais',
+            'recomenda_solo': 'Realizar calagem se pH < 5.5. Adicionar matéria orgânica.'
         },
         'arroz': {
             'nome': 'Arroz', 'sementes_por_ha': 120, 'fertilizante_npk': 180, 
@@ -513,7 +514,8 @@ def calcular_plantio():
             'epoca_plantio': 'Nov-Jan (irrigado), Mar-Mai (sequeiro)',
             'pragas_comuns': ['Broca-do-colmo', 'Percevejo-do-grão', 'Lagarta-das-folhas'],
             'doencas_comuns': ['Brusone', 'Queima-das-bainhas', 'Mancha-parda'],
-            'densidade_plantio': '100-150 kg sementes/ha', 'categoria': 'cereais'
+            'densidade_plantio': '100-150 kg sementes/ha', 'categoria': 'cereais',
+            'recomenda_solo': 'Manter lâmina de água constante. NPK rico em Nitrogênio.'
         },
         'trigo': {
             'nome': 'Trigo', 'sementes_por_ha': 150, 'fertilizante_npk': 200, 
