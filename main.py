@@ -303,6 +303,17 @@ def superadmin_required(f):
 
 
 # Rotas principais
+@app.before_request
+def update_premium_status():
+    if 'user_id' in session:
+        conn = sqlite3.connect('agri_vendas.db')
+        c = conn.cursor()
+        c.execute("SELECT premium FROM usuarios WHERE id = ?", (session['user_id'],))
+        user = c.fetchone()
+        conn.close()
+        if user:
+            session['is_premium'] = user[0]
+
 @app.route('/')
 def index():
     conn = sqlite3.connect('agri_vendas.db')
@@ -380,6 +391,7 @@ def login():
         conn.close()
 
         if user and check_password_hash(user[2], senha):
+            # Buscar dados atualizados do banco antes de salvar na sessão
             session['user_id'] = user[0]
             session['user_name'] = user[1]
             session['user_type'] = user[3]

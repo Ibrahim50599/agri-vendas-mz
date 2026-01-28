@@ -347,7 +347,14 @@
                         </div>
                         <div class="card-body">
                             <h5 class="card-title">{{ equip[1] }}</h5>
-                            <div class="preco mb-3">{{ "%.2f"|format(equip[3]) }} MT</div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="preco">{{ "%.2f"|format(equip[3]) }} MT</div>
+                                {% if equip[5] > 0 %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3">Disponível</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3">Esgotado</span>
+                                {% endif %}
+                            </div>
                             
                             {% if equip[2] %}
                                 <p class="card-text mb-3">
