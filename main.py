@@ -308,11 +308,13 @@ def update_premium_status():
     if 'user_id' in session:
         conn = sqlite3.connect('agri_vendas.db')
         c = conn.cursor()
-        c.execute("SELECT premium FROM usuarios WHERE id = ?", (session['user_id'],))
+        c.execute("SELECT premium, tipo FROM usuarios WHERE id = ?", (session['user_id'],))
         user = c.fetchone()
         conn.close()
         if user:
+            # Atualiza tanto o status premium quanto o tipo de usuário (caso tenha virado admin)
             session['is_premium'] = user[0]
+            session['user_type'] = user[1]
 
 @app.route('/')
 def index():
