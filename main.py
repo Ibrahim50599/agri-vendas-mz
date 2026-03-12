@@ -51,9 +51,8 @@ def init_db():
         FOREIGN KEY (vendedor_id) REFERENCES usuarios (id)
     )''')
 
-    # Tabela de administradores (recriar com estrutura correta)
-    c.execute('DROP TABLE IF EXISTS administradores')
-    c.execute('''CREATE TABLE administradores (
+    # Tabela de administradores
+    c.execute('''CREATE TABLE IF NOT EXISTS administradores (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         usuario_id INTEGER,
         nivel_acesso TEXT DEFAULT 'admin',
