@@ -24,14 +24,14 @@
             <div class="col-md-3">
                 <label class="form-label fw-semibold">Categoria</label>
                 <select class="form-select form-select-lg" name="categoria">
-                    <option value="">🌾 Todas as categorias</option>
-                    <option value="Cereais">🌾 Cereais</option>
-                    <option value="Legumes">🥬 Legumes</option>
-                    <option value="Frutas">🍎 Frutas</option>
-                    <option value="Tubérculos">🥔 Tubérculos</option>
-                    <option value="Sementes">🌱 Sementes</option>
-                    <option value="Fertilizantes">🧪 Fertilizantes</option>
-                    <option value="Equipamentos">🚜 Equipamentos</option>
+                    <option value="">Todas as categorias</option>
+                    <option value="Cereais">Cereais</option>
+                    <option value="Legumes">Legumes</option>
+                    <option value="Frutas">Frutas</option>
+                    <option value="Tubérculos">Tubérculos</option>
+                    <option value="Sementes">Sementes</option>
+                    <option value="Fertilizantes">Fertilizantes</option>
+                    <option value="Equipamentos">Equipamentos</option>
                 </select>
             </div>
 
@@ -123,11 +123,24 @@
 
                     <!-- Ações -->
                     <div class="card-footer bg-white border-top">
-                        <div class="d-grid gap-2">
-                            <a href="{{ url_for('contato_whatsapp', vendedor_id=produto[1]) }}"
-                               class="btn btn-success btn-lg">
-                                <i class="fab fa-whatsapp me-2"></i> Contactar Vendedor
-                            </a>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <button class="btn btn-outline-primary btn-sm w-100" onclick="quickView({{ produto[0] }})">
+                                    <i class="fas fa-eye me-1"></i> Ver
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <a href="{{ url_for('contato_whatsapp', vendedor_id=produto[1]) }}"
+                                   class="btn btn-success btn-sm w-100">
+                                    <i class="fab fa-whatsapp me-1"></i> Contactar
+                                </a>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-center">
+                            <button class="btn btn-link btn-sm text-muted p-0" onclick="toggleFavorite({{ produto[0] }})">
+                                <i class="far fa-heart me-1" id="heart-{{ produto[0] }}"></i>
+                                <small>Favoritar</small>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -137,9 +150,14 @@
 
     <!-- Paginação ou Load More -->
     <div class="text-center mt-5">
-        <button class="btn btn-outline-success btn-lg px-4">
+        <button class="btn btn-outline-success btn-lg px-4" id="loadMoreBtn" onclick="loadMoreProducts()">
             <i class="fas fa-plus-circle me-2"></i> Carregar Mais Produtos
         </button>
+        <div id="loadingSpinner" class="d-none mt-3">
+            <div class="spinner-border text-success" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+        </div>
     </div>
 
 {% else %}
@@ -163,6 +181,27 @@
     </div>
 {% endif %}
 
+<!-- Quick View Modal -->
+<div class="modal fade" id="quickViewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="quickViewTitle">Detalhes do Produto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="quickViewBody">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-success" id="contactBtn">
+                    <i class="fab fa-whatsapp me-2"></i> Contactar Vendedor
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Estatísticas do Marketplace -->
 <div class="card mt-5 bg-gradient" style="background: linear-gradient(135deg, #E8F5E8 0%, #F1F8E9 100%);">
     <div class="card-body text-center py-4">
@@ -182,5 +221,138 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
+<script>
+// Product interaction functions
+let currentPage = 1;
+const productsPerPage = 12;
+let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+function loadMoreProducts() {
+    const btn = document.getElementById('loadMoreBtn');
+    const spinner = document.getElementById('loadingSpinner');
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Carregando...';
+    spinner.classList.remove('d-none');
+
+    // Simulate loading more products
+    setTimeout(() => {
+        currentPage++;
+        // In a real app, this would make an AJAX call to load more products
+        // For now, we'll just hide the button after a few loads
+        if (currentPage >= 3) {
+            btn.style.display = 'none';
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-plus-circle me-2"></i> Carregar Mais Produtos';
+        spinner.classList.add('d-none');
+
+        // Show success message
+        showToast('Mais produtos carregados!', 'success');
+    }, 1500);
+}
+
+function quickView(productId) {
+    // Find product data (in real app, this would be an AJAX call)
+    const products = {{ produtos|tojson }};
+    const product = products.find(p => p[0] === productId);
+
+    if (product) {
+        document.getElementById('quickViewTitle').textContent = product[2];
+
+        const body = document.getElementById('quickViewBody');
+        body.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    ${product[6] ?
+                        `<img src="/static/${product[6]}" class="img-fluid rounded" alt="${product[2]}">` :
+                        `<div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 300px;">
+                            <i class="fas fa-image fa-3x text-muted"></i>
+                        </div>`
+                    }
+                </div>
+                <div class="col-md-6">
+                    <h4 class="text-success">${product[2]}</h4>
+                    <h3 class="text-success fw-bold mb-3">${product[3].toFixed(2)} MT</h3>
+                    <p class="mb-3">${product[4]}</p>
+                    <div class="mb-3">
+                        <strong>Categoria:</strong> ${product[7] || 'N/A'}<br>
+                        <strong>Localização:</strong> ${product[5]}<br>
+                        <strong>Vendedor:</strong> ${product[9]}
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Entre em contato diretamente com o vendedor para mais detalhes e negociação.
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('contactBtn').onclick = () => {
+            window.open(`https://wa.me/258${product[10] || '878312890'}?text=Olá! Vi seu produto "${product[2]}" no AGRI.vendasMz e gostaria de mais informações.`, '_blank');
+        };
+
+        new bootstrap.Modal(document.getElementById('quickViewModal')).show();
+    }
+}
+
+function toggleFavorite(productId) {
+    const heartIcon = document.getElementById(`heart-${productId}`);
+
+    if (favorites.includes(productId)) {
+        favorites = favorites.filter(id => id !== productId);
+        heartIcon.className = 'far fa-heart me-1';
+        showToast('Removido dos favoritos', 'info');
+    } else {
+        favorites.push(productId);
+        heartIcon.className = 'fas fa-heart me-1 text-danger';
+        showToast('Adicionado aos favoritos!', 'success');
+    }
+
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+}
+
+// Initialize favorites on page load
+document.addEventListener('DOMContentLoaded', function() {
+    favorites.forEach(id => {
+        const heartIcon = document.getElementById(`heart-${id}`);
+        if (heartIcon) {
+            heartIcon.className = 'fas fa-heart me-1 text-danger';
+        }
+    });
+});
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    const toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+    toastContainer.innerHTML = `
+        <div class="toast align-items-center text-white bg-${type} border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(toastContainer);
+    const toast = new bootstrap.Toast(toastContainer.querySelector('.toast'));
+    toast.show();
+
+    setTimeout(() => {
+        document.body.removeChild(toastContainer);
+    }, 3000);
+}
+
+// Enhanced search with debouncing
+let searchTimeout;
+document.querySelector('input[name="regiao"]')?.addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        // Auto-suggest locations
+        console.log('Searching locations...');
+    }, 500);
+});
+</script>
