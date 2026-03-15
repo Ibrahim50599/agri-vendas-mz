@@ -3,7 +3,7 @@ services:
     name: agri-vendas-mz
     env: python
     buildCommand: ""
-    startCommand: python start.py
+    startCommand: gunicorn main:app --bind 0.0.0.0:$PORT
 
 
 
