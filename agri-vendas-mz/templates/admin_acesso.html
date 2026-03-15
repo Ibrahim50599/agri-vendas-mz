@@ -1,0 +1,41 @@
+
+{% extends "base.html" %}
+
+{% block title %}Acesso Administrativo - AGRI.vendasMz{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white text-center">
+                <h4><i class="fas fa-shield-alt"></i> Acesso Administrativo</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-key"></i> Código de Acesso
+                        </label>
+                        <input type="password" class="form-control" name="codigo" required
+                               placeholder="Digite o código de acesso">
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="fas fa-sign-in-alt"></i> Acessar
+                        </button>
+                    </div>
+                </form>
+
+                <hr>
+
+                <div class="text-center">
+                    <a href="{{ url_for('recuperar_codigo_admin') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-question-circle"></i> Esqueceu o código?
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
