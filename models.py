@@ -2,17 +2,9 @@ import sqlite3
 from werkzeug.security import generate_password_hash
 import datetime
 
-# Importar sistema robusto
-from robust_system import RobustDatabase
+class Database:
+    """Database class com funcionalidades básicas"""
 
-class Database(RobustDatabase):
-    """Database class com funcionalidades robustas herdadas"""
-
-    def __init__(self, db_path):
-        # Chamar construtor da classe pai
-        super().__init__(db_path)
-
-    # Todas as outras funções permanecem iguais, mas agora com robustez adicional
     def __init__(self, db_path):
         self.db_path = db_path
 
