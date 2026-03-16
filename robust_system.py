@@ -10,6 +10,7 @@ import traceback
 import hashlib
 import secrets
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import session
 
 # Importação condicional para evitar dependência circular
 def get_database_class():
