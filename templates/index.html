@@ -1,14 +1,361 @@
 
 {% extends "base.html" %}
 
-{% block title %}AGRI.vendasMz - Marketplace Agrícola de Moçambique{% endblock %}
+{% block title %}AGRI.vendasMz - Marketplace Agrícola Profissional de Moçambique{% endblock %}
 
 {% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1 class="hero-title">
+            <i class="fas fa-seedling me-3"></i>
+            Revolucione sua Agricultura
+        </h1>
+        <p class="hero-subtitle">
+            O marketplace agrícola mais avançado de Moçambique. Conecte-se com produtores, consultores e fornecedores de equipamentos agrícolas.
+        </p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('produtos') }}" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-shopping-cart me-2"></i>Explorar Produtos
+            </a>
+            <a href="{{ url_for('consultoria') }}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-chart-line me-2"></i>Consultoria Agrícola
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-4 fw-bold text-primary mb-3" data-aos="fade-up">
+                    Por que escolher AGRI.vendasMz?
+                </h2>
+                <p class="lead text-muted" data-aos="fade-up" data-aos-delay="200">
+                    Tecnologia de ponta para agricultura moderna em Moçambique
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-store fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Marketplace Completo</h5>
+                        <p class="card-text text-muted">
+                            Compre e venda produtos agrícolas com segurança e praticidade. Nossa plataforma conecta produtores de todo o país.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-chart-line fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Consultoria Inteligente</h5>
+                        <p class="card-text text-muted">
+                            Análises avançadas de mercado, previsões climáticas e recomendações personalizadas para maximizar sua produção.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-4">
+                            <i class="fas fa-shield-alt fa-3x text-warning"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Segurança Total</h5>
+                        <p class="card-text text-muted">
+                            Sistema robusto com criptografia avançada, backups automáticos e monitoramento 24/7 para proteger seus dados.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up">
+                <div class="stat-card">
+                    <div class="stat-number display-4 fw-bold text-primary mb-2">{{ stats.produtos if stats else '500+' }}</div>
+                    <div class="stat-label h6 text-muted">Produtos Disponíveis</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-card">
+                    <div class="stat-number display-4 fw-bold text-success mb-2">{{ stats.usuarios if stats else '200+' }}</div>
+                    <div class="stat-label h6 text-muted">Usuários Ativos</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="stat-card">
+                    <div class="stat-number display-4 fw-bold text-warning mb-2">{{ stats.transacoes if stats else '1500+' }}</div>
+                    <div class="stat-label h6 text-muted">Transações Realizadas</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="stat-card">
+                    <div class="stat-number display-4 fw-bold text-info mb-2">98%</div>
+                    <div class="stat-label h6 text-muted">Satisfação dos Usuários</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold text-primary mb-3" data-aos="fade-up">
+                    Produtos em Destaque
+                </h2>
+                <p class="lead text-muted" data-aos="fade-up" data-aos-delay="200">
+                    Descubra os melhores produtos agrícolas disponíveis na nossa plataforma
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for produto in produtos[:6] %}
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <div class="card-img-container">
+                        {% if produto.foto_url %}
+                            <img src="{{ produto.foto_url }}" class="card-img-top" alt="{{ produto.nome }}">
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Produto agrícola">
+                        {% endif %}
+                        <div class="card-img-overlay d-flex align-items-center justify-content-center opacity-0">
+                            <button class="btn btn-primary btn-lg">
+                                <i class="fas fa-eye me-2"></i>Ver Detalhes
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title fw-bold mb-0">{{ produto.nome }}</h5>
+                            <span class="badge bg-success">{{ produto.categoria }}</span>
+                        </div>
+                        <p class="card-text text-muted mb-3">{{ produto.descricao[:100] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="price">
+                                <span class="h4 text-primary fw-bold mb-0">{{ produto.preco }} MT</span>
+                            </div>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                <small class="text-muted">{{ produto.localizacao }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <button class="btn btn-outline-primary w-100">
+                            <i class="fas fa-shopping-cart me-2"></i>Comprar Agora
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-5" data-aos="fade-up">
+            <a href="{{ url_for('produtos') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-arrow-right me-2"></i>Ver Todos os Produtos
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold text-primary mb-3" data-aos="fade-up">
+                    O que nossos usuários dizem
+                </h2>
+                <p class="lead text-muted" data-aos="fade-up" data-aos-delay="200">
+                    Histórias de sucesso de produtores que transformaram seus negócios
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left fa-2x text-primary opacity-25"></i>
+                        </div>
+                        <p class="card-text mb-4">
+                            "A AGRI.vendasMz revolucionou minha forma de vender produtos agrícolas. Em poucos meses, consegui expandir meu negócio e aumentar minhas vendas em 300%."
+                        </p>
+                        <div class="d-flex align-items-center">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" class="rounded-circle me-3" width="50" height="50" alt="João Silva">
+                            <div>
+                                <h6 class="mb-0 fw-bold">João Silva</h6>
+                                <small class="text-muted">Produtor de Milho, Manica</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left fa-2x text-success opacity-25"></i>
+                        </div>
+                        <p class="card-text mb-4">
+                            "As ferramentas de consultoria me ajudaram a otimizar minha produção de hortaliças. As recomendações são precisas e baseadas em dados reais."
+                        </p>
+                        <div class="d-flex align-items-center">
+                            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&w=100&q=80" class="rounded-circle me-3" width="50" height="50" alt="Maria Santos">
+                            <div>
+                                <h6 class="mb-0 fw-bold">Maria Santos</h6>
+                                <small class="text-muted">Produtora de Hortaliças, Maputo</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-quote-left fa-2x text-warning opacity-25"></i>
+                        </div>
+                        <p class="card-text mb-4">
+                            "A segurança da plataforma me dá confiança para fazer negócios online. Nunca me senti tão protegido em transações digitais."
+                        </p>
+                        <div class="d-flex align-items-center">
+                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&q=80" class="rounded-circle me-3" width="50" height="50" alt="Carlos Oliveira">
+                            <div>
+                                <h6 class="mb-0 fw-bold">Carlos Oliveira</h6>
+                                <small class="text-muted">Comerciante, Nampula</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center" data-aos="fade-up">
+        <h2 class="display-5 fw-bold mb-3">
+            Pronto para revolucionar sua agricultura?
+        </h2>
+        <p class="lead mb-4 opacity-90">
+            Junte-se a milhares de produtores que já transformaram seus negócios com nossa plataforma.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{{ url_for('cadastro') }}" class="btn btn-light btn-lg">
+                <i class="fas fa-rocket me-2"></i>Começar Agora
+            </a>
+            <a href="{{ url_for('consultoria') }}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-chart-line me-2"></i>Consultoria Gratuita
+            </a>
+        </div>
+    </div>
+</section>
+
 <style>
+.stat-card {
+    padding: 2rem 1rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-card {
+    transition: all 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-img-container {
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+}
+
+.card-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.card-img-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(27,94,32,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+}
+
+.product-card:hover .card-img-overlay {
+    opacity: 1;
+}
+
+.product-card:hover img {
+    transform: scale(1.1);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, rgba(76,175,80,0.1), rgba(27,94,32,0.1));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    transition: transform 0.3s ease;
+}
+
+.feature-icon:hover {
+    transform: scale(1.1);
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(50px);
+        transform: translateY(30px);
     }
     to {
         opacity: 1;
@@ -18,35 +365,10 @@
 
 @keyframes float {
     0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
+    50% { transform: translateY(-10px); }
 }
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-@keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-100px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(100px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
+</style>
+{% endblock %}
 
 .hero-section {
     background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #4CAF50 100%);

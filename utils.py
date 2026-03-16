@@ -7,9 +7,25 @@ def validate_email(email):
     return re.match(pattern, email) is not None
 
 def validate_phone(phone):
-    # Mozambique phone number validation (Movitel: 82/83, Vodacom/Emcel: 84-87)
-    pattern = r'^(\+258|258|0)?8[2-7][0-9]{7}$'
-    return re.match(pattern, phone) is not None
+    # Normalize and validate Mozambique phone numbers.
+    # Accepted prefixes: +258, 258, 0 (optional)
+    # Accepted networks: Movitel (82/83), Vodacom/Emcel (84-87)
+    # Format examples: 828123456, 0828123456, +258828123456
+    if not phone:
+        return False
+
+    # Remove whitespace and non-digit characters (e.g., spaces, dashes)
+    cleaned = re.sub(r'\D', '', phone)
+
+    # Allow optional leading 0, 258, or +258 (handled via digits only)
+    if cleaned.startswith('258'):
+        cleaned = cleaned[3:]
+    elif cleaned.startswith('0'):
+        cleaned = cleaned[1:]
+
+    # Now should be 9 digits starting with 8[2-7]
+    pattern = r'^8[2-7][0-9]{7}$'
+    return re.match(pattern, cleaned) is not None
 
 def allowed_file(filename, allowed_extensions={'png', 'jpg', 'jpeg', 'gif'}):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions

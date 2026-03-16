@@ -2,7 +2,17 @@ import sqlite3
 from werkzeug.security import generate_password_hash
 import datetime
 
-class Database:
+# Importar sistema robusto
+from robust_system import RobustDatabase
+
+class Database(RobustDatabase):
+    """Database class com funcionalidades robustas herdadas"""
+
+    def __init__(self, db_path):
+        # Chamar construtor da classe pai
+        super().__init__(db_path)
+
+    # Todas as outras funções permanecem iguais, mas agora com robustez adicional
     def __init__(self, db_path):
         self.db_path = db_path
 
@@ -154,6 +164,15 @@ class Database:
 
         conn.commit()
         conn.close()
+
+    def _check_user_active(self, user_id):
+        """Verifica se usuário está ativo"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute("SELECT ativo FROM usuarios WHERE id = ?", (user_id,))
+        result = c.fetchone()
+        conn.close()
+        return result and result[0] == 1
 
     def get_user_by_credentials(self, login_field, senha):
         conn = self.get_connection()
