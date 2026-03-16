@@ -17,7 +17,7 @@
             O marketplace agrícola mais avançado de Moçambique. Conecte-se com produtores, consultores e fornecedores de equipamentos agrícolas.
         </p>
         <div class="hero-buttons">
-            <a href="{{ url_for('produtos') }}" class="btn btn-primary btn-lg me-3">
+            <a href="{{ url_for('listar_produtos') }}" class="btn btn-primary btn-lg me-3">
                 <i class="fas fa-shopping-cart me-2"></i>Explorar Produtos
             </a>
             <a href="{{ url_for('consultoria') }}" class="btn btn-outline-primary btn-lg">
@@ -368,7 +368,6 @@
     50% { transform: translateY(-10px); }
 }
 </style>
-{% endblock %}
 
 .hero-section {
     background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #4CAF50 100%);

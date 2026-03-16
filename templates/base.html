@@ -503,7 +503,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('produtos') }}">
+                        <a class="nav-link" href="{{ url_for('listar_produtos') }}">
                             <i class="fas fa-store me-1"></i>Produtos
                         </a>
                     </li>
@@ -555,9 +555,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+    <!-- Content block is defined later in the template -->
 
     <!-- Footer -->
     <footer class="footer">
@@ -576,7 +574,7 @@
                 <div class="col-lg-2 mb-4">
                     <h5>Plataforma</h5>
                     <ul class="list-unstyled">
-                        <li><a href="{{ url_for('produtos') }}">Produtos</a></li>
+                        <li><a href="{{ url_for('listar_produtos') }}">Produtos</a></li>
                         <li><a href="{{ url_for('consultoria') }}">Consultoria</a></li>
                         <li><a href="{{ url_for('premium') }}">Premium</a></li>
                         <li><a href="#">Sobre nós</a></li>
