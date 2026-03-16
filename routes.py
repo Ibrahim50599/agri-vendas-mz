@@ -9,121 +9,130 @@ from config import Config
 from models import Database
 from utils import validate_email, validate_phone, allowed_file, save_uploaded_file, CODIGOS_ADMIN, NIVEIS_HIERARQUIA, get_nivel_hierarquia, check_admin_access, DADOS_CULTURAS
 
-def register_routes(app, db):
+app = Flask(__name__)
+app.config.from_object(Config)
 
-    def login_required(f):
+# Criar pasta de uploads se não existir
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# Inicializar banco de dados
+db = Database(app.config['DATABASE'])
+db.init_db()
+
+# Decorador para verificar login
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Decorador para verificar admin
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Permitir acesso com código especial (apenas super admin)
+        if session.get('admin_access_code'):
+            config = db.get_admin_config()
+            if config and session.get('admin_access_code') == config[1]:
+                session['admin_level'] = 'superadmin'
+                return f(*args, **kwargs)
+
+        if 'user_id' not in session:
+            flash('Acesso negado. Faça login ou use o código de acesso.')
+            return redirect(url_for('login'))
+
+        # Verificar se é admin e qual o nível
+        conn = db.get_connection()
+        c = conn.cursor()
+        c.execute("""SELECT u.tipo, a.nivel_acesso
+                    FROM usuarios u
+                    LEFT JOIN administradores a ON u.id = a.usuario_id AND a.ativo = 1
+                    WHERE u.id = ? AND u.ativo = 1""", (session['user_id'],))
+        user = c.fetchone()
+        conn.close()
+
+        if not user or (user[0] != 'admin' and not user[1]):
+            flash('Acesso negado. Apenas administradores.')
+            return redirect(url_for('index'))
+
+        # Definir nível do admin na sessão
+        session['admin_level'] = user[1] if user[1] else 'admin'
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Decorador para super admin apenas
+def superadmin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('admin_access_code'):
+            config = db.get_admin_config()
+            if config and session.get('admin_access_code') == config[1]:
+                return f(*args, **kwargs)
+
+        if 'user_id' not in session:
+            flash('Acesso negado.')
+            return redirect(url_for('login'))
+
+        # Verificar se é super admin
+        conn = db.get_connection()
+        c = conn.cursor()
+        c.execute("SELECT nivel_acesso FROM administradores WHERE usuario_id = ? AND ativo = 1", (session['user_id'],))
+        admin = c.fetchone()
+        conn.close()
+
+        if not admin or admin[0] != 'superadmin':
+            flash('Apenas o super administrador pode acessar esta função.')
+            return redirect(url_for('admin_panel'))
+
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Decorador para diferentes níveis de admin
+def nivel_admin_required(nivel_minimo):
+    def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if 'user_id' not in session:
-                return redirect(url_for('login'))
-            return f(*args, **kwargs)
-        return decorated_function
-
-    # Decorador para verificar admin
-    def admin_required(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            # Permitir acesso com código especial (apenas super admin)
             if session.get('admin_access_code'):
-                config = db.get_admin_config()
-                if config and session.get('admin_access_code') == config[1]:
-                    session['admin_level'] = 'superadmin'
-                    return f(*args, **kwargs)
-
-            if 'user_id' not in session:
-                flash('Acesso negado. Faça login ou use o código de acesso.')
-                return redirect(url_for('login'))
-
-            # Verificar se é admin e qual o nível
-            conn = db.get_connection()
-            c = conn.cursor()
-            c.execute("""SELECT u.tipo, a.nivel_acesso
-                        FROM usuarios u
-                        LEFT JOIN administradores a ON u.id = a.usuario_id AND a.ativo = 1
-                        WHERE u.id = ? AND u.ativo = 1""", (session['user_id'],))
-            user = c.fetchone()
-            conn.close()
-
-            if not user or (user[0] != 'admin' and not user[1]):
-                flash('Acesso negado. Apenas administradores.')
-                return redirect(url_for('index'))
-
-            # Definir nível do admin na sessão
-            session['admin_level'] = user[1] if user[1] else 'admin'
-            return f(*args, **kwargs)
-        return decorated_function
-
-    # Decorador para super admin apenas
-    def superadmin_required(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            if session.get('admin_access_code'):
-                config = db.get_admin_config()
-                if config and session.get('admin_access_code') == config[1]:
+                codigo = session.get('admin_access_code')
+                if check_admin_access(codigo, nivel_minimo):
                     return f(*args, **kwargs)
 
             if 'user_id' not in session:
                 flash('Acesso negado.')
                 return redirect(url_for('login'))
 
-            # Verificar se é super admin
             conn = db.get_connection()
             c = conn.cursor()
             c.execute("SELECT nivel_acesso FROM administradores WHERE usuario_id = ? AND ativo = 1", (session['user_id'],))
             admin = c.fetchone()
             conn.close()
 
-            if not admin or admin[0] != 'superadmin':
-                flash('Apenas o super administrador pode acessar esta função.')
-                return redirect(url_for('admin_panel'))
+            if not admin:
+                flash('Acesso negado.')
+                return redirect(url_for('index'))
 
-            return f(*args, **kwargs)
+            if get_nivel_hierarquia(admin[0]) >= get_nivel_hierarquia(nivel_minimo):
+                return f(*args, **kwargs)
+
+            flash('Você não tem permissão para acessar esta área.')
+            return redirect(url_for('admin_panel'))
         return decorated_function
+    return decorator
 
-    # Decorador para diferentes níveis de admin
-    def nivel_admin_required(nivel_minimo):
-        def decorator(f):
-            @wraps(f)
-            def decorated_function(*args, **kwargs):
-                if session.get('admin_access_code'):
-                    codigo = session.get('admin_access_code')
-                    if check_admin_access(codigo, nivel_minimo):
-                        return f(*args, **kwargs)
-
-                if 'user_id' not in session:
-                    flash('Acesso negado.')
-                    return redirect(url_for('login'))
-
-                conn = db.get_connection()
-                c = conn.cursor()
-                c.execute("SELECT nivel_acesso FROM administradores WHERE usuario_id = ? AND ativo = 1", (session['user_id'],))
-                admin = c.fetchone()
-                conn.close()
-
-                if not admin:
-                    flash('Acesso negado.')
-                    return redirect(url_for('index'))
-
-                if get_nivel_hierarquia(admin[0]) >= get_nivel_hierarquia(nivel_minimo):
-                    return f(*args, **kwargs)
-
-                flash('Você não tem permissão para acessar esta área.')
-                return redirect(url_for('admin_panel'))
-            return decorated_function
-        return decorator
-
-    # Rotas principais
-    @app.before_request
-    def update_premium_status():
-        if 'user_id' in session:
-            conn = db.get_connection()
-            c = conn.cursor()
-            c.execute("SELECT premium, tipo FROM usuarios WHERE id = ?", (session['user_id'],))
-            user = c.fetchone()
-            conn.close()
-            if user:
-                session['is_premium'] = user[0]
-                session['user_type'] = user[1]
+# Rotas principais
+@app.before_request
+def update_premium_status():
+    if 'user_id' in session:
+        conn = db.get_connection()
+        c = conn.cursor()
+        c.execute("SELECT premium, tipo FROM usuarios WHERE id = ?", (session['user_id'],))
+        user = c.fetchone()
+        conn.close()
+        if user:
+            session['is_premium'] = user[0]
+            session['user_type'] = user[1]
 
 @app.route('/')
 def index():
