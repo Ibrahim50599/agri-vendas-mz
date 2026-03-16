@@ -297,7 +297,7 @@
             <div class="col-lg-4 text-end">
                 <div class="d-flex gap-2 justify-content-end">
                     {% if session.get('user_type') in ['vendedor', 'admin'] %}
-                        <a href="{{ url_for('publicar') }}" class="btn btn-primary">
+                        <a href="{{ url_for('publicar_produto') }}" class="btn btn-primary">
                             <i class="fas fa-plus me-1"></i>Publicar Produto
                         </a>
                     {% endif %}
@@ -367,12 +367,12 @@
         </h4>
         <div class="action-buttons">
             {% if session.get('user_type') in ['vendedor', 'admin'] %}
-                <a href="{{ url_for('publicar') }}" class="action-btn">
+                <a href="{{ url_for('publicar_produto') }}" class="action-btn">
                     <i class="fas fa-plus-circle text-primary"></i>
                     <strong>Publicar Produto</strong>
                     <small class="text-muted d-block">Adicione novos itens ao catálogo</small>
                 </a>
-                <a href="{{ url_for('meus_produtos') }}" class="action-btn">
+                <a href="{{ url_for('dashboard') }}" class="action-btn">
                     <i class="fas fa-boxes text-success"></i>
                     <strong>Meus Produtos</strong>
                     <small class="text-muted d-block">Gerencie seus anúncios</small>

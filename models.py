@@ -9,7 +9,9 @@ class Database:
         self.db_path = db_path
 
     def get_connection(self):
-        return sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
 
     def init_db(self):
         conn = self.get_connection()
