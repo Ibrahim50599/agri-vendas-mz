@@ -10,7 +10,7 @@ from models import Database
 from utils import validate_email, validate_phone, allowed_file, save_uploaded_file, CODIGOS_ADMIN, NIVEIS_HIERARQUIA, get_nivel_hierarquia, check_admin_access, DADOS_CULTURAS
 
 # Importar sistema robusto
-from robust_system import with_error_handling, with_performance_monitoring, with_audit_trail, SecurityManager
+from robust_system import with_error_handling, with_performance_monitoring, with_audit_trail, SecurityManager, RobustDatabase
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -19,7 +19,7 @@ app.config.from_object(Config)
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Inicializar banco de dados robusto
-db = Database(app.config['DATABASE'])
+db = RobustDatabase(app.config['DATABASE'])
 db.init_db()
 
 # Inicializar gerenciador de segurança
