@@ -7,8 +7,8 @@ def validate_email(email):
     return re.match(pattern, email) is not None
 
 def validate_phone(phone):
-    # Mozambique phone number validation (basic)
-    pattern = r'^(\+258|258|0)?[8-9][0-9]{7}$'
+    # Mozambique phone number validation (Movitel: 82/83, Vodacom/Emcel: 84-87)
+    pattern = r'^(\+258|258|0)?8[2-7][0-9]{6}$'
     return re.match(pattern, phone) is not None
 
 def allowed_file(filename, allowed_extensions={'png', 'jpg', 'jpeg', 'gif'}):
