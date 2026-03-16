@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 {% extends "base.html" %}
 
@@ -176,7 +177,7 @@
                         <td><strong class="text-success">{{ "%.2f"|format(produto[3]) }} MT</strong></td>
                         <td>{{ produto[9] }}</td>
                         <td><small>{{ produto[5] }}</small></td>
-                        <td><small>{{ produto[8][:10] }}</small></td>
+                        <td><small>{{ produto[8][:10] if produto[8] else '' }}</small></td>
                         <td>
                             {% if produto[10] == 1 %}
                                 <span class="badge bg-success">Ativo</span>
@@ -253,3 +254,260 @@
     </a>
 </div>
 {% endblock %}
+=======
+
+{% extends "base.html" %}
+
+{% block title %}Gestão de Produtos - AGRI.vendasMz{% endblock %}
+
+{% block content %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #1B5E20, #4CAF50);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 24px rgba(27, 94, 32, 0.2);
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        border-left: 4px solid #4CAF50;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1B5E20;
+        margin: 10px 0;
+    }
+    
+    .table-actions {
+        display: flex;
+        gap: 5px;
+    }
+    
+    .product-img-thumb {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    
+    .filter-panel {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+    }
+</style>
+
+<div class="admin-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="mb-2"><i class="fas fa-box-open me-2"></i>Gestão de Produtos</h2>
+            <p class="mb-0 opacity-75">Gerencie todos os produtos do marketplace</p>
+        </div>
+        <div>
+            <span class="badge bg-white text-success fs-5">
+                <i class="fas fa-shield-halved me-1"></i>Gestor de Produtos
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Estatísticas -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <i class="fas fa-box fa-2x text-success mb-2"></i>
+            <div class="stat-number">{{ stats.total_produtos }}</div>
+            <div class="text-muted">Produtos Ativos</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+            <div class="stat-number">{{ stats.produtos_pendentes or 0 }}</div>
+            <div class="text-muted">Pendentes Aprovação</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <i class="fas fa-eye-slash fa-2x text-danger mb-2"></i>
+            <div class="stat-number">{{ stats.produtos_inativos or 0 }}</div>
+            <div class="text-muted">Produtos Removidos</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
+            <div class="stat-number">{{ stats.produtos_mes or 0 }}</div>
+            <div class="text-muted">Novos Este Mês</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="filter-panel">
+    <form method="GET" class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Categoria</label>
+            <select class="form-select" name="categoria">
+                <option value="">Todas</option>
+                <option value="Cereais">Cereais</option>
+                <option value="Legumes">Legumes</option>
+                <option value="Frutas">Frutas</option>
+                <option value="Tubérculos">Tubérculos</option>
+                <option value="Sementes">Sementes</option>
+                <option value="Fertilizantes">Fertilizantes</option>
+                <option value="Equipamentos">Equipamentos</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Status</label>
+            <select class="form-select" name="status">
+                <option value="ativo">Ativos</option>
+                <option value="inativo">Inativos</option>
+                <option value="todos">Todos</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Buscar</label>
+            <input type="text" class="form-control" name="busca" placeholder="Nome do produto ou vendedor">
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-success w-100">
+                <i class="fas fa-search me-2"></i>Filtrar
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Tabela de Produtos -->
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Lista de Produtos</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Foto</th>
+                        <th>Produto</th>
+                        <th>Categoria</th>
+                        <th>Preço</th>
+                        <th>Vendedor</th>
+                        <th>Localização</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produto in produtos %}
+                    <tr>
+                        <td>
+                            {% if produto[6] %}
+                                <img src="{{ url_for('static', filename=produto[6]) }}" 
+                                     class="product-img-thumb" alt="{{ produto[2] }}">
+                            {% else %}
+                                <div class="product-img-thumb bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-image text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ produto[2] }}</strong></td>
+                        <td><span class="badge bg-info">{{ produto[7] or 'N/A' }}</span></td>
+                        <td><strong class="text-success">{{ "%.2f"|format(produto[3]) }} MT</strong></td>
+                        <td>{{ produto[9] }}</td>
+                        <td><small>{{ produto[5] }}</small></td>
+                        <td><small>{{ produto[8][:10] if produto[8] else '' }}</small></td>
+                        <td>
+                            {% if produto[10] == 1 %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="btn btn-sm btn-info" data-bs-toggle="modal" 
+                                        data-bs-target="#modalDetalhes{{ produto[0] }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                {% if produto[10] == 1 %}
+                                    <a href="{{ url_for('remover_produto', produto_id=produto[0]) }}" 
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Remover produto {{ produto[2] }}?')">
+                                        <i class="fas fa-ban"></i>
+                                    </a>
+                                {% else %}
+                                    <a href="#" class="btn btn-sm btn-success">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Modal de Detalhes -->
+                    <div class="modal fade" id="modalDetalhes{{ produto[0] }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header bg-success text-white">
+                                    <h5 class="modal-title">Detalhes do Produto</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-5">
+                                            {% if produto[6] %}
+                                                <img src="{{ url_for('static', filename=produto[6]) }}" 
+                                                     class="img-fluid rounded" alt="{{ produto[2] }}">
+                                            {% else %}
+                                                <div class="bg-light p-5 text-center rounded">
+                                                    <i class="fas fa-image fa-4x text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-7">
+                                            <h4>{{ produto[2] }}</h4>
+                                            <p class="text-muted">{{ produto[4] }}</p>
+                                            <hr>
+                                            <p><strong>Preço:</strong> <span class="text-success fs-4">{{ "%.2f"|format(produto[3]) }} MT</span></p>
+                                            <p><strong>Categoria:</strong> {{ produto[7] or 'N/A' }}</p>
+                                            <p><strong>Localização:</strong> {{ produto[5] }}</p>
+                                            <p><strong>Vendedor:</strong> {{ produto[9] }}</p>
+                                            <p><strong>Data de publicação:</strong> {{ produto[8] }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Voltar ao Painel
+    </a>
+</div>
+{% endblock %}
+>>>>>>> 926299c (Fix templates to safely handle missing dates in admin views)
