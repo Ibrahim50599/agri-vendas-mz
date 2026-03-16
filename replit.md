@@ -6,6 +6,22 @@ AGRI.vendasMz is a comprehensive agricultural marketplace platform designed spec
 
 The application is built as a Flask-based monolithic web application with SQLite for data persistence, featuring user authentication, product listings, premium membership tiers, equipment store, and an administrative panel for platform management.
 
+## Migration Fixes (March 2026)
+
+### Replit Environment Migration
+- Installed all Python packages (Flask 2.3.2, Werkzeug 3.0.1, gunicorn, PyJWT) and converted all CRLF line endings to Unix LF.
+- Fixed `sqlite3.Row` factory in both `Database.get_connection()` and `RobustDatabase.get_connection()`.
+- Added `CustomJSONProvider` to Flask app to serialize `sqlite3.Row` objects for Jinja2 `|tojson` filters.
+- Replaced corrupt/duplicated `base.html` (1268 lines = two stacked documents) with clean backup.
+- Fixed duplicate `{% block %}` definitions in `admin_usuarios.html` and `admin_produtos.html` (templates were 2–4× duplicated from the original environment export).
+- Corrected route name references in templates (`produtos`→`listar_produtos`, `publicar`→`publicar_produto`, `meus_produtos`→`dashboard`).
+- Removed stray `{% endblock %}` tags from `cadastro.html`, `publicar.html`, and `dashboard.html`.
+- Switched `routes.py` to use `RobustDatabase` (exposes `audit_log`, `validate_data_integrity`, `logger`).
+- Added missing `_cleanup_old_backups` method to `BackupScheduler` in `robust_system.py`.
+- All 17+ routes now return HTTP 200/302 with no application errors.
+- Admin credentials: phone `878312890`, password `12345,Ibrahim`, superadmin code `AGRI2024ADMIN`.
+- Note: 404s for `/uploads/alfac.jpeg` are expected — original uploaded images were not migrated.
+
 ## Recent Changes (November 2025)
 
 ### 1. Enhanced Agricultural Consultancy System

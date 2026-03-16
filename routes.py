@@ -1,25 +1,35 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
+from flask.json.provider import DefaultJSONProvider
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import datetime
 import os
 import re
+import sqlite3
 from functools import wraps
 from config import Config
 from models import Database
 from utils import validate_email, validate_phone, allowed_file, save_uploaded_file, CODIGOS_ADMIN, NIVEIS_HIERARQUIA, get_nivel_hierarquia, check_admin_access, DADOS_CULTURAS
 
 # Importar sistema robusto
-from robust_system import with_error_handling, with_performance_monitoring, with_audit_trail, SecurityManager
+from robust_system import with_error_handling, with_performance_monitoring, with_audit_trail, SecurityManager, RobustDatabase
+
+class CustomJSONProvider(DefaultJSONProvider):
+    def default(self, o):
+        if isinstance(o, sqlite3.Row):
+            return dict(o)
+        return super().default(o)
 
 app = Flask(__name__)
+app.json_provider_class = CustomJSONProvider
+app.json = CustomJSONProvider(app)
 app.config.from_object(Config)
 
 # Criar pasta de uploads se não existir
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Inicializar banco de dados robusto
-db = Database(app.config['DATABASE'])
+db = RobustDatabase(app.config['DATABASE'])
 db.init_db()
 
 # Inicializar gerenciador de segurança

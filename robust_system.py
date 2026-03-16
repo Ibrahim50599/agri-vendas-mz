@@ -10,6 +10,7 @@ import traceback
 import hashlib
 import secrets
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import session
 
 # Importação condicional para evitar dependência circular
 def get_database_class():
@@ -80,6 +81,7 @@ class RobustDatabase:
         """Conexão com tratamento de erros e logging"""
         try:
             conn = sqlite3.connect(self.db_path, timeout=30.0)
+            conn.row_factory = sqlite3.Row
             conn.execute("PRAGMA foreign_keys = ON")
             conn.execute("PRAGMA journal_mode = WAL")
             conn.execute("PRAGMA synchronous = NORMAL")
@@ -218,6 +220,23 @@ class BackupScheduler:
         except Exception as e:
             logging.error(f"Erro ao verificar necessidade de backup: {str(e)}")
             return False
+
+    def _cleanup_old_backups(self, max_backups=10):
+        """Remove backups antigos, mantendo apenas os mais recentes"""
+        try:
+            backup_files = sorted(
+                [f for f in os.listdir(self.backup_dir) if f.endswith('.db')],
+                key=lambda x: os.path.getctime(os.path.join(self.backup_dir, x))
+            )
+            while len(backup_files) > max_backups:
+                oldest = backup_files.pop(0)
+                os.remove(os.path.join(self.backup_dir, oldest))
+                config_file = oldest.replace('.db', '_configs.json')
+                config_path = os.path.join(self.backup_dir, config_file)
+                if os.path.exists(config_path):
+                    os.remove(config_path)
+        except Exception as e:
+            logging.error(f"Erro ao limpar backups antigos: {str(e)}")
 
 class SecurityManager:
     """Gerenciador de segurança avançado"""
