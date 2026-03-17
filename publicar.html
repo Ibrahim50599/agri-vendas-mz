@@ -1,541 +1,425 @@
-
 {% extends "base.html" %}
 
-{% block title %}Dashboard - AGRI.vendasMz{% endblock %}
+{% block title %}Loja de Equipamentos - AGRI.vendasMz{% endblock %}
 
 {% block content %}
 <style>
-.dashboard-card {
-    transition: all 0.3s ease;
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.dashboard-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-.stat-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin: 0 auto 1rem;
-}
-
-.chart-container {
-    position: relative;
-    height: 300px;
-    margin: 20px 0;
-}
-
-.quick-action-btn {
-    transition: all 0.3s ease;
-    border-radius: 10px;
-}
-
-.quick-action-btn:hover {
-    transform: scale(1.05);
-}
-
-.notification-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: #dc3545;
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.recommendation-card {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-left: 4px solid #28a745;
-}
-
-.activity-timeline {
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.timeline-item {
-    padding: 10px 0;
-    border-left: 2px solid #dee2e6;
-    margin-left: 15px;
-    position: relative;
-}
-
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -6px;
-    top: 15px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #28a745;
-}
+    .hero-loja {
+        background: linear-gradient(135deg, #1B5E20 0%, #388E3C 50%, #4CAF50 100%);
+        color: white;
+        padding: 60px 0;
+        margin: -24px -12px 30px -12px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-loja::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .hero-loja h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        position: relative;
+        z-index: 1;
+    }
+    
+    .hero-loja p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .equip-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        background: white;
+    }
+    
+    .equip-card:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+    }
+    
+    .equip-card .card-img-container {
+        position: relative;
+        height: 250px;
+        overflow: hidden;
+    }
+    
+    .equip-card .card-img-top {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .equip-card:hover .card-img-top {
+        transform: scale(1.1);
+    }
+    
+    .equip-card .badge-categoria {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        padding: 8px 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border-radius: 30px;
+        background: linear-gradient(135deg, #1B5E20, #4CAF50);
+        color: white;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .equip-card .badge-estoque {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        border-radius: 20px;
+    }
+    
+    .equip-card .card-body {
+        padding: 25px;
+    }
+    
+    .equip-card .card-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1B5E20;
+        margin-bottom: 10px;
+    }
+    
+    .equip-card .preco {
+        font-size: 1.8rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #1B5E20, #4CAF50);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .equip-card .card-text {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    
+    .equip-card .info-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .equip-card .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .equip-card .info-item i {
+        width: 30px;
+        color: #4CAF50;
+    }
+    
+    .btn-contactar {
+        background: linear-gradient(135deg, #25D366, #128C7E);
+        border: none;
+        padding: 15px 25px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        color: white;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .btn-contactar:hover {
+        background: linear-gradient(135deg, #128C7E, #075E54);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(37, 211, 102, 0.3);
+        color: white;
+    }
+    
+    .filter-section {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        margin-bottom: 40px;
+    }
+    
+    .filter-section .form-control,
+    .filter-section .form-select {
+        border-radius: 12px;
+        padding: 15px 20px;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-section .form-control:focus,
+    .filter-section .form-select:focus {
+        border-color: #4CAF50;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
+    }
+    
+    .btn-filtrar {
+        background: linear-gradient(135deg, #1B5E20, #4CAF50);
+        border: none;
+        padding: 15px 30px;
+        font-weight: 600;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-filtrar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(27, 94, 32, 0.3);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+    }
+    
+    .empty-state i {
+        font-size: 5rem;
+        color: #e0e0e0;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        color: #666;
+        margin-bottom: 15px;
+    }
+    
+    .categoria-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 30px;
+        justify-content: center;
+    }
+    
+    .categoria-chip {
+        padding: 10px 20px;
+        border-radius: 30px;
+        background: white;
+        border: 2px solid #e0e0e0;
+        color: #666;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    
+    .categoria-chip:hover,
+    .categoria-chip.active {
+        background: linear-gradient(135deg, #1B5E20, #4CAF50);
+        border-color: transparent;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(27, 94, 32, 0.2);
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .equip-card {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .equip-card:nth-child(1) { animation-delay: 0.1s; }
+    .equip-card:nth-child(2) { animation-delay: 0.2s; }
+    .equip-card:nth-child(3) { animation-delay: 0.3s; }
+    .equip-card:nth-child(4) { animation-delay: 0.4s; }
 </style>
 
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center">
-            <h2 class="mb-0">
-                <i class="fas fa-tachometer-alt text-success me-2"></i>
-                Meu Dashboard
-                {% if session.is_premium %}
-                    <span class="badge bg-warning text-dark ms-2">
-                        <i class="fas fa-crown me-1"></i>PREMIUM
-                    </span>
-                {% endif %}
-            </h2>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary quick-action-btn" onclick="refreshDashboard()">
-                    <i class="fas fa-sync-alt"></i> Atualizar
-                </button>
-                <button class="btn btn-outline-info quick-action-btn" onclick="toggleNotifications()">
-                    <i class="fas fa-bell"></i> Notificações
-                    <span class="notification-badge" id="notificationCount">3</span>
-                </button>
-            </div>
-        </div>
+<div class="hero-loja">
+    <div class="container">
+        <h1><i class="fas fa-tractor me-3"></i>Loja de Equipamentos</h1>
+        <p>Encontre os melhores equipamentos e ferramentas agrícolas para sua produção</p>
     </div>
 </div>
 
-<!-- Stats Cards -->
-<div class="row mb-4">
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card dashboard-card h-100">
-            <div class="card-body text-center">
-                <div class="stat-icon bg-primary text-white">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h6 class="text-muted mb-1">Bem-vindo</h6>
-                <h5 class="mb-0">{{ session.user_name.split()[0] }}</h5>
-                <small class="text-muted">{{ session.user_type.title() }}</small>
-            </div>
-        </div>
+<div class="container">
+    <div class="categoria-chips">
+        <a href="{{ url_for('loja_equipamentos') }}" class="categoria-chip {% if not request.args.get('categoria') %}active{% endif %}">
+            <i class="fas fa-th-large me-2"></i>Todos
+        </a>
+        <a href="{{ url_for('loja_equipamentos', categoria='Tratores') }}" class="categoria-chip {% if request.args.get('categoria') == 'Tratores' %}active{% endif %}">
+            <i class="fas fa-tractor me-2"></i>Tratores
+        </a>
+        <a href="{{ url_for('loja_equipamentos', categoria='Irrigação') }}" class="categoria-chip {% if request.args.get('categoria') == 'Irrigação' %}active{% endif %}">
+            <i class="fas fa-tint me-2"></i>Irrigação
+        </a>
+        <a href="{{ url_for('loja_equipamentos', categoria='Ferramentas') }}" class="categoria-chip {% if request.args.get('categoria') == 'Ferramentas' %}active{% endif %}">
+            <i class="fas fa-tools me-2"></i>Ferramentas
+        </a>
+        <a href="{{ url_for('loja_equipamentos', categoria='Pulverizadores') }}" class="categoria-chip {% if request.args.get('categoria') == 'Pulverizadores' %}active{% endif %}">
+            <i class="fas fa-spray-can me-2"></i>Pulverizadores
+        </a>
+        <a href="{{ url_for('loja_equipamentos', categoria='Colheita') }}" class="categoria-chip {% if request.args.get('categoria') == 'Colheita' %}active{% endif %}">
+            <i class="fas fa-wheat-awn me-2"></i>Colheita
+        </a>
     </div>
 
-    {% if session.user_type in ['vendedor', 'admin'] %}
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card dashboard-card h-100">
-                <div class="card-body text-center">
-                    <div class="stat-icon bg-success text-white">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <h6 class="text-muted mb-1">Meus Produtos</h6>
-                    <h3 class="mb-0 text-success">{{ meus_produtos|length }}</h3>
-                    <small class="text-muted">Ativos</small>
+    <div class="filter-section">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold"><i class="fas fa-tag me-2 text-success"></i>Categoria</label>
+                <select class="form-select" name="categoria">
+                    <option value="">Todas as categorias</option>
+                    <option value="Tratores" {% if request.args.get('categoria') == 'Tratores' %}selected{% endif %}>Tratores</option>
+                    <option value="Irrigação" {% if request.args.get('categoria') == 'Irrigação' %}selected{% endif %}>Sistemas de Irrigação</option>
+                    <option value="Ferramentas" {% if request.args.get('categoria') == 'Ferramentas' %}selected{% endif %}>Ferramentas Manuais</option>
+                    <option value="Pulverizadores" {% if request.args.get('categoria') == 'Pulverizadores' %}selected{% endif %}>Pulverizadores</option>
+                    <option value="Colheita" {% if request.args.get('categoria') == 'Colheita' %}selected{% endif %}>Equipamentos de Colheita</option>
+                    <option value="Armazenamento" {% if request.args.get('categoria') == 'Armazenamento' %}selected{% endif %}>Armazenamento</option>
+                    <option value="Outros" {% if request.args.get('categoria') == 'Outros' %}selected{% endif %}>Outros</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold"><i class="fas fa-money-bill-wave me-2 text-success"></i>Preço Máximo</label>
+                <div class="input-group">
+                    <span class="input-group-text" style="border-radius: 12px 0 0 12px;">MT</span>
+                    <input type="number" class="form-control" name="preco_max" placeholder="Ex: 50000" 
+                           value="{{ request.args.get('preco_max', '') }}" style="border-radius: 0 12px 12px 0;">
                 </div>
             </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card dashboard-card h-100">
-                <div class="card-body text-center">
-                    <div class="stat-icon bg-warning text-white">
-                        <i class="fas fa-eye"></i>
-                    </div>
-                    <h6 class="text-muted mb-1">Visualizações</h6>
-                    <h3 class="mb-0 text-warning">127</h3>
-                    <small class="text-muted">Esta semana</small>
-                </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-filtrar btn-success w-100">
+                    <i class="fas fa-search me-2"></i>Buscar Equipamentos
+                </button>
             </div>
-        </div>
+        </form>
+    </div>
 
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card dashboard-card h-100">
-                <div class="card-body text-center">
-                    <div class="stat-icon bg-info text-white">
-                        <i class="fas fa-plus"></i>
+    {% if equipamentos %}
+        <div class="row g-4">
+            {% for equip in equipamentos %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="card equip-card h-100">
+                        <div class="card-img-container">
+                            {% if equip[6] %}
+                                <img src="{{ url_for('static', filename=equip[6]) }}" class="card-img-top" alt="{{ equip[1] }}">
+                            {% else %}
+                                <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-tractor fa-4x text-muted opacity-50"></i>
+                                </div>
+                            {% endif %}
+                            {% if equip[4] %}
+                                <span class="badge-categoria">{{ equip[4] }}</span>
+                            {% endif %}
+                            {% if equip[5] > 0 %}
+                                <span class="badge-estoque bg-success text-white">
+                                    <i class="fas fa-check me-1"></i>Em estoque ({{ equip[5] }})
+                                </span>
+                            {% else %}
+                                <span class="badge-estoque bg-danger text-white">
+                                    <i class="fas fa-times me-1"></i>Esgotado
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ equip[1] }}</h5>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="preco">{{ "%.2f"|format(equip[3]) }} MT</div>
+                                {% if equip[5] > 0 %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3">Disponível</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3">Esgotado</span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if equip[2] %}
+                                <p class="card-text mb-3">
+                                    {{ equip[2][:150] }}{% if equip[2]|length > 150 %}...{% endif %}
+                                </p>
+                            {% endif %}
+                            
+                            <div class="info-section mb-3">
+                                {% if equip[7] %}
+                                    <div class="info-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>{{ equip[7] }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if equip[8] %}
+                                    <div class="info-item">
+                                        <i class="fas fa-phone"></i>
+                                        <span>{{ equip[8] }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            {% if equip[8] %}
+                                <a href="https://wa.me/258{{ equip[8]|replace(' ', '')|replace('-', '') }}?text=Olá! Vi o equipamento '{{ equip[1] }}' no AGRI.vendasMz e tenho interesse!" 
+                                   class="btn btn-contactar w-100" target="_blank">
+                                    <i class="fab fa-whatsapp fa-lg"></i>
+                                    Contactar via WhatsApp
+                                </a>
+                            {% else %}
+                                <a href="https://wa.me/258878312890?text=Olá! Vi o equipamento '{{ equip[1] }}' no AGRI.vendasMz e tenho interesse!" 
+                                   class="btn btn-contactar w-100" target="_blank">
+                                    <i class="fab fa-whatsapp fa-lg"></i>
+                                    Contactar via WhatsApp
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
-                    <h6 class="text-muted mb-1">Ações Rápidas</h6>
-                    <a href="{{ url_for('publicar_produto') }}" class="btn btn-info btn-sm mt-2">
-                        <i class="fas fa-plus me-1"></i> Novo Produto
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-tractor"></i>
+            <h3>Nenhum equipamento encontrado</h3>
+            <p class="text-muted">Ainda não há equipamentos disponíveis nesta categoria.</p>
+            <a href="{{ url_for('loja_equipamentos') }}" class="btn btn-success btn-lg mt-3">
+                <i class="fas fa-refresh me-2"></i>Ver Todos os Equipamentos
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0" style="background: linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 100%); border-radius: 20px;">
+                <div class="card-body text-center py-5">
+                    <h3 class="text-success mb-3"><i class="fas fa-headset me-2"></i>Precisa de ajuda?</h3>
+                    <p class="text-muted mb-4">Nossa equipe está pronta para ajudar você a encontrar o equipamento ideal para sua produção</p>
+                    <a href="https://wa.me/258878312890" class="btn btn-success btn-lg" target="_blank">
+                        <i class="fab fa-whatsapp me-2"></i>Falar com Suporte
                     </a>
                 </div>
             </div>
         </div>
-    {% endif %}
-
-    {% if not session.is_premium %}
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card dashboard-card h-100 border-warning">
-                <div class="card-body text-center">
-                    <div class="stat-icon bg-warning text-white">
-                        <i class="fas fa-crown"></i>
-                    </div>
-                    <h6 class="text-muted mb-1">Upgrade</h6>
-                    <a href="{{ url_for('premium') }}" class="btn btn-warning btn-sm">
-                        <i class="fas fa-arrow-up me-1"></i> Premium
-                    </a>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-</div>
-
-<!-- Charts and Analytics -->
-{% if session.user_type in ['vendedor', 'admin'] %}
-<div class="row mb-4">
-    <div class="col-lg-8 mb-4">
-        <div class="card dashboard-card">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-chart-line me-2"></i>
-                    Performance dos Produtos
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="productsChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4 mb-4">
-        <div class="card dashboard-card">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-tags me-2"></i>
-                    Categorias
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="categoriesChart"></canvas>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
-
-<!-- Recommendations -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card dashboard-card recommendation-card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-lightbulb text-success me-2"></i>
-                    Recomendações Inteligentes
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>Produtos Populares na sua Região</h6>
-                        <ul class="list-unstyled">
-                            <li><i class="fas fa-seedling text-success me-2"></i> Milho - Alta demanda</li>
-                            <li><i class="fas fa-leaf text-success me-2"></i> Hortaliças - Boa rentabilidade</li>
-                            <li><i class="fas fa-apple-alt text-success me-2"></i> Frutas cítricas - Mercado crescente</li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <h6>Dicas para Melhorar Vendas</h6>
-                        <ul class="list-unstyled">
-                            <li><i class="fas fa-camera text-primary me-2"></i> Adicione fotos de qualidade</li>
-                            <li><i class="fas fa-tags text-primary me-2"></i> Use preços competitivos</li>
-                            <li><i class="fas fa-map-marker-alt text-primary me-2"></i> Especifique localização</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<!-- Activity Timeline -->
-<div class="row mb-4">
-    <div class="col-lg-6 mb-4">
-        <div class="card dashboard-card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-history me-2"></i>
-                    Atividades Recentes
-                </h5>
-            </div>
-            <div class="card-body activity-timeline">
-                <div class="timeline-item">
-                    <small class="text-muted">2 horas atrás</small>
-                    <p class="mb-0">Produto "Milho Premium" foi visualizado 5 vezes</p>
-                </div>
-                <div class="timeline-item">
-                    <small class="text-muted">1 dia atrás</small>
-                    <p class="mb-0">Novo produto publicado: "Arroz Orgânico"</p>
-                </div>
-                <div class="timeline-item">
-                    <small class="text-muted">3 dias atrás</small>
-                    <p class="mb-0">Perfil atualizado com sucesso</p>
-                </div>
-                <div class="timeline-item">
-                    <small class="text-muted">1 semana atrás</small>
-                    <p class="mb-0">Primeiro login realizado</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-6 mb-4">
-        <div class="card dashboard-card">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0">
-                    <i class="fas fa-star me-2"></i>
-                    Avaliações e Feedback
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="text-center mb-3">
-                    <h3 class="text-warning">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                        4.5
-                    </h3>
-                    <small class="text-muted">Baseado em 23 avaliações</small>
-                </div>
-                <div class="progress mb-2">
-                    <div class="progress-bar bg-success" style="width: 80%">5 estrelas (18)</div>
-                </div>
-                <div class="progress mb-2">
-                    <div class="progress-bar bg-info" style="width: 15%">4 estrelas (3)</div>
-                </div>
-                <div class="progress mb-2">
-                    <div class="progress-bar bg-warning" style="width: 5%">3 estrelas (1)</div>
-                </div>
-                <div class="progress mb-2">
-                    <div class="progress-bar bg-danger" style="width: 0%">2 estrelas (0)</div>
-                </div>
-                <div class="progress">
-                    <div class="progress-bar bg-secondary" style="width: 0%">1 estrela (0)</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Products Table -->
-{% if session.user_type in ['vendedor', 'admin'] and meus_produtos %}
-<div class="row">
-    <div class="col-12">
-        <div class="card dashboard-card">
-            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    <i class="fas fa-box me-2"></i>
-                    Meus Produtos
-                </h5>
-                <div class="d-flex gap-2">
-                    <input type="text" class="form-control form-control-sm" placeholder="Buscar produtos..." id="productSearch" style="width: 200px;">
-                    <select class="form-select form-select-sm" id="categoryFilter" style="width: 150px;">
-                        <option value="">Todas categorias</option>
-                        <option value="cereais">Cereais</option>
-                        <option value="hortalicas">Hortaliças</option>
-                        <option value="frutas">Frutas</option>
-                    </select>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover" id="productsTable">
-                        <thead class="table-success">
-                            <tr>
-                                <th>Nome</th>
-                                <th>Preço</th>
-                                <th>Categoria</th>
-                                <th>Data</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for produto in meus_produtos %}
-                                <tr>
-                                    <td>
-                                        <strong>{{ produto[2] }}</strong>
-                                        {% if produto[6] %}
-                                            <br><small class="text-muted">{{ produto[6][:50] }}...</small>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary">{{ "%.2f"|format(produto[3]) }} MT</span>
-                                    </td>
-                                    <td>{{ produto[7] or 'N/A' }}</td>
-                                    <td>{{ produto[8] }}</td>
-                                    <td>
-                                        <span class="badge bg-success">Ativo</span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-primary" onclick="editProduct({{ produto[0] }})">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-outline-success" onclick="viewProduct({{ produto[0] }})">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="btn btn-outline-danger" onclick="deleteProduct({{ produto[0] }})">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<script>
-// Initialize Charts
-document.addEventListener('DOMContentLoaded', function() {
-    // Products Performance Chart
-    const productsCtx = document.getElementById('productsChart').getContext('2d');
-    new Chart(productsCtx, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-            datasets: [{
-                label: 'Visualizações',
-                data: [12, 19, 15, 25, 22, 30],
-                borderColor: '#28a745',
-                backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                tension: 0.4,
-                fill: true
-            }, {
-                label: 'Contatos',
-                data: [2, 5, 3, 8, 6, 10],
-                borderColor: '#007bff',
-                backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    // Categories Chart
-    const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
-    new Chart(categoriesCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Cereais', 'Hortaliças', 'Frutas', 'Equipamentos'],
-            datasets: [{
-                data: [40, 30, 20, 10],
-                backgroundColor: [
-                    '#28a745',
-                    '#007bff',
-                    '#ffc107',
-                    '#dc3545'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                }
-            }
-        }
-    });
-
-    // Search and Filter Functionality
-    const searchInput = document.getElementById('productSearch');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const table = document.getElementById('productsTable');
-    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-
-    function filterTable() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const categoryValue = categoryFilter.value.toLowerCase();
-
-        for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
-            const name = row.cells[0].textContent.toLowerCase();
-            const category = row.cells[2].textContent.toLowerCase();
-
-            const matchesSearch = name.includes(searchTerm);
-            const matchesCategory = categoryValue === '' || category.includes(categoryValue);
-
-            if (matchesSearch && matchesCategory) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        }
-    }
-
-    searchInput.addEventListener('input', filterTable);
-    categoryFilter.addEventListener('change', filterTable);
-});
-
-// Dashboard Functions
-function refreshDashboard() {
-    location.reload();
-}
-
-function toggleNotifications() {
-    // Toggle notifications panel
-    alert('Notificações: Você tem 3 novas mensagens!');
-}
-
-function editProduct(id) {
-    window.location.href = `/editar_produto/${id}`;
-}
-
-function viewProduct(id) {
-    window.location.href = `/produto/${id}`;
-}
-
-function deleteProduct(id) {
-    if (confirm('Tem certeza que deseja excluir este produto?')) {
-        // AJAX call to delete product
-        fetch(`/admin/remover_produto/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Erro ao excluir produto');
-            }
-        });
-    }
-}
-</script>
 {% endblock %}
