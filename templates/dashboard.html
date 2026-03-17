@@ -994,6 +994,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('productSearch');
     const categoryFilter = document.getElementById('categoryFilter');
     const table = document.getElementById('productsTable');
+
+    if (!table || !searchInput || !categoryFilter) return;
+
     const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
     function filterTable() {
