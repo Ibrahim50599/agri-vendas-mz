@@ -170,6 +170,15 @@ def cadastro():
             'tipo': request.form.get('tipo', 'comprador')
         }
 
+        # Normalizar telefone ANTES de validar (remove espaços, hífens, parênteses, +258, 258, 0)
+        if form_data['telefone']:
+            tel_clean = re.sub(r'\D', '', form_data['telefone'])
+            if tel_clean.startswith('258') and len(tel_clean) > 9:
+                tel_clean = tel_clean[3:]
+            elif tel_clean.startswith('0') and len(tel_clean) > 9:
+                tel_clean = tel_clean[1:]
+            form_data['telefone'] = tel_clean
+
         # Regras de validação robustas
         validation_rules = {
             'nome_completo': {
@@ -177,27 +186,27 @@ def cadastro():
                 'type': 'string',
                 'min_length': 3,
                 'max_length': 100,
-                'pattern': r'^[a-zA-ZÀ-ÿ\s\-\.\' ]+$'  # Nomes com acentos e caracteres especiais comuns
+                'pattern': r'^[a-zA-ZÀ-ÿ\s\-\.\' ]+$'
             },
             'email': {
-                'required': False,  # Email ou telefone obrigatório, mas não ambos
+                'required': False,
                 'type': 'string',
                 'max_length': 150,
                 'pattern': r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
             },
             'telefone': {
-                'required': False,  # Email ou telefone obrigatório, mas não ambos
+                'required': False,
                 'type': 'string',
-                'min_length': 9,
-                'max_length': 15,
-                'pattern': r'^(\+258|258|8)?[28][0-9]{7,8}$'  # Padrão Moçambicano
+                'min_length': 8,
+                'max_length': 13,
+                # Números moçambicanos: móveis 82-87 (9 dígitos), fixos 21/23/25/26/27 (9 dígitos), formatos alternativos
+                'pattern': r'^(8[2-7][0-9]{7}|2[1-9][0-9]{6,7}|[0-9]{8,9})$'
             },
             'senha': {
                 'required': True,
                 'type': 'string',
-                'min_length': 8,  # Aumentado para 8 caracteres
+                'min_length': 6,
                 'max_length': 128,
-                'pattern': r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$'  # Pelo menos uma minúscula, maiúscula e número
             },
             'tipo': {
                 'required': True,
@@ -310,6 +319,16 @@ def login():
 
         login_field = login_data['login']
         senha = login_data['senha']
+
+        # Normalizar telefone no login (remover espaços, hífens, prefixo 258/0)
+        if re.match(r'^[\d\s\+\-\(\)]+$', login_field):
+            tel_clean = re.sub(r'\D', '', login_field)
+            if tel_clean.startswith('258') and len(tel_clean) > 9:
+                tel_clean = tel_clean[3:]
+            elif tel_clean.startswith('0') and len(tel_clean) > 9:
+                tel_clean = tel_clean[1:]
+            if len(tel_clean) >= 8:
+                login_field = tel_clean
 
         # Verificar rate limiting
         client_ip = request.remote_addr

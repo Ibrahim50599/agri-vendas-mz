@@ -256,6 +256,10 @@ class SecurityManager:
 
             value = data[field]
 
+            # Ignorar validação de campos opcionais vazios
+            if not rule.get('required', False) and (value == '' or value is None):
+                continue
+
             # Validar tipo
             if 'type' in rule:
                 if rule['type'] == 'string' and not isinstance(value, str):
