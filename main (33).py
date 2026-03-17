@@ -356,5 +356,3 @@ document.querySelector('input[name="regiao"]')?.addEventListener('input', functi
     }, 500);
 });
 </script>
-
-{% endblock %}
