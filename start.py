@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="GitSharedSettings">
-    <option name="synchronizeBranchProtectionRules" value="false" />
-  </component>
-  <component name="VcsDirectoryMappings">
-    <mapping directory="$PROJECT_DIR$" vcs="Git" />
-  </component>
-</project>
+import os
+from main import app
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
+
+
+
