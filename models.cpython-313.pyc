@@ -1,0 +1,79 @@
+
+{% extends "base.html" %}
+
+{% block title %}Publicar Produto - AGRI.vendasMz{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="fas fa-plus"></i> Publicar Produto
+                </h2>
+
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Nome do Produto *</label>
+                                <input type="text" class="form-control" name="nome" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Preço (MT) *</label>
+                                <input type="number" step="0.01" class="form-control" name="preco" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Descrição</label>
+                        <textarea class="form-control" name="descricao" rows="4"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Categoria</label>
+                                <select class="form-select" name="categoria">
+                                    <option value="">Selecionar categoria</option>
+                                    <option value="Cereais">Cereais</option>
+                                    <option value="Legumes">Legumes</option>
+                                    <option value="Frutas">Frutas</option>
+                                    <option value="Tubérculos">Tubérculos</option>
+                                    <option value="Sementes">Sementes</option>
+                                    <option value="Fertilizantes">Fertilizantes</option>
+                                    <option value="Equipamentos">Equipamentos</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Localização</label>
+                                <input type="text" class="form-control" name="localizacao" placeholder="Maputo, Matola...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Foto do Produto</label>
+                        <input type="file" class="form-control" name="foto" accept="image/*">
+                    </div>
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Publicar Produto
+                    </button>
+
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
