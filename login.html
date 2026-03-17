@@ -1,0 +1,554 @@
+
+{% extends "base.html" %}
+
+{% block title %}Gestão de Usuários - AGRI.vendasMz{% endblock %}
+
+{% block content %}
+<style>
+.usuarios-header {
+    background: linear-gradient(135deg, #6A1B9A, #8E24AA, #AB47BC);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+.user-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid #AB47BC;
+}
+
+.user-card:hover {
+    transform: translateX(10px);
+    box-shadow: 0 5px 20px rgba(171, 71, 188, 0.3);
+}
+</style>
+
+<div class="usuarios-header">
+    <h2><i class="fas fa-users-cog me-3"></i>Gestão de Usuários</h2>
+    <p class="mb-0 opacity-90">Gerenciar contas, permissões e atividades dos usuários</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-user-plus fa-3x text-success mb-3"></i>
+                <h4>{{ stats.novos_mes }}</h4>
+                <p class="text-muted mb-0">Novos este mês</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-user-check fa-3x text-primary mb-3"></i>
+                <h4>{{ stats.usuarios_ativos }}</h4>
+                <p class="text-muted mb-0">Ativos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-crown fa-3x text-warning mb-3"></i>
+                <h4>{{ stats.premium }}</h4>
+                <p class="text-muted mb-0">Premium</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-user-times fa-3x text-danger mb-3"></i>
+                <h4>{{ stats.bloqueados }}</h4>
+                <p class="text-muted mb-0">Bloqueados</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-purple text-white">
+        <h5 class="mb-0"><i class="fas fa-table me-2"></i>Lista de Usuários</h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <input type="text" class="form-control" id="buscarUsuario" placeholder="Buscar usuário...">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="filtroTipo">
+                    <option value="">Todos os tipos</option>
+                    <option value="vendedor">Vendedores</option>
+                    <option value="comprador">Compradores</option>
+                    <option value="admin">Administradores</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="filtroStatus">
+                    <option value="">Todos os status</option>
+                    <option value="ativo">Ativos</option>
+                    <option value="premium">Premium</option>
+                    <option value="bloqueado">Bloqueados</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-purple">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Contato</th>
+                        <th>Tipo</th>
+                        <th>Status</th>
+                        <th>Cadastro</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr class="user-card">
+                        <td>{{ usuario[0] }}</td>
+                        <td><strong>{{ usuario[1] }}</strong></td>
+                        <td>
+                            <small>{{ usuario[2] or usuario[3] }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">{{ usuario[4] }}</span>
+                        </td>
+                        <td>
+                            {% if usuario[5] %}
+                                <span class="badge bg-warning">Premium</span>
+                            {% elif usuario[9] %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Bloqueado</span>
+                            {% endif %}
+                        </td>
+                        <td><small>{{ usuario[7][:10] }}</small></td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" title="Ver Detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-success" title="Ativar Premium">
+                                    <i class="fas fa-crown"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" title="Bloquear">
+                                    <i class="fas fa-ban"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Gestão de Usuários - AGRI.vendasMz{% endblock %}
+
+{% block content %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #D32F2F, #F44336);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 24px rgba(211, 47, 47, 0.2);
+        animation: slideDown 0.5s ease;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .user-stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        border-left: 4px solid #F44336;
+        animation: fadeInUp 0.6s ease;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .user-stat-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #D32F2F;
+        margin: 10px 0;
+        animation: countUp 1s ease;
+    }
+    
+    @keyframes countUp {
+        from {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #F44336, #E91E63);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+    }
+    
+    .filter-section {
+        background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .user-table-row {
+        transition: all 0.3s ease;
+    }
+    
+    .user-table-row:hover {
+        background: #FFF3E0;
+        transform: translateX(5px);
+    }
+</style>
+
+<div class="admin-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="mb-2">
+                <i class="fas fa-users-cog me-2"></i>Gestão de Usuários
+            </h2>
+            <p class="mb-0 opacity-75">Gerencie todos os usuários da plataforma</p>
+        </div>
+        <div>
+            <span class="badge bg-white text-danger fs-5">
+                <i class="fas fa-shield-halved me-1"></i>Gestor de Usuários
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Estatísticas -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="user-stat-card">
+            <i class="fas fa-users fa-2x text-primary mb-2"></i>
+            <div class="stat-number">{{ stats.total_usuarios }}</div>
+            <div class="text-muted">Total de Usuários</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="user-stat-card">
+            <i class="fas fa-user-check fa-2x text-success mb-2"></i>
+            <div class="stat-number">{{ stats.usuarios_ativos or stats.total_usuarios }}</div>
+            <div class="text-muted">Usuários Ativos</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="user-stat-card">
+            <i class="fas fa-crown fa-2x text-warning mb-2"></i>
+            <div class="stat-number">{{ stats.usuarios_premium }}</div>
+            <div class="text-muted">Usuários Premium</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="user-stat-card">
+            <i class="fas fa-store fa-2x text-info mb-2"></i>
+            <div class="stat-number">{{ stats.vendedores or 0 }}</div>
+            <div class="text-muted">Vendedores</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="filter-section">
+    <form method="GET" class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">
+                <i class="fas fa-filter me-1"></i>Tipo de Usuário
+            </label>
+            <select class="form-select" name="tipo">
+                <option value="">Todos</option>
+                <option value="comprador">Compradores</option>
+                <option value="vendedor">Vendedores</option>
+                <option value="admin">Administradores</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">
+                <i class="fas fa-star me-1"></i>Premium
+            </label>
+            <select class="form-select" name="premium">
+                <option value="">Todos</option>
+                <option value="1">Premium</option>
+                <option value="0">Gratuito</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">
+                <i class="fas fa-search me-1"></i>Buscar
+            </label>
+            <input type="text" class="form-control" name="busca" placeholder="Nome, email ou telefone">
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-danger w-100">
+                <i class="fas fa-search me-2"></i>Filtrar
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Ações Rápidas -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Ações Rápidas</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <button class="btn btn-outline-success w-100">
+                    <i class="fas fa-user-plus me-2"></i>Adicionar Usuário
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-warning w-100">
+                    <i class="fas fa-crown me-2"></i>Ativar Premium em Massa
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-info w-100">
+                    <i class="fas fa-file-export me-2"></i>Exportar Lista
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-primary w-100">
+                    <i class="fas fa-envelope me-2"></i>Enviar Email em Massa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabela de Usuários -->
+<div class="card shadow-sm">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Lista de Usuários</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Avatar</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>Tipo</th>
+                        <th>Status</th>
+                        <th>Premium</th>
+                        <th>Cadastro</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr class="user-table-row">
+                        <td>
+                            <div class="user-avatar">
+                                {{ usuario[1][0].upper() }}
+                            </div>
+                        </td>
+                        <td><strong>{{ usuario[1] }}</strong></td>
+                        <td><small>{{ usuario[2] or 'N/A' }}</small></td>
+                        <td><small>{{ usuario[3] or 'N/A' }}</small></td>
+                        <td>
+                            {% if usuario[4] == 'admin' %}
+                                <span class="badge bg-danger">Admin</span>
+                            {% elif usuario[4] == 'vendedor' %}
+                                <span class="badge bg-info">Vendedor</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Comprador</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if usuario[8] == 1 %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if usuario[5] == 1 %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-crown me-1"></i>Premium
+                                </span>
+                            {% else %}
+                                <span class="badge bg-light text-dark">Gratuito</span>
+                            {% endif %}
+                        </td>
+                        <td><small>{{ usuario[7][:10] }}</small></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-info" data-bs-toggle="modal" 
+                                        data-bs-target="#userModal{{ usuario[0] }}" title="Ver Detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                
+                                {% if usuario[5] == 0 %}
+                                    <a href="{{ url_for('ativar_premium', user_id=usuario[0]) }}" 
+                                       class="btn btn-sm btn-warning" title="Ativar Premium">
+                                        <i class="fas fa-crown"></i>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('desativar_premium', user_id=usuario[0]) }}" 
+                                       class="btn btn-sm btn-secondary" title="Desativar Premium">
+                                        <i class="fas fa-crown"></i>
+                                    </a>
+                                {% endif %}
+                                
+                                {% if usuario[8] == 1 and usuario[4] != 'admin' %}
+                                    <a href="{{ url_for('banir_usuario', user_id=usuario[0]) }}" 
+                                       class="btn btn-sm btn-danger" title="Banir Usuário"
+                                       onclick="return confirm('Banir {{ usuario[1] }}?')">
+                                        <i class="fas fa-ban"></i>
+                                    </a>
+                                {% elif usuario[8] == 0 %}
+                                    <a href="{{ url_for('reativar_usuario', user_id=usuario[0]) }}" 
+                                       class="btn btn-sm btn-success" title="Reativar">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Modal de Detalhes -->
+                    <div class="modal fade" id="userModal{{ usuario[0] }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">Detalhes do Usuário</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="text-center mb-4">
+                                        <div class="user-avatar mx-auto mb-3" style="width: 100px; height: 100px; font-size: 3rem;">
+                                            {{ usuario[1][0].upper() }}
+                                        </div>
+                                        <h4>{{ usuario[1] }}</h4>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <strong><i class="fas fa-envelope me-2"></i>Email:</strong>
+                                            <p>{{ usuario[2] or 'Não informado' }}</p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <strong><i class="fas fa-phone me-2"></i>Telefone:</strong>
+                                            <p>{{ usuario[3] or 'Não informado' }}</p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <strong><i class="fas fa-user-tag me-2"></i>Tipo:</strong>
+                                            <p>{{ usuario[4].title() }}</p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <strong><i class="fas fa-calendar me-2"></i>Data de Cadastro:</strong>
+                                            <p>{{ usuario[7] }}</p>
+                                        </div>
+                                        {% if usuario[5] == 1 %}
+                                        <div class="col-md-12 mb-3">
+                                            <strong><i class="fas fa-crown me-2 text-warning"></i>Premium até:</strong>
+                                            <p>{{ usuario[6] or 'Indeterminado' }}</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Voltar ao Painel
+    </a>
+</div>
+
+<script>
+// Animação de contagem nos números das estatísticas
+document.addEventListener('DOMContentLoaded', function() {
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+        const finalValue = parseInt(stat.textContent);
+        let currentValue = 0;
+        const increment = Math.ceil(finalValue / 50);
+        
+        const counter = setInterval(() => {
+            currentValue += increment;
+            if (currentValue >= finalValue) {
+                stat.textContent = finalValue;
+                clearInterval(counter);
+            } else {
+                stat.textContent = currentValue;
+            }
+        }, 20);
+    });
+});
+</script>
+{% endblock %}

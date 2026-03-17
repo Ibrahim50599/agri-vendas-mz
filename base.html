@@ -1,0 +1,190 @@
+
+{% extends "base.html" %}
+
+{% block title %}Gestão Financeira - AGRI.vendasMz{% endblock %}
+
+{% block content %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #0277BD, #01579B);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 24px rgba(2, 119, 189, 0.2);
+    }
+    
+    .revenue-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        border-left: 4px solid #0277BD;
+    }
+    
+    .revenue-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    
+    .revenue-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #01579B;
+        margin: 10px 0;
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div class="admin-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="mb-2"><i class="fas fa-chart-line me-2"></i>Gestão Financeira</h2>
+            <p class="mb-0 opacity-75">Monitoramento financeiro e análises</p>
+        </div>
+        <div>
+            <span class="badge bg-white text-primary fs-5">
+                <i class="fas fa-shield-halved me-1"></i>Gestor Financeiro
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Estatísticas Financeiras -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="revenue-card">
+            <i class="fas fa-wallet fa-2x text-primary mb-2"></i>
+            <div class="revenue-number">{{ stats.receita_total or 0 }} MT</div>
+            <div class="text-muted">Receita Total (Estimada)</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="revenue-card">
+            <i class="fas fa-users-crown fa-2x text-warning mb-2"></i>
+            <div class="revenue-number">{{ stats.usuarios_premium }} × 500 MT</div>
+            <div class="text-muted">Assinaturas Premium</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="revenue-card">
+            <i class="fas fa-calendar-month fa-2x text-success mb-2"></i>
+            <div class="revenue-number">{{ stats.receita_mes or 0 }} MT</div>
+            <div class="text-muted">Receita Este Mês</div>
+        </div>
+    </div>
+</div>
+
+<!-- Informações de Pagamento -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-mobile-alt me-2"></i>Métodos de Pagamento</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h6 class="text-primary"><i class="fas fa-money-bill-wave me-2"></i>E-MOLA</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fs-4 fw-bold">{{ configuracoes_pagamento.numero_emola or '878312890' }}</span>
+                        <button class="btn btn-sm btn-outline-primary" onclick="copiarNumero('{{ configuracoes_pagamento.numero_emola or '878312890' }}')">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <h6 class="text-success"><i class="fas fa-mobile-screen me-2"></i>M-PESA</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fs-4 fw-bold">{{ configuracoes_pagamento.numero_mpesa or '847214191' }}</span>
+                        <button class="btn btn-sm btn-outline-success" onclick="copiarNumero('{{ configuracoes_pagamento.numero_mpesa or '847214191' }}')">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0"><i class="fas fa-crown me-2"></i>Gestão de Premium</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Valor da Assinatura:</strong> <span class="text-success fs-4">500 MT/mês</span></p>
+                <p><strong>Usuários Premium Ativos:</strong> <span class="badge bg-warning text-dark fs-5">{{ stats.usuarios_premium }}</span></p>
+                <p><strong>Receita Mensal Premium:</strong> <span class="text-success fs-5">{{ stats.usuarios_premium * 500 }} MT</span></p>
+                <hr>
+                <a href="{{ url_for('admin_panel') }}#usuarios" class="btn btn-warning w-100">
+                    <i class="fas fa-users me-2"></i>Gerenciar Assinaturas
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Relatórios -->
+<div class="card shadow-sm">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fas fa-file-invoice-dollar me-2"></i>Relatórios Financeiros</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card border-info">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-day fa-3x text-info mb-3"></i>
+                        <h6>Relatório Diário</h6>
+                        <button class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-download me-1"></i>Gerar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-warning">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-week fa-3x text-warning mb-3"></i>
+                        <h6>Relatório Semanal</h6>
+                        <button class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-download me-1"></i>Gerar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-success">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-alt fa-3x text-success mb-3"></i>
+                        <h6>Relatório Mensal</h6>
+                        <button class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-download me-1"></i>Gerar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-4">
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Voltar ao Painel
+    </a>
+</div>
+
+<script>
+function copiarNumero(numero) {
+    navigator.clipboard.writeText(numero).then(() => {
+        alert('Número copiado: ' + numero);
+    });
+}
+</script>
+{% endblock %}
