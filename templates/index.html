@@ -138,11 +138,9 @@
             <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
                 <div class="card h-100 border-0 shadow-sm product-card">
                     <div class="card-img-container">
-                        {% if produto.foto_url %}
-                            <img src="{{ produto.foto_url }}" class="card-img-top" alt="{{ produto.nome }}">
-                        {% else %}
-                            <img src="https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=400&q=80" class="card-img-top" alt="Produto agrícola">
-                        {% endif %}
+                        <img src="{{ url_for('static', filename=produto.foto_url) if produto.foto_url else 'https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=400&q=80' }}"
+                             class="card-img-top" alt="{{ produto.nome }}"
+                             onerror="this.src='https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=400&q=80';this.onerror=null;">
                         <div class="card-img-overlay d-flex align-items-center justify-content-center opacity-0">
                             <button class="btn btn-primary btn-lg">
                                 <i class="fas fa-eye me-2"></i>Ver Detalhes
@@ -586,15 +584,10 @@
             <div class="col-xl-3 col-lg-4 col-md-6">
                 <div class="card product-card h-100 shadow-sm">
                     <div class="position-relative overflow-hidden" style="height: 200px;">
-                        {% if produto[6] %}
-                            <img src="{{ url_for('static', filename=produto[6]) }}"
-                                 class="card-img-top w-100 h-100"
-                                 style="object-fit: cover;">
-                        {% else %}
-                            <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
-                                <i class="fas fa-image fa-3x text-muted"></i>
-                            </div>
-                        {% endif %}
+                        <img src="{{ url_for('static', filename=produto[6]) if produto[6] else 'https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=400&q=80' }}"
+                             class="card-img-top w-100 h-100"
+                             style="object-fit: cover;"
+                             onerror="this.src='https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=400&q=80';this.onerror=null;">
 
                         {% if produto[7] %}
                             <span class="position-absolute top-0 start-0 m-2 badge bg-success">

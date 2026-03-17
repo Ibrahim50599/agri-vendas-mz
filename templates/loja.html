@@ -333,7 +333,12 @@
                     <div class="card equip-card h-100">
                         <div class="card-img-container">
                             {% if equip[6] %}
-                                <img src="{{ url_for('static', filename=equip[6]) }}" class="card-img-top" alt="{{ equip[1] }}">
+                                <img src="{{ url_for('static', filename=equip[6]) }}"
+                                     class="card-img-top" alt="{{ equip[1] }}"
+                                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';this.onerror=null;">
+                                <div class="w-100 h-100 bg-light d-none align-items-center justify-content-center">
+                                    <i class="fas fa-tractor fa-4x text-muted opacity-50"></i>
+                                </div>
                             {% else %}
                                 <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
                                     <i class="fas fa-tractor fa-4x text-muted opacity-50"></i>

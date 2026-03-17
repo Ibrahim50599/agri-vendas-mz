@@ -121,3 +121,13 @@
 2026-03-16 13:34:38,396 - AUDIT - {"timestamp": "2026-03-16T13:34:38.396765", "action": "LOGIN_FAILED", "user_id": null, "details": {"login_field": "yayzydaguerra@gmail.com", "ip": "127.0.0.1"}, "ip_address": null}
 2026-03-16 13:34:38,396 - AUDIT - {"timestamp": "2026-03-16T13:34:38.396765", "action": "LOGIN_FAILED", "user_id": null, "details": {"login_field": "yayzydaguerra@gmail.com", "ip": "127.0.0.1"}, "ip_address": null}
 2026-03-16 13:34:38,396 - AUDIT - {"timestamp": "2026-03-16T13:34:38.396765", "action": "LOGIN_FAILED", "user_id": null, "details": {"login_field": "yayzydaguerra@gmail.com", "ip": "127.0.0.1"}, "ip_address": null}
+2026-03-17 13:36:14,707 - AUDIT - {"timestamp": "2026-03-17T13:36:14.707430", "action": "START_user_registration", "user_id": null, "details": {}, "ip_address": null}
+2026-03-17 13:36:14,707 - AUDIT - {"timestamp": "2026-03-17T13:36:14.707430", "action": "START_user_registration", "user_id": null, "details": {}, "ip_address": null}
+2026-03-17 13:36:14,712 - AUDIT - {"timestamp": "2026-03-17T13:36:14.712305", "action": "SUCCESS_user_registration", "user_id": null, "details": {}, "ip_address": null}
+2026-03-17 13:36:14,712 - AUDIT - {"timestamp": "2026-03-17T13:36:14.712305", "action": "SUCCESS_user_registration", "user_id": null, "details": {}, "ip_address": null}
+2026-03-17 13:37:06,640 - AUDIT - {"timestamp": "2026-03-17T13:37:06.640143", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-03-17 13:37:06,640 - AUDIT - {"timestamp": "2026-03-17T13:37:06.640143", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-03-17 13:37:06,640 - AUDIT - {"timestamp": "2026-03-17T13:37:06.640143", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-03-17 13:37:06,703 - AUDIT - {"timestamp": "2026-03-17T13:37:06.703244", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-03-17 13:37:06,703 - AUDIT - {"timestamp": "2026-03-17T13:37:06.703244", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-03-17 13:37:06,703 - AUDIT - {"timestamp": "2026-03-17T13:37:06.703244", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
