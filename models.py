@@ -1,196 +1,548 @@
-# AGRI.vendasMz - Agricultural Marketplace Platform
+import sqlite3
+from werkzeug.security import generate_password_hash
+import datetime
 
-## Overview
+class Database:
+    """Database class com funcionalidades básicas"""
 
-AGRI.vendasMz is a comprehensive agricultural marketplace platform designed specifically for Mozambique. It connects farmers, buyers, and agricultural stakeholders through a web-based marketplace with integrated consultancy services. The platform enables users to buy and sell agricultural products, access farming guidance, receive expert agricultural advice, and purchase agricultural equipment.
+    def __init__(self, db_path):
+        self.db_path = db_path
 
-The application is built as a Flask-based monolithic web application with SQLite for data persistence, featuring user authentication, product listings, premium membership tiers, equipment store, and an administrative panel for platform management.
+    def get_connection(self):
+        return sqlite3.connect(self.db_path)
 
-## Recent Changes (November 2025)
+    def init_db(self):
+        conn = self.get_connection()
+        c = conn.cursor()
 
-### 1. Enhanced Agricultural Consultancy System
-- Expanded crop database from 4 to 50+ crops across 8 categories:
-  - Cereais (milho, arroz, trigo, sorgo, aveia, cevada)
-  - Hortícolas (tomate, alface, cenoura, couve, cebola, pimento, repolho, pepino, abóbora)
-  - Frutícolas (manga, banana, citrinos, maçã, uva, abacate, papaia, ananás)
-  - Tubérculos (mandioca, batata, batata-doce, inhame)
-  - Leguminosas (feijão, soja, grão-de-bico, amendoim, ervilha, feijão-nhemba)
-  - Oleaginosas (girassol, gergelim, coco)
-  - Medicinais (aloe-vera, manjericão, hortelã, moringa)
-  - Regionais (mapira, mexoeira, mucuna, cajueiro, algodão)
-- Added dual-unit area input (hectares and square meters) with automatic conversion
-- Comprehensive crop data including: soil requirements, temperature, altitude, planting seasons, common pests/diseases, planting density
+        # Tabela de usuários
+        c.execute('''CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome_completo TEXT NOT NULL,
+            email TEXT UNIQUE,
+            telefone TEXT UNIQUE,
+            senha_hash TEXT NOT NULL,
+            tipo TEXT DEFAULT 'comprador',
+            premium INTEGER DEFAULT 0,
+            data_premium_expira DATE,
+            data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            ativo INTEGER DEFAULT 1
+        )''')
 
-### 2. Equipment Store System
-- New beautiful store template at `/loja` route
-- Equipment database table with full CRUD operations
-- Category filtering (Tratores, Irrigação, Ferramentas, Pulverizadores, Colheita, Armazenamento)
-- Price filtering
-- WhatsApp contact integration for inquiries
-- Modern responsive design with hover animations
+        # Tabela de produtos
+        c.execute('''CREATE TABLE IF NOT EXISTS produtos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            vendedor_id INTEGER,
+            nome TEXT NOT NULL,
+            preco REAL NOT NULL,
+            descricao TEXT,
+            localizacao TEXT,
+            foto_url TEXT,
+            categoria TEXT,
+            data_publicacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            ativo INTEGER DEFAULT 1,
+            FOREIGN KEY (vendedor_id) REFERENCES usuarios (id)
+        )''')
 
-### 3. Super Admin Equipment Management
-- New "Equipamentos" tab in admin panel (super admin only)
-- Add/Edit/Remove equipment with image upload
-- Equipment status tracking (disponível, reservado, vendido)
-- Stock management
-- Location and contact information
+        # Tabela de administradores
+        c.execute('''CREATE TABLE IF NOT EXISTS administradores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario_id INTEGER,
+            nivel_acesso TEXT DEFAULT 'admin',
+            data_nomeacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            nomeado_por INTEGER,
+            ativo INTEGER DEFAULT 1,
+            FOREIGN KEY (usuario_id) REFERENCES usuarios (id),
+            FOREIGN KEY (nomeado_por) REFERENCES usuarios (id)
+        )''')
 
-### 4. UI/UX Improvements
-- Green gradient color scheme (#1B5E20, #2E7D32, #4CAF50) for agricultural theme
-- Card-based layouts with hover animations and shadows
-- Updated navigation to include equipment store link
-- Responsive design improvements
+        # Tabela de configurações do sistema
+        c.execute('''CREATE TABLE IF NOT EXISTS configuracoes_sistema (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            chave TEXT UNIQUE,
+            valor TEXT,
+            descricao TEXT,
+            data_alteracao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            alterado_por INTEGER,
+            FOREIGN KEY (alterado_por) REFERENCES usuarios (id)
+        )''')
 
-## User Preferences
+        # Tabela de configurações admin
+        c.execute('''CREATE TABLE IF NOT EXISTS configuracoes_admin (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            codigo_acesso TEXT NOT NULL,
+            nome_completo TEXT,
+            email_recuperacao TEXT,
+            telefone_recuperacao TEXT,
+            pergunta_seguranca TEXT,
+            resposta_seguranca TEXT,
+            data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            data_alteracao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )''')
 
-Preferred communication style: Simple, everyday language.
+        # Tabela de equipamentos (gerenciada pelo super admin)
+        c.execute('''CREATE TABLE IF NOT EXISTS equipamentos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            descricao TEXT,
+            preco REAL NOT NULL,
+            categoria TEXT,
+            estoque INTEGER DEFAULT 1,
+            foto_url TEXT,
+            localizacao TEXT,
+            contato TEXT,
+            status TEXT DEFAULT 'disponivel',
+            criado_por INTEGER,
+            data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            ativo INTEGER DEFAULT 1,
+            FOREIGN KEY (criado_por) REFERENCES usuarios (id)
+        )''')
 
-## System Architecture
+        # Inserir configurações padrão
+        c.execute("INSERT OR IGNORE INTO configuracoes_sistema (chave, valor, descricao) VALUES (?, ?, ?)",
+                  ('numero_emola', '878312890', 'Número E-MOLA para pagamentos'))
+        c.execute("INSERT OR IGNORE INTO configuracoes_sistema (chave, valor, descricao) VALUES (?, ?, ?)",
+                  ('numero_mpesa', '847214191', 'Número M-PESA para pagamentos'))
+        c.execute("INSERT OR IGNORE INTO configuracoes_sistema (chave, valor, descricao) VALUES (?, ?, ?)",
+                  ('numero_suporte', '878312890', 'Número de suporte técnico'))
 
-### Frontend Architecture
-- **Template Engine**: Jinja2 templates with server-side rendering
-- **UI Framework**: Bootstrap 5.3.0 for responsive design
-- **Icons**: Font Awesome 6.0.0 for iconography
-- **Typography**: Google Fonts (Poppins family)
-- **Styling Approach**: Custom CSS with CSS variables for theming, combined with Bootstrap utilities
-- **Design Pattern**: Traditional multi-page application (MPA) with form-based navigation
+        # Inserir configuração admin padrão
+        c.execute("SELECT COUNT(*) FROM configuracoes_admin")
+        if c.fetchone()[0] == 0:
+            c.execute('''INSERT INTO configuracoes_admin
+                        (codigo_acesso, nome_completo, email_recuperacao, telefone_recuperacao,
+                         pergunta_seguranca, resposta_seguranca)
+                        VALUES (?, ?, ?, ?, ?, ?)''',
+                      ('AGRI2024ADMIN', 'Ibrahim Hagi Amane', 'ibrahim@agrivendas.mz', '878312890',
+                       'Qual é o nome da sua primeira empresa?', 'AGRI.vendasMz'))
 
-**Rationale**: Server-side rendering provides simplicity, better SEO, and reduces JavaScript dependencies. Bootstrap ensures mobile-first responsive design without custom CSS frameworks.
+        # Inserir admin padrão se não existir
+        c.execute("SELECT * FROM usuarios WHERE telefone = '878312890'")
+        if not c.fetchone():
+            admin_hash = generate_password_hash('12345,Ibrahim')
+            c.execute('''INSERT INTO usuarios
+                        (nome_completo, telefone, senha_hash, tipo, premium)
+                        VALUES (?, ?, ?, ?, ?)''',
+                      ('Ibrahim Hagi Amane', '878312890', admin_hash, 'admin', 1))
 
-### Backend Architecture
-- **Framework**: Flask 2.3.2 (Python micro-framework)
-- **Architecture Pattern**: Monolithic application with route-based controllers
-- **Session Management**: Flask sessions with server-side secret key
-- **Authentication**: Password hashing with Werkzeug's security utilities
-- **File Uploads**: Werkzeug secure filename handling with size limits (16MB max)
-- **Authorization**: Custom decorator-based role checking (admin, premium, vendor, buyer)
+            admin_id = c.lastrowid
+            c.execute("INSERT INTO administradores (usuario_id, nivel_acesso, nomeado_por) VALUES (?, ?, ?)",
+                      (admin_id, 'superadmin', admin_id))
+        else:
+            # Verificar se o admin existe na tabela administradores
+            c.execute("SELECT id FROM usuarios WHERE telefone = '878312890'")
+            admin_id = c.fetchone()[0]
+            c.execute("SELECT * FROM administradores WHERE usuario_id = ?", (admin_id,))
+            if not c.fetchone():
+                c.execute("INSERT INTO administradores (usuario_id, nivel_acesso, nomeado_por) VALUES (?, ?, ?)",
+                          (admin_id, 'superadmin', admin_id))
 
-**Rationale**: Flask provides lightweight, flexible routing ideal for small-to-medium applications. Monolithic architecture simplifies deployment on platforms like Replit.
+        # Inserir equipamentos de exemplo
+        c.execute("SELECT COUNT(*) FROM equipamentos")
+        if c.fetchone()[0] == 0:
+            equipamentos_exemplo = [
+                ('Trator Agrícola 75HP', 'Trator robusto ideal para preparação de solo, aração e cultivo. Motor diesel de 75HP, tração 4x4.',
+                 450000, 'Tratores', 2, '', 'Maputo', '878312890', 'disponivel', admin_id),
+                ('Sistema de Irrigação por Aspersão', 'Sistema completo para irrigação de até 5 hectares. Inclui bomba, tubos e aspersores.',
+                 85000, 'Irrigação', 5, '', 'Matola', '878312890', 'disponivel', admin_id),
+                ('Pulverizador Costal 20L', 'Pulverizador manual de alta pressão, ideal para aplicação de defensivos agrícolas.',
+                 3500, 'Pulverizadores', 15, '', 'Beira', '878312890', 'disponivel', admin_id)
+            ]
 
-### Data Storage
-- **Primary Database**: SQLite 3 (file-based relational database)
-- **Schema Design**: Normalized tables with foreign key relationships
-- **Key Tables**:
-  - `usuarios` (users) - User accounts with role-based types
-  - `produtos` (products) - Product listings linked to vendors
-  - `equipamentos` (equipment) - Agricultural equipment for sale
-  - `administradores` - Admin user tracking
-  - `configuracoes_sistema` - System configuration
-  - `configuracoes_admin` - Admin access configuration
+            for equip in equipamentos_exemplo:
+                c.execute('''INSERT INTO equipamentos
+                            (nome, descricao, preco, categoria, estoque, foto_url, localizacao, contato, status, criado_por)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', equip)
 
-**Rationale**: SQLite requires no separate database server, making it ideal for development and small-scale deployments. Easy to migrate to PostgreSQL later if needed.
+        conn.commit()
+        conn.close()
 
-**Limitations**: SQLite is not suitable for high-concurrency production workloads. Consider migrating to PostgreSQL for production scale.
+    def _check_user_active(self, user_id):
+        """Verifica se usuário está ativo"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute("SELECT ativo FROM usuarios WHERE id = ?", (user_id,))
+        result = c.fetchone()
+        conn.close()
+        return result and result[0] == 1
 
-### Authentication & Authorization
-- **Authentication Method**: Email/phone + password with hashed storage
-- **Password Hashing**: Werkzeug's `generate_password_hash` and `check_password_hash`
-- **Session Storage**: Flask server-side sessions
-- **User Roles**: 
-  - `comprador` (buyer)
-  - `vendedor` (seller/vendor)
-  - `admin`
-  - `superadmin`
-  - Premium status tracked separately via `premium` flag and expiration date
-- **Super Admin Access Code**: AGRI2024ADMIN (configurable in admin panel)
-- **Default Admin**: Phone 878312890, Password: 12345,Ibrahim
+    def get_user_by_credentials(self, login_field, senha):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''SELECT id, nome_completo, senha_hash, tipo, premium
+                    FROM usuarios
+                    WHERE (email = ? OR telefone = ?) AND ativo = 1''',
+                  (login_field, login_field))
+        user = c.fetchone()
+        conn.close()
+        return user
 
-**Rationale**: Password hashing prevents credential theft. Role-based access control enables tiered feature access. Session-based auth simplifies implementation over token-based approaches.
+    def create_user(self, nome, email, telefone, senha, tipo):
+        conn = self.get_connection()
+        c = conn.cursor()
+        senha_hash = generate_password_hash(senha)
+        c.execute('''INSERT INTO usuarios
+                    (nome_completo, email, telefone, senha_hash, tipo)
+                    VALUES (?, ?, ?, ?, ?)''',
+                  (nome, email, telefone, senha_hash, tipo))
+        conn.commit()
+        conn.close()
 
-### File Upload System
-- **Upload Directory**: `static/uploads/`
-- **Security**: Werkzeug `secure_filename` prevents path traversal attacks
-- **Size Limit**: 16MB maximum file size
-- **Use Case**: Product photos, equipment images, and potentially user avatars
+    def get_products(self, limit=20):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''SELECT p.*, u.nome_completo, u.telefone
+                    FROM produtos p
+                    JOIN usuarios u ON p.vendedor_id = u.id
+                    WHERE p.ativo = 1 AND u.ativo = 1
+                    ORDER BY p.data_publicacao DESC LIMIT ?''', (limit,))
+        produtos = c.fetchall()
+        conn.close()
+        return produtos
 
-**Rationale**: Storing uploads in the static directory allows direct serving via Flask without CDN complexity. Size limits prevent abuse.
+    def create_product(self, vendedor_id, nome, preco, descricao, localizacao, foto_url, categoria):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''INSERT INTO produtos
+                    (vendedor_id, nome, preco, descricao, localizacao, foto_url, categoria)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)''',
+                  (vendedor_id, nome, preco, descricao, localizacao, foto_url, categoria))
+        conn.commit()
+        conn.close()
 
-### Premium Membership System
-- **Premium Tracking**: Boolean flag + expiration date in user table
-- **Payment Integration**: Manual payment verification (M-Pesa reference number: 847214191)
-- **Pricing**: 199 MT/month
-- **Features**: Unlimited listings, advanced filters, detailed crop information, SMS alerts, priority support
+    def get_user_products(self, user_id):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''SELECT * FROM produtos
+                    WHERE vendedor_id = ? AND ativo = 1
+                    ORDER BY data_publicacao DESC''',
+                  (user_id,))
+        produtos = c.fetchall()
+        conn.close()
+        return produtos
 
-**Rationale**: Manual payment processing avoids complex payment gateway integrations initially. Can be automated later with M-Pesa API integration.
+    def get_user_count(self, user_id):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute("SELECT COUNT(*) FROM produtos WHERE vendedor_id = ? AND ativo = 1",
+                  (user_id,))
+        count = c.fetchone()[0]
+        conn.close()
+        return count
 
-### Administrative Panel
-- **Access Control**: Two-tier admin system (admin and superadmin)
-- **Authentication**: Separate admin code-based access system
-- **Features**: 
-  - User management (activate/deactivate premium, ban users)
-  - Product moderation
-  - Analytics/reporting
-  - Equipment management (super admin only)
-  - Admin nomination (super admin only)
-  - Security configuration (super admin only)
-- **Recovery System**: Admin code recovery via email or phone
+    def get_admin_config(self):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute("SELECT * FROM configuracoes_admin ORDER BY id DESC LIMIT 1")
+        config = c.fetchone()
+        conn.close()
+        return config
 
-**Rationale**: Separate admin authentication adds security layer. Code-based access simpler than complex RBAC systems for small teams.
+    def update_admin_config(self, codigo_acesso, nome_completo, email_recuperacao, telefone_recuperacao, pergunta_seguranca, resposta_seguranca):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''UPDATE configuracoes_admin SET
+                    codigo_acesso = ?, nome_completo = ?, email_recuperacao = ?,
+                    telefone_recuperacao = ?, pergunta_seguranca = ?, resposta_seguranca = ?,
+                    data_alteracao = CURRENT_TIMESTAMP''',
+                  (codigo_acesso, nome_completo, email_recuperacao, telefone_recuperacao,
+                   pergunta_seguranca, resposta_seguranca))
+        conn.commit()
+        conn.close()
 
-### Application Entry Points
-- **Development**: `main.py` runs Flask directly on port 5000
-- **Production**: `start.py` launches Gunicorn WSGI server on port 10000
-- **Database Initialization**: `init_db()` creates tables on startup
+    def get_equipments(self):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute("SELECT * FROM equipamentos WHERE ativo = 1 ORDER BY data_criacao DESC")
+        equipamentos = c.fetchall()
+        conn.close()
+        return equipamentos
 
-**Rationale**: Gunicorn provides production-grade WSGI serving with better performance than Flask's development server.
+    def create_equipment(self, nome, descricao, preco, categoria, estoque, foto_url, localizacao, contato, criado_por):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''INSERT INTO equipamentos
+                    (nome, descricao, preco, categoria, estoque, foto_url, localizacao, contato, criado_por)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                  (nome, descricao, preco, categoria, estoque, foto_url, localizacao, contato, criado_por))
+        conn.commit()
+        conn.close()
 
-## Key Routes
+    def update_equipment(self, equip_id, nome, descricao, preco, categoria, estoque, foto_url, localizacao, contato, status):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''UPDATE equipamentos SET
+                    nome=?, descricao=?, preco=?, categoria=?, estoque=?,
+                    foto_url=?, localizacao=?, contato=?, status=?
+                    WHERE id=?''',
+                  (nome, descricao, preco, categoria, estoque, foto_url, localizacao, contato, status, equip_id))
+        conn.commit()
+        conn.close()
 
-### Public Routes
-- `/` - Homepage
-- `/produtos` - Product listings
-- `/loja` - Equipment store
-- `/login` - User login
-- `/cadastro` - User registration
+    def delete_equipment(self, equip_id):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute("UPDATE equipamentos SET ativo = 0 WHERE id = ?", (equip_id,))
+        conn.commit()
+        conn.close()
 
-### Authenticated Routes
-- `/dashboard` - User dashboard
-- `/consultoria` - Agricultural consultancy (with crop calculator)
-- `/calcular_plantio` - API endpoint for crop calculations
-- `/publicar` - Publish new product (vendors only)
-- `/premium` - Premium subscription page
+    def get_equipment_by_id(self, equip_id):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute("SELECT * FROM equipamentos WHERE id = ?", (equip_id,))
+        equipamento = c.fetchone()
+        conn.close()
+        return equipamento
 
-### Admin Routes
-- `/admin` - Admin panel
-- `/admin/acesso` - Super admin access code entry
-- `/admin/equipamentos/novo` - Add new equipment (super admin)
-- `/admin/equipamentos/<id>/editar` - Edit equipment (super admin)
-- `/admin/equipamentos/<id>/remover` - Remove equipment (super admin)
+    def get_filtered_equipments(self, categoria=None, preco_max=None):
+        conn = self.get_connection()
+        c = conn.cursor()
 
-## External Dependencies
+        query = '''SELECT * FROM equipamentos WHERE ativo = 1 AND status = 'disponivel' '''
+        params = []
 
-### Python Packages
-- **Flask 2.3.2**: Web framework (core dependency)
-- **Werkzeug 3.0.1**: WSGI utilities, security helpers (comes with Flask)
-- **Gunicorn 21.2.0**: Production WSGI HTTP server
-- **PyJWT 2.8.0**: JWT token encoding/decoding
+        if categoria:
+            query += ' AND categoria = ?'
+            params.append(categoria)
 
-### Frontend Libraries (CDN-based)
-- **Bootstrap 5.3.0**: UI component framework and grid system
-- **Font Awesome 6.0.0**: Icon library
-- **Google Fonts**: Poppins font family
+        if preco_max:
+            query += ' AND preco <= ?'
+            params.append(float(preco_max))
 
-**Rationale**: CDN delivery reduces bundle size and leverages browser caching. No build process required.
+        query += ' ORDER BY data_criacao DESC'
 
-### Database
-- **SQLite3**: Bundled with Python, no external installation required
+        c.execute(query, params)
+        equipamentos = c.fetchall()
+        conn.close()
+        return equipamentos
 
-### Third-Party Service Integrations
-- **M-Pesa Mobile Money**: Payment processing (manual integration, no API)
-  - Reference number: 847214191
-  - Used for premium subscription payments (199 MT/month)
-- **WhatsApp**: Contact integration for equipment inquiries
+    def get_filtered_products(self, categoria=None, preco_max=None, regiao=None):
+        conn = self.get_connection()
+        c = conn.cursor()
 
-**Future Considerations**: 
-- Automated M-Pesa API integration for payment verification
-- SMS gateway integration for alerts (mentioned in premium features)
-- Email service for notifications and admin code recovery
-- Migration to PostgreSQL for production scalability
+        query = '''SELECT p.*, u.nome_completo, u.telefone
+                  FROM produtos p
+                  JOIN usuarios u ON p.vendedor_id = u.id
+                  WHERE p.ativo = 1 AND u.ativo = 1'''
+        params = []
 
-### Deployment Platform
-- **Target Platform**: Replit or similar cloud platforms
-- **Port Configuration**: Configured for port 5000 (development) / 10000 (production)
-- **Static File Serving**: Flask serves static files directly
+        if categoria:
+            query += ' AND p.categoria = ?'
+            params.append(categoria)
 
-**Note**: The application currently uses SQLite but may require PostgreSQL integration for production deployment on platforms like Replit with persistent database requirements.
+        if preco_max:
+            query += ' AND p.preco <= ?'
+            params.append(float(preco_max))
+
+        if regiao:
+            query += ' AND p.localizacao LIKE ?'
+            params.append(f'%{regiao}%')
+
+        query += ' ORDER BY p.data_publicacao DESC'
+
+        c.execute(query, params)
+        produtos = c.fetchall()
+        conn.close()
+        return produtos
+
+    def get_user_by_id(self, user_id):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute("SELECT nome_completo, telefone FROM usuarios WHERE id = ? AND ativo = 1", (user_id,))
+        user = c.fetchone()
+        conn.close()
+        return user
+
+    def get_admin_users(self):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''SELECT a.*, u.nome_completo, u.telefone, u2.nome_completo as nomeado_por_nome
+                    FROM administradores a
+                    JOIN usuarios u ON a.usuario_id = u.id
+                    LEFT JOIN usuarios u2 ON a.nomeado_por = u2.id
+                    WHERE a.ativo = 1
+                    ORDER BY a.data_nomeacao DESC''')
+        admins = c.fetchall()
+        conn.close()
+        return admins
+
+    def get_users(self):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''SELECT id, nome_completo, email, telefone, tipo, premium, data_premium_expira, data_cadastro, ativo
+                    FROM usuarios
+                    ORDER BY data_cadastro DESC''')
+        users = c.fetchall()
+        conn.close()
+        return users
+
+    def activate_premium(self, user_id):
+        conn = self.get_connection()
+        c = conn.cursor()
+        data_expira = datetime.datetime.now() + datetime.timedelta(days=30)
+        c.execute("UPDATE usuarios SET premium = 1, data_premium_expira = ? WHERE id = ?",
+                  (data_expira.date(), user_id))
+        conn.commit()
+        conn.close()
+
+    def deactivate_premium(self, user_id):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute("UPDATE usuarios SET premium = 0, data_premium_expira = NULL WHERE id = ?",
+                  (user_id,))
+        conn.commit()
+        conn.close()
+
+    def ban_user(self, user_id):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute("UPDATE usuarios SET ativo = 0 WHERE id = ?", (user_id,))
+        c.execute("UPDATE produtos SET ativo = 0 WHERE vendedor_id = ?", (user_id,))
+        conn.commit()
+        conn.close()
+
+    def unban_user(self, user_id):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute("UPDATE usuarios SET ativo = 1 WHERE id = ?", (user_id,))
+        conn.commit()
+        conn.close()
+
+    def remove_product(self, produto_id):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute("UPDATE produtos SET ativo = 0 WHERE id = ?", (produto_id,))
+        conn.commit()
+        conn.close()
+
+    def get_stats(self):
+        conn = self.get_connection()
+        c = conn.cursor()
+
+        c.execute("SELECT COUNT(*) FROM usuarios WHERE ativo = 1")
+        total_usuarios = c.fetchone()[0]
+
+        c.execute("SELECT COUNT(*) FROM usuarios WHERE premium = 1 AND ativo = 1")
+        usuarios_premium = c.fetchone()[0]
+
+        c.execute("SELECT COUNT(*) FROM produtos WHERE ativo = 1")
+        total_produtos = c.fetchone()[0]
+
+        c.execute("SELECT COUNT(*) FROM administradores WHERE ativo = 1")
+        total_admins = c.fetchone()[0]
+
+        c.execute("SELECT COUNT(*) FROM equipamentos WHERE ativo = 1")
+        total_equipamentos = c.fetchone()[0]
+
+        conn.close()
+
+        return {
+            'total_usuarios': total_usuarios,
+            'usuarios_premium': usuarios_premium,
+            'total_produtos': total_produtos,
+            'total_admins': total_admins,
+            'total_equipamentos': total_equipamentos
+        }
+
+    def update_config(self, chave, valor, alterado_por):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''UPDATE configuracoes_sistema
+                    SET valor = ?, data_alteracao = CURRENT_TIMESTAMP, alterado_por = ?
+                    WHERE chave = ?''', (valor, alterado_por, chave))
+        conn.commit()
+        conn.close()
+
+    def get_configs(self):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute("SELECT * FROM configuracoes_sistema ORDER BY chave")
+        configs = c.fetchall()
+        conn.close()
+        return configs
+
+    def nomear_admin(self, user_id, nivel, nomeado_por):
+        conn = self.get_connection()
+        c = conn.cursor()
+
+        # Verificar se usuário existe
+        c.execute("SELECT nome_completo FROM usuarios WHERE id = ? AND ativo = 1", (user_id,))
+        user = c.fetchone()
+
+        if not user:
+            conn.close()
+            return False
+
+        # Verificar se já é admin
+        c.execute("SELECT id FROM administradores WHERE usuario_id = ? AND ativo = 1", (user_id,))
+        if c.fetchone():
+            conn.close()
+            return False
+
+        # Atualizar tipo do usuário
+        c.execute("UPDATE usuarios SET tipo = 'admin' WHERE id = ?", (user_id,))
+
+        # Inserir na tabela de administradores
+        c.execute('''INSERT INTO administradores (usuario_id, nivel_acesso, nomeado_por)
+                    VALUES (?, ?, ?)''', (user_id, nivel, nomeado_por))
+
+        conn.commit()
+        conn.close()
+        return True
+
+    def remover_admin(self, admin_id):
+        conn = self.get_connection()
+        c = conn.cursor()
+
+        # Verificar se é o super admin
+        c.execute('''SELECT a.usuario_id, a.nivel_acesso
+                    FROM administradores a
+                    WHERE a.id = ?''', (admin_id,))
+        result = c.fetchone()
+
+        if result and result[1] == 'superadmin':
+            conn.close()
+            return False
+
+        # Desativar administrador
+        c.execute("UPDATE administradores SET ativo = 0 WHERE id = ?", (admin_id,))
+
+        # Alterar tipo do usuário para vendedor
+        if result:
+            c.execute("UPDATE usuarios SET tipo = 'vendedor' WHERE id = ?", (result[0],))
+
+        conn.commit()
+        conn.close()
+        return True
+
+    def get_reports(self):
+        conn = self.get_connection()
+        c = conn.cursor()
+
+        # Relatório de crescimento mensal
+        c.execute('''SELECT strftime('%Y-%m', data_cadastro) as mes, COUNT(*) as novos_usuarios
+                    FROM usuarios WHERE ativo = 1
+                    GROUP BY mes ORDER BY mes DESC LIMIT 12''')
+        crescimento_usuarios = c.fetchall()
+
+        # Produtos mais populares por categoria
+        c.execute('''SELECT categoria, COUNT(*) as total
+                    FROM produtos WHERE ativo = 1
+                    GROUP BY categoria ORDER BY total DESC''')
+        produtos_categoria = c.fetchall()
+
+        # Vendedores mais ativos
+        c.execute('''SELECT u.nome_completo, u.telefone, COUNT(p.id) as total_produtos
+                    FROM usuarios u
+                    JOIN produtos p ON u.id = p.vendedor_id
+                    WHERE p.ativo = 1 AND u.ativo = 1
+                    GROUP BY u.id ORDER BY total_produtos DESC LIMIT 10''')
+        vendedores_ativos = c.fetchall()
+
+        conn.close()
+
+        return {
+            'crescimento': crescimento_usuarios,
+            'categorias': produtos_categoria,
+            'vendedores': vendedores_ativos
+        }

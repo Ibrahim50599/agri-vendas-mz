@@ -1,10 +1,4 @@
-services:
-  - type: web
-    name: agri-vendas-mz
-    env: python
-    buildCommand: ""
-    startCommand: gunicorn main:app --bind 0.0.0.0:$PORT --workers 1
+from routes import app
 
-
-
-
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(__import__('os').environ.get('PORT', 5000)))

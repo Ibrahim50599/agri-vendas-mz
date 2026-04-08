@@ -1,0 +1,1269 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AGRI.vendasMz - Marketplace Agrícola Profissional{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-green: #1B5E20;
+            --secondary-green: #2E7D32;
+            --accent-green: #4CAF50;
+            --light-green: #81C784;
+            --dark-green: #0D3B0D;
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-light: #FFFFFF;
+            --background-light: #FAFAFA;
+            --background-white: #FFFFFF;
+            --border-light: #E8F5E8;
+            --shadow-light: 0 2px 8px rgba(27,94,32,0.08);
+            --shadow-medium: 0 4px 16px rgba(27,94,32,0.12);
+            --shadow-heavy: 0 8px 32px rgba(27,94,32,0.15);
+            --gradient-primary: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #4CAF50 100%);
+            --gradient-secondary: linear-gradient(135deg, #81C784 0%, #4CAF50 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-light);
+            color: var(--text-primary);
+            font-size: 16px;
+            line-height: 1.6;
+            font-weight: 400;
+            overflow-x: hidden;
+        }
+
+        /* Background Pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 25% 25%, rgba(76,175,80,0.03) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(27,94,32,0.03) 0%, transparent 50%);
+            background-size: 400px 400px;
+            background-position: 0 0, 200px 200px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Navbar Professional */
+        .navbar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--primary-green) !important;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .navbar-brand::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+        }
+
+        .navbar-brand:hover::after {
+            width: 100%;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-primary) !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin: 0 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .navbar-nav .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+            z-index: -1;
+        }
+
+        .navbar-nav .nav-link:hover::before {
+            opacity: 0.1;
+            transform: scale(1);
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-green) !important;
+            transform: translateY(-1px);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            min-height: 80vh;
+            background: var(--gradient-primary);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(27,94,32,0.8) 0%, rgba(76,175,80,0.6) 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            font-weight: 300;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .hero-buttons {
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        /* Cards Professional */
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: var(--shadow-light);
+            background: var(--background-white);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Buttons Professional */
+        .btn {
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(27,94,32,0.3);
+            color: white;
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary-green);
+            color: var(--primary-green);
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--gradient-primary);
+            border-color: var(--primary-green);
+            color: white;
+        }
+
+        /* Form Styles */
+        .form-control {
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
+            background: white;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-light);
+            border-top: 4px solid var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Alert Styles */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #4CAF50, #81C784);
+            color: white;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #f44336, #e57373);
+            color: white;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, #ff9800, #ffb74d);
+            color: white;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #2196F3, #64B5F6);
+            color: white;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+
+        .footer h5 {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+
+            .card:hover {
+                transform: none;
+            }
+        }
+
+        /* Scroll to top button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .scroll-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--background-light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-green);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-leaf me-2"></i>
+                AGRI.vendasMz
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">
+                            <i class="fas fa-home me-1"></i>Início
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('listar_produtos') }}">
+                            <i class="fas fa-store me-1"></i>Produtos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('consultoria') }}">
+                            <i class="fas fa-chart-line me-1"></i>Consultoria
+                        </a>
+                    </li>
+                    {% if session.get('user_id') %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                                <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                            </a>
+                        </li>
+                        {% if session.get('user_type') in ['vendedor', 'admin'] %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('publicar') }}">
+                                    <i class="fas fa-plus me-1"></i>Publicar
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if session.get('admin_level') %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin_panel') }}">
+                                    <i class="fas fa-cog me-1"></i>Admin
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt me-1"></i>Sair
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">
+                                <i class="fas fa-sign-in-alt me-1"></i>Entrar
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('cadastro') }}">
+                                <i class="fas fa-user-plus me-1"></i>Cadastrar
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <!-- Content block is defined later in the template -->
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5><i class="fas fa-leaf me-2"></i>AGRI.vendasMz</h5>
+                    <p>O marketplace agrícola mais completo de Moçambique. Conectando produtores, compradores e consultores em um só lugar.</p>
+                    <div class="social-links">
+                        <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 mb-4">
+                    <h5>Plataforma</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('listar_produtos') }}">Produtos</a></li>
+                        <li><a href="{{ url_for('consultoria') }}">Consultoria</a></li>
+                        <li><a href="{{ url_for('premium') }}">Premium</a></li>
+                        <li><a href="#">Sobre nós</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 mb-4">
+                    <h5>Suporte</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Ajuda</a></li>
+                        <li><a href="#">Contato</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Política de Privacidade</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5>Contato</h5>
+                    <p><i class="fas fa-map-marker-alt me-2"></i>Maputo, Moçambique</p>
+                    <p><i class="fas fa-phone me-2"></i>+258 84 123 4567</p>
+                    <p><i class="fas fa-envelope me-2"></i>contato@agrivendasmz.co.mz</p>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p>&copy; 2024 AGRI.vendasMz. Todos os direitos reservados. Desenvolvido com <i class="fas fa-heart text-danger"></i> para a agricultura moçambicana.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Scroll to top functionality
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.classList.add('show');
+            } else {
+                scrollToTopBtn.classList.remove('show');
+            }
+        });
+
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add loading animation to forms
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<div class="loading-spinner"></div>';
+                    submitBtn.disabled = true;
+                }
+            });
+        });
+
+        // Animate elements on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card, .alert, .hero-content').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add stagger animation to card grids
+        document.querySelectorAll('.row .col').forEach((col, index) => {
+            col.style.animationDelay = `${index * 0.1}s`;
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.25);
+        }
+
+        .page-header .page-header-inner {
+            position: relative;
+            z-index: 2;
+        }
+
+        .page-header h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .reveal.on-screen {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-color);
+        }
+
+        .text-muted {
+            color: #666666 !important;
+            font-size: 14px;
+        }
+
+        .small {
+            font-size: 14px !important;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--accent-color) !important;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--accent-color);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #F8F9FA 0%, #E8F5E8 100%);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-text {
+            font-size: 15px;
+            color: #555555;
+            line-height: 1.6;
+        }
+
+        .product-card {
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+            border-color: var(--secondary-color);
+        }
+
+        .product-img-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image-overlay {
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 85%);
+        }
+
+        .product-img-container:hover .product-image-overlay {
+            opacity: 1;
+        }
+
+        .alert {
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            transition: left 0.3s ease;
+            z-index: 1050;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1040;
+            display: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul li a:hover {
+            background: rgba(255,255,255,0.1);
+            padding-left: 10px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 50px;
+        }
+
+        .badge {
+            font-weight: 500;
+        }
+
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table th {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+
+        .modal-header {
+            border-radius: 15px 15px 0 0;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+
+            .card {
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Utilities for professional UI effects */
+        .bg-hero {
+            background-image: url('https://images.unsplash.com/photo-1516910817561-470a0c6e430d?auto=format&fit=crop&w=1600&q=80');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bg-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        .bg-hero .container,
+        .bg-hero .row,
+        .bg-hero .text-white {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-glow {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-glow::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(120deg, rgba(255,255,255,0.25), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-glow:hover::after {
+            opacity: 1;
+        }
+
+        /* Auth screens with image side panel */
+        .auth-layout {
+            min-height: 72vh;
+        }
+
+        .auth-image {
+            background: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+            min-height: 420px;
+        }
+
+        .auth-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+        }
+
+        .auth-image .overlay-text {
+            position: relative;
+            z-index: 1;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <button class="menu-toggle me-3" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-seedling"></i> AGRI.vendasMz
+            </a>
+
+            <div class="navbar-nav ms-auto">
+                {% if session.get('user_id') %}
+                    <span class="nav-link">
+                        <i class="fas fa-user"></i>
+                        Olá, {{ session.get('user_name', '') | split(' ') | first }}!
+                        {% if session.get('is_premium') %}
+                            <span class="badge bg-warning text-dark ms-1">Premium</span>
+                        {% endif %}
+                    </span>
+                {% else %}
+                    <a class="nav-link" href="{{ url_for('login') }}">
+                        <i class="fas fa-sign-in-alt"></i> Entrar
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5><i class="fas fa-seedling"></i> Menu</h5>
+            <button class="btn btn-sm btn-outline-light" onclick="toggleSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <ul>
+            <li>
+                <a href="{{ url_for('index') }}">
+                    <i class="fas fa-home me-3"></i> Início
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('listar_produtos') }}">
+                    <i class="fas fa-shopping-cart me-3"></i> Produtos
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('loja_equipamentos') }}">
+                    <i class="fas fa-tractor me-3"></i> Loja Equipamentos
+                </a>
+            </li>
+
+            {% if session.user_id %}
+                <li>
+                    <a href="{{ url_for('dashboard') }}">
+                        <i class="fas fa-tachometer-alt me-3"></i> Meu Painel
+                    </a>
+                </li>
+
+                {% if session.user_type in ['vendedor', 'admin'] %}
+                    <li>
+                        <a href="{{ url_for('publicar_produto') }}">
+                            <i class="fas fa-plus-circle me-3"></i> Publicar
+                        </a>
+                    </li>
+                {% endif %}
+
+                <li>
+                    <a href="{{ url_for('consultoria') }}">
+                        <i class="fas fa-leaf me-3"></i> Consultoria
+                    </a>
+                </li>
+
+                {% if not session.is_premium %}
+                    <li>
+                        <a href="{{ url_for('premium') }}">
+                            <i class="fas fa-crown me-3"></i> Premium
+                        </a>
+                    </li>
+                {% endif %}
+
+                <li>
+                    <a href="{{ url_for('logout') }}">
+                        <i class="fas fa-sign-out-alt me-3"></i> Sair
+                    </a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="{{ url_for('login') }}">
+                        <i class="fas fa-sign-in-alt me-3"></i> Fazer Login
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('cadastro') }}">
+                        <i class="fas fa-user-plus me-3"></i> Criar Conta
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+
+        <hr class="my-4">
+
+        <div class="mb-3">
+            <h6><i class="fas fa-headset"></i> Suporte</h6>
+            <p class="small mb-2">
+                <i class="fas fa-phone"></i> 878312890
+            </p>
+            <p class="small">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </p>
+        </div>
+
+        <button class="btn btn-outline-light btn-sm w-100" onclick="acessoAdmin()">
+            <i class="fas fa-key me-2"></i> Acesso Administrativo
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container my-4">
+        {% block page_header %}{% endblock %}
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="row">
+                    <div class="col-12">
+                        {% for message in messages %}
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-seedling"></i> AGRI.vendasMz</h5>
+                    <p>Conectando agricultores e compradores em Moçambique</p>
+                </div>
+                <div class="col-md-3">
+                    <h6>Links Rápidos</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('index') }}" class="text-light">Início</a></li>
+                        <li><a href="{{ url_for('listar_produtos') }}" class="text-light">Produtos</a></li>
+                        <li><a href="{{ url_for('consultoria') }}" class="text-light">Consultoria</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>Contato</h6>
+                    <p><i class="fas fa-phone"></i> 878312890</p>
+                    <p><i class="fab fa-whatsapp"></i> WhatsApp</p>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="text-center">
+                <small>&copy; 2024 AGRI.vendasMz. Todos os direitos reservados.</small>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function acessoAdmin() {
+            const codigo = prompt('Digite o código de acesso administrativo:');
+            if (codigo) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ url_for("validar_acesso_admin") }}';
+
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'codigo';
+                input.value = codigo;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+
+            if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+                document.querySelector('.sidebar-overlay').classList.remove('active');
+            }
+        });
+
+        // Scroll reveal animation for elements with `.reveal`
+        document.addEventListener('DOMContentLoaded', function() {
+            const revealElements = document.querySelectorAll('.reveal');
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('on-screen');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            revealElements.forEach(el => revealObserver.observe(el));
+        });
+    </script>
+</body>
+</html>

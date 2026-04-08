@@ -1,0 +1,1062 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard - AGRI.vendasMz{% endblock %}
+
+{% block content %}
+<style>
+.dashboard-hero {
+    background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #4CAF50 100%);
+    color: white;
+    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=1600&q=80');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.1;
+}
+
+.dashboard-hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-top: -2rem;
+    position: relative;
+    z-index: 3;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1B5E20;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.stat-change {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.stat-change.positive {
+    color: #28a745;
+}
+
+.stat-change.negative {
+    color: #dc3545;
+}
+
+.quick-actions {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.action-btn {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.action-btn:hover {
+    border-color: #4CAF50;
+    background: #4CAF50;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.2);
+}
+
+.action-btn i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.recent-activity {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.activity-meta {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.chart-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.chart-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chart-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e9ecef;
+    background: white;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chart-btn.active, .chart-btn:hover {
+    background: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+@media (max-width: 768px) {
+    .dashboard-hero {
+        padding: 3rem 0;
+    }
+
+    .welcome-card {
+        margin-top: -1rem;
+        padding: 1.5rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<!-- Hero Section -->
+<section class="dashboard-hero">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-3" data-aos="fade-up">
+            <i class="fas fa-tachometer-alt me-3"></i>
+            Bem-vindo ao seu Dashboard
+        </h1>
+        <p class="lead mb-0 opacity-90" data-aos="fade-up" data-aos-delay="200">
+            Monitore seu negócio agrícola em tempo real
+        </p>
+    </div>
+</section>
+
+<!-- Welcome Card -->
+<div class="container">
+    <div class="welcome-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h3 class="mb-2">
+                    Olá, {{ session.get('user_name', 'Usuário') }}!
+                    {% if session.get('is_premium') %}
+                        <span class="badge bg-warning ms-2">
+                            <i class="fas fa-crown me-1"></i>Premium
+                        </span>
+                    {% endif %}
+                </h3>
+                <p class="text-muted mb-0">
+                    {% if session.get('user_type') == 'vendedor' %}
+                        Você tem {{ produtos_count or 0 }} produtos publicados e {{ vendas_count or 0 }} vendas este mês.
+                    {% elif session.get('user_type') == 'comprador' %}
+                        Você fez {{ compras_count or 0 }} compras este mês. Continue explorando nossos produtos!
+                    {% else %}
+                        Acesse todas as funcionalidades da nossa plataforma agrícola.
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-lg-4 text-end">
+                <div class="d-flex gap-2 justify-content-end">
+                    {% if session.get('user_type') in ['vendedor', 'admin'] %}
+                        <a href="{{ url_for('publicar') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Publicar Produto
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('consultoria') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-chart-line me-1"></i>Consultoria
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Content -->
+<div class="container mt-4">
+    <!-- Stats Grid -->
+    <div class="stats-grid" data-aos="fade-up" data-aos-delay="400">
+        <div class="stat-card">
+            <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="stat-value">{{ vendas_count or 0 }}</div>
+            <div class="stat-label">Vendas este mês</div>
+            <div class="stat-change positive">
+                <i class="fas fa-arrow-up me-1"></i>+12% vs mês passado
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-success bg-opacity-10 text-success">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stat-value">{{ produtos_count or 0 }}</div>
+            <div class="stat-label">Produtos ativos</div>
+            <div class="stat-change positive">
+                <i class="fas fa-arrow-up me-1"></i>+5 novos produtos
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                <i class="fas fa-eye"></i>
+            </div>
+            <div class="stat-value">{{ visualizacoes_count or 0 }}</div>
+            <div class="stat-label">Visualizações</div>
+            <div class="stat-change positive">
+                <i class="fas fa-arrow-up me-1"></i>+8% esta semana
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-info bg-opacity-10 text-info">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-value">{{ avaliacao_media or 4.8 }}</div>
+            <div class="stat-label">Avaliação média</div>
+            <div class="stat-change positive">
+                <i class="fas fa-star me-1"></i>Excelente
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions" data-aos="fade-up" data-aos-delay="500">
+        <h4 class="mb-4">
+            <i class="fas fa-bolt me-2 text-warning"></i>
+            Ações Rápidas
+        </h4>
+        <div class="action-buttons">
+            {% if session.get('user_type') in ['vendedor', 'admin'] %}
+                <a href="{{ url_for('publicar') }}" class="action-btn">
+                    <i class="fas fa-plus-circle text-primary"></i>
+                    <strong>Publicar Produto</strong>
+                    <small class="text-muted d-block">Adicione novos itens ao catálogo</small>
+                </a>
+                <a href="{{ url_for('meus_produtos') }}" class="action-btn">
+                    <i class="fas fa-boxes text-success"></i>
+                    <strong>Meus Produtos</strong>
+                    <small class="text-muted d-block">Gerencie seus anúncios</small>
+                </a>
+            {% endif %}
+            <a href="{{ url_for('consultoria') }}" class="action-btn">
+                <i class="fas fa-chart-line text-info"></i>
+                <strong>Consultoria</strong>
+                <small class="text-muted d-block">Análises e recomendações</small>
+            </a>
+            <a href="{{ url_for('premium') }}" class="action-btn">
+                <i class="fas fa-crown text-warning"></i>
+                <strong>Upgrade Premium</strong>
+                <small class="text-muted d-block">Recursos avançados</small>
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Charts Section -->
+        <div class="col-lg-8" data-aos="fade-up" data-aos-delay="600">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h5 class="chart-title">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Performance Mensal
+                    </h5>
+                    <div class="chart-controls">
+                        <button class="chart-btn active" data-period="7d">7 dias</button>
+                        <button class="chart-btn" data-period="30d">30 dias</button>
+                        <button class="chart-btn" data-period="90d">90 dias</button>
+                    </div>
+                </div>
+                <canvas id="performanceChart" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="700">
+            <div class="recent-activity">
+                <h5 class="mb-4">
+                    <i class="fas fa-clock me-2"></i>
+                    Atividade Recente
+                </h5>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon bg-success bg-opacity-10 text-success">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Nova venda realizada</div>
+                            <div class="activity-meta">Milho - 50kg • há 2 horas</div>
+                        </div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Produto visualizado</div>
+                            <div class="activity-meta">Arroz Premium • há 4 horas</div>
+                        </div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Nova avaliação recebida</div>
+                            <div class="activity-meta">5 estrelas • há 6 horas</div>
+                        </div>
+                    </div>
+
+                    <div class="activity-item">
+                        <div class="activity-icon bg-info bg-opacity-10 text-info">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Relatório gerado</div>
+                            <div class="activity-meta">Análise de vendas • há 1 dia</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Features for Premium Users -->
+    {% if session.get('is_premium') %}
+    <div class="row mt-4">
+        <div class="col-12" data-aos="fade-up" data-aos-delay="800">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h5 class="chart-title">
+                        <i class="fas fa-crown me-2 text-warning"></i>
+                        Recursos Premium
+                    </h5>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <div class="premium-feature">
+                            <i class="fas fa-chart-pie fa-3x text-primary mb-3"></i>
+                            <h6>Relatórios Avançados</h6>
+                            <p class="text-muted small">Análises detalhadas de mercado</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="premium-feature">
+                            <i class="fas fa-cloud-sun fa-3x text-warning mb-3"></i>
+                            <h6>Previsões Climáticas</h6>
+                            <p class="text-muted small">Dados meteorológicos precisos</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="premium-feature">
+                            <i class="fas fa-users fa-3x text-success mb-3"></i>
+                            <h6>Suporte Prioritário</h6>
+                            <p class="text-muted small">Atendimento VIP 24/7</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="premium-feature">
+                            <i class="fas fa-rocket fa-3x text-info mb-3"></i>
+                            <h6>Publicações Ilimitadas</h6>
+                            <p class="text-muted small">Sem limites de anúncios</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Performance Chart
+const ctx = document.getElementById('performanceChart').getContext('2d');
+const performanceChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+        datasets: [{
+            label: 'Vendas',
+            data: [12, 19, 15, 25, 22, 30],
+            borderColor: '#4CAF50',
+            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(0,0,0,0.05)'
+                }
+            },
+            x: {
+                grid: {
+                    color: 'rgba(0,0,0,0.05)'
+                }
+            }
+        }
+    }
+});
+
+// Chart period controls
+document.querySelectorAll('.chart-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        // Here you would update the chart data based on the selected period
+        console.log('Period changed to:', this.dataset.period);
+    });
+});
+</script>
+{% endblock %}
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.recommendation-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-left: 4px solid #28a745;
+}
+
+.activity-timeline {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.timeline-item {
+    padding: 10px 0;
+    border-left: 2px solid #dee2e6;
+    margin-left: 15px;
+    position: relative;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 15px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #28a745;
+}
+</style>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">
+                <i class="fas fa-tachometer-alt text-success me-2"></i>
+                Meu Dashboard
+                {% if session.is_premium %}
+                    <span class="badge bg-warning text-dark ms-2">
+                        <i class="fas fa-crown me-1"></i>PREMIUM
+                    </span>
+                {% endif %}
+            </h2>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary quick-action-btn" onclick="refreshDashboard()">
+                    <i class="fas fa-sync-alt"></i> Atualizar
+                </button>
+                <button class="btn btn-outline-info quick-action-btn" onclick="toggleNotifications()">
+                    <i class="fas fa-bell"></i> Notificações
+                    <span class="notification-badge" id="notificationCount">3</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body text-center">
+                <div class="stat-icon bg-primary text-white">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h6 class="text-muted mb-1">Bem-vindo</h6>
+                <h5 class="mb-0">{{ session.user_name.split()[0] }}</h5>
+                <small class="text-muted">{{ session.user_type.title() }}</small>
+            </div>
+        </div>
+    </div>
+
+    {% if session.user_type in ['vendedor', 'admin'] %}
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card dashboard-card h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-success text-white">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <h6 class="text-muted mb-1">Meus Produtos</h6>
+                    <h3 class="mb-0 text-success">{{ meus_produtos|length }}</h3>
+                    <small class="text-muted">Ativos</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card dashboard-card h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-warning text-white">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h6 class="text-muted mb-1">Visualizações</h6>
+                    <h3 class="mb-0 text-warning">127</h3>
+                    <small class="text-muted">Esta semana</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card dashboard-card h-100">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-info text-white">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <h6 class="text-muted mb-1">Ações Rápidas</h6>
+                    <a href="{{ url_for('publicar_produto') }}" class="btn btn-info btn-sm mt-2">
+                        <i class="fas fa-plus me-1"></i> Novo Produto
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if not session.is_premium %}
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card dashboard-card h-100 border-warning">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-warning text-white">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <h6 class="text-muted mb-1">Upgrade</h6>
+                    <a href="{{ url_for('premium') }}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-arrow-up me-1"></i> Premium
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Charts and Analytics -->
+{% if session.user_type in ['vendedor', 'admin'] %}
+<div class="row mb-4">
+    <div class="col-lg-8 mb-4">
+        <div class="card dashboard-card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Performance dos Produtos
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="productsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card dashboard-card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-tags me-2"></i>
+                    Categorias
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="categoriesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recommendations -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card dashboard-card recommendation-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-lightbulb text-success me-2"></i>
+                    Recomendações Inteligentes
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Produtos Populares na sua Região</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-seedling text-success me-2"></i> Milho - Alta demanda</li>
+                            <li><i class="fas fa-leaf text-success me-2"></i> Hortaliças - Boa rentabilidade</li>
+                            <li><i class="fas fa-apple-alt text-success me-2"></i> Frutas cítricas - Mercado crescente</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Dicas para Melhorar Vendas</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-camera text-primary me-2"></i> Adicione fotos de qualidade</li>
+                            <li><i class="fas fa-tags text-primary me-2"></i> Use preços competitivos</li>
+                            <li><i class="fas fa-map-marker-alt text-primary me-2"></i> Especifique localização</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Activity Timeline -->
+<div class="row mb-4">
+    <div class="col-lg-6 mb-4">
+        <div class="card dashboard-card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    Atividades Recentes
+                </h5>
+            </div>
+            <div class="card-body activity-timeline">
+                <div class="timeline-item">
+                    <small class="text-muted">2 horas atrás</small>
+                    <p class="mb-0">Produto "Milho Premium" foi visualizado 5 vezes</p>
+                </div>
+                <div class="timeline-item">
+                    <small class="text-muted">1 dia atrás</small>
+                    <p class="mb-0">Novo produto publicado: "Arroz Orgânico"</p>
+                </div>
+                <div class="timeline-item">
+                    <small class="text-muted">3 dias atrás</small>
+                    <p class="mb-0">Perfil atualizado com sucesso</p>
+                </div>
+                <div class="timeline-item">
+                    <small class="text-muted">1 semana atrás</small>
+                    <p class="mb-0">Primeiro login realizado</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card dashboard-card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-star me-2"></i>
+                    Avaliações e Feedback
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <h3 class="text-warning">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        4.5
+                    </h3>
+                    <small class="text-muted">Baseado em 23 avaliações</small>
+                </div>
+                <div class="progress mb-2">
+                    <div class="progress-bar bg-success" style="width: 80%">5 estrelas (18)</div>
+                </div>
+                <div class="progress mb-2">
+                    <div class="progress-bar bg-info" style="width: 15%">4 estrelas (3)</div>
+                </div>
+                <div class="progress mb-2">
+                    <div class="progress-bar bg-warning" style="width: 5%">3 estrelas (1)</div>
+                </div>
+                <div class="progress mb-2">
+                    <div class="progress-bar bg-danger" style="width: 0%">2 estrelas (0)</div>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar bg-secondary" style="width: 0%">1 estrela (0)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Products Table -->
+{% if session.user_type in ['vendedor', 'admin'] and meus_produtos %}
+<div class="row">
+    <div class="col-12">
+        <div class="card dashboard-card">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-box me-2"></i>
+                    Meus Produtos
+                </h5>
+                <div class="d-flex gap-2">
+                    <input type="text" class="form-control form-control-sm" placeholder="Buscar produtos..." id="productSearch" style="width: 200px;">
+                    <select class="form-select form-select-sm" id="categoryFilter" style="width: 150px;">
+                        <option value="">Todas categorias</option>
+                        <option value="cereais">Cereais</option>
+                        <option value="hortalicas">Hortaliças</option>
+                        <option value="frutas">Frutas</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="productsTable">
+                        <thead class="table-success">
+                            <tr>
+                                <th>Nome</th>
+                                <th>Preço</th>
+                                <th>Categoria</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for produto in meus_produtos %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ produto[2] }}</strong>
+                                        {% if produto[6] %}
+                                            <br><small class="text-muted">{{ produto[6][:50] }}...</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ "%.2f"|format(produto[3]) }} MT</span>
+                                    </td>
+                                    <td>{{ produto[7] or 'N/A' }}</td>
+                                    <td>{{ produto[8] }}</td>
+                                    <td>
+                                        <span class="badge bg-success">Ativo</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" onclick="editProduct({{ produto[0] }})">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success" onclick="viewProduct({{ produto[0] }})">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger" onclick="deleteProduct({{ produto[0] }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+// Initialize Charts
+document.addEventListener('DOMContentLoaded', function() {
+    // Products Performance Chart
+    const productsCtx = document.getElementById('productsChart').getContext('2d');
+    new Chart(productsCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+            datasets: [{
+                label: 'Visualizações',
+                data: [12, 19, 15, 25, 22, 30],
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Contatos',
+                data: [2, 5, 3, 8, 6, 10],
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Categories Chart
+    const categoriesCtx = document.getElementById('categoriesChart').getContext('2d');
+    new Chart(categoriesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Cereais', 'Hortaliças', 'Frutas', 'Equipamentos'],
+            datasets: [{
+                data: [40, 30, 20, 10],
+                backgroundColor: [
+                    '#28a745',
+                    '#007bff',
+                    '#ffc107',
+                    '#dc3545'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    // Search and Filter Functionality
+    const searchInput = document.getElementById('productSearch');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const table = document.getElementById('productsTable');
+    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const categoryValue = categoryFilter.value.toLowerCase();
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const name = row.cells[0].textContent.toLowerCase();
+            const category = row.cells[2].textContent.toLowerCase();
+
+            const matchesSearch = name.includes(searchTerm);
+            const matchesCategory = categoryValue === '' || category.includes(categoryValue);
+
+            if (matchesSearch && matchesCategory) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    categoryFilter.addEventListener('change', filterTable);
+});
+
+// Dashboard Functions
+function refreshDashboard() {
+    location.reload();
+}
+
+function toggleNotifications() {
+    // Toggle notifications panel
+    alert('Notificações: Você tem 3 novas mensagens!');
+}
+
+function editProduct(id) {
+    window.location.href = `/editar_produto/${id}`;
+}
+
+function viewProduct(id) {
+    window.location.href = `/produto/${id}`;
+}
+
+function deleteProduct(id) {
+    if (confirm('Tem certeza que deseja excluir este produto?')) {
+        // AJAX call to delete product
+        fetch(`/admin/remover_produto/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro ao excluir produto');
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

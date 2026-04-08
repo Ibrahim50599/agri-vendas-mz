@@ -1,0 +1,563 @@
+
+{% extends "base.html" %}
+
+{% block title %}Publicar Produto - AGRI.vendasMz{% endblock %}
+
+{% block content %}
+<style>
+.publish-hero {
+    background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 50%, #1B5E20 100%);
+    color: white;
+    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.publish-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=1600&q=80');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.1;
+}
+
+.publish-hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+.publish-form-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 3rem;
+    margin-top: -2rem;
+    position: relative;
+    z-index: 3;
+}
+
+.form-section {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.form-section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.form-section-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-right: 1rem;
+}
+
+.form-section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.form-floating {
+    margin-bottom: 1.5rem;
+}
+
+.form-floating > label {
+    color: #666;
+    font-weight: 500;
+}
+
+.form-control, .form-select {
+    border: 2px solid #e8f5e8;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    background: white;
+}
+
+.image-upload-area {
+    border: 2px dashed #4CAF50;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    background: rgba(76, 175, 80, 0.05);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.image-upload-area:hover {
+    background: rgba(76, 175, 80, 0.1);
+    border-color: #2E7D32;
+}
+
+.image-upload-area.dragover {
+    background: rgba(76, 175, 80, 0.15);
+    border-color: #1B5E20;
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: #4CAF50;
+    margin-bottom: 1rem;
+}
+
+.image-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.image-preview-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    border: 1px solid #e9ecef;
+}
+
+.image-preview-item img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
+
+.image-preview-item .remove-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(220, 53, 69, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.btn-publish {
+    background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    width: 100%;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-publish::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-publish:hover::before {
+    left: 100%;
+}
+
+.btn-publish:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(27, 94, 32, 0.3);
+}
+
+.preview-card {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.preview-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.preview-content {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+}
+
+.tips-section {
+    background: linear-gradient(135deg, rgba(255,193,7,0.1), rgba(255,193,7,0.05));
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid rgba(255,193,7,0.2);
+}
+
+.tips-section .tips-icon {
+    color: #ffc107;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .publish-hero {
+        padding: 3rem 0;
+    }
+
+    .publish-form-container {
+        margin-top: -1rem;
+        padding: 2rem 1.5rem;
+    }
+
+    .form-section {
+        padding: 1.5rem;
+    }
+
+    .image-preview {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+}
+</style>
+
+<!-- Hero Section -->
+<section class="publish-hero">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-3" data-aos="fade-up">
+            <i class="fas fa-plus-circle me-3"></i>
+            Publicar Produto
+        </h1>
+        <p class="lead mb-0 opacity-90" data-aos="fade-up" data-aos-delay="200">
+            Anuncie seu produto agrícola e alcance milhares de compradores em Moçambique
+        </p>
+    </div>
+</section>
+
+<!-- Main Form -->
+<div class="container">
+    <div class="publish-form-container" data-aos="fade-up" data-aos-delay="300">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' }} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" enctype="multipart/form-data" id="publishForm">
+            <!-- Basic Information -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <div class="form-section-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h3 class="form-section-title">Informações Básicas</h3>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome do Produto" required>
+                            <label for="nome">
+                                <i class="fas fa-tag me-2"></i>Nome do Produto *
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="number" step="0.01" min="0" class="form-control" id="preco" name="preco" placeholder="Preço" required>
+                            <label for="preco">
+                                <i class="fas fa-money-bill me-2"></i>Preço (MT) *
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-floating">
+                    <textarea class="form-control" id="descricao" name="descricao" placeholder="Descrição detalhada do produto" style="height: 120px;" required></textarea>
+                    <label for="descricao">
+                        <i class="fas fa-align-left me-2"></i>Descrição *
+                    </label>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select class="form-select" id="categoria" name="categoria" required>
+                                <option value="">Selecione uma categoria</option>
+                                <option value="cereais">Cereais</option>
+                                <option value="horticolas">Hortícolas</option>
+                                <option value="frutas">Frutas</option>
+                                <option value="tuberculos">Tubérculos</option>
+                                <option value="leguminosas">Leguminosas</option>
+                                <option value="oleaginosas">Oleaginosas</option>
+                                <option value="especiarias">Especiarias</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                            <label for="categoria">
+                                <i class="fas fa-list me-2"></i>Categoria *
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="localizacao" name="localizacao" placeholder="Localização" required>
+                            <label for="localizacao">
+                                <i class="fas fa-map-marker-alt me-2"></i>Localização *
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Images -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <div class="form-section-icon">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <h3 class="form-section-title">Fotos do Produto</h3>
+                </div>
+
+                <div class="image-upload-area" id="imageUploadArea">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h5>Clique para adicionar fotos</h5>
+                    <p class="text-muted mb-0">ou arraste e solte as imagens aqui</p>
+                    <input type="file" id="foto" name="foto" accept="image/*" style="display: none;" multiple>
+                </div>
+
+                <div class="image-preview" id="imagePreview"></div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="tips-section">
+                <div class="text-center">
+                    <div class="tips-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h5>Dicas para um anúncio de sucesso</h5>
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <i class="fas fa-camera text-primary me-2"></i>
+                            <strong>Fotos de qualidade</strong>
+                            <br><small class="text-muted">Use boas fotos do seu produto</small>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-edit text-success me-2"></i>
+                            <strong>Descrição detalhada</strong>
+                            <br><small class="text-muted">Descreva características e benefícios</small>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-tag text-warning me-2"></i>
+                            <strong>Preço competitivo</strong>
+                            <br><small class="text-muted">Pesquise preços similares no mercado</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-publish" id="publishBtn">
+                <i class="fas fa-rocket me-2"></i>
+                <span id="publishText">Publicar Produto</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+// Image upload functionality
+const imageUploadArea = document.getElementById('imageUploadArea');
+const imageInput = document.getElementById('foto');
+const imagePreview = document.getElementById('imagePreview');
+let selectedFiles = [];
+
+imageUploadArea.addEventListener('click', () => {
+    imageInput.click();
+});
+
+imageInput.addEventListener('change', handleFileSelect);
+
+function handleFileSelect(event) {
+    const files = Array.from(event.target.files);
+    addFiles(files);
+}
+
+function addFiles(files) {
+    files.forEach(file => {
+        if (file.type.startsWith('image/')) {
+            selectedFiles.push(file);
+            displayImagePreview(file);
+        }
+    });
+}
+
+function displayImagePreview(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const previewItem = document.createElement('div');
+        previewItem.className = 'image-preview-item';
+        previewItem.innerHTML = `
+            <img src="${e.target.result}" alt="Preview">
+            <button type="button" class="remove-image" onclick="removeImage(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        imagePreview.appendChild(previewItem);
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeImage(button) {
+    const previewItem = button.parentElement;
+    const index = Array.from(imagePreview.children).indexOf(previewItem);
+    selectedFiles.splice(index, 1);
+    previewItem.remove();
+}
+
+// Drag and drop functionality
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    imageUploadArea.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+    imageUploadArea.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+    imageUploadArea.addEventListener(eventName, unhighlight, false);
+});
+
+function highlight(e) {
+    imageUploadArea.classList.add('dragover');
+}
+
+function unhighlight(e) {
+    imageUploadArea.classList.remove('dragover');
+}
+
+imageUploadArea.addEventListener('drop', handleDrop, false);
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = Array.from(dt.files);
+    addFiles(files);
+}
+
+// Form submission
+document.getElementById('publishForm').addEventListener('submit', function(e) {
+    const btn = document.getElementById('publishBtn');
+    const text = document.getElementById('publishText');
+
+    btn.disabled = true;
+    text.textContent = 'Publicando...';
+
+    btn.innerHTML = `
+        <div class="d-flex align-items-center justify-content-center">
+            <div class="spinner-border spinner-border-sm me-2" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            Publicando produto...
+        </div>
+    `;
+});
+
+// Auto-resize textarea
+document.getElementById('descricao').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+});
+
+// Price formatting
+document.getElementById('preco').addEventListener('input', function() {
+    let value = this.value;
+    if (value && !isNaN(value)) {
+        this.value = parseFloat(value).toFixed(2);
+    }
+});
+</script>
+{% endblock %}
+                                    <option value="">Selecionar categoria</option>
+                                    <option value="Cereais">Cereais</option>
+                                    <option value="Legumes">Legumes</option>
+                                    <option value="Frutas">Frutas</option>
+                                    <option value="Tubérculos">Tubérculos</option>
+                                    <option value="Sementes">Sementes</option>
+                                    <option value="Fertilizantes">Fertilizantes</option>
+                                    <option value="Equipamentos">Equipamentos</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Localização</label>
+                                <input type="text" class="form-control" name="localizacao" placeholder="Maputo, Matola...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Foto do Produto</label>
+                        <input type="file" class="form-control" name="foto" accept="image/*">
+                    </div>
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Publicar Produto
+                    </button>
+
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
