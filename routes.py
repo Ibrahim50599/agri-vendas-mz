@@ -7,6 +7,8 @@ import os
 import re
 import sqlite3
 from functools import wraps
+from google import genai
+from google.genai import types
 from config import Config
 from models import Database
 from utils import validate_email, validate_phone, allowed_file, save_uploaded_file, CODIGOS_ADMIN, NIVEIS_HIERARQUIA, get_nivel_hierarquia, check_admin_access, DADOS_CULTURAS
@@ -513,12 +515,61 @@ def publicar_produto():
 
     return render_template('publicar.html')
 
-    return render_template('publicar.html')
-
 @app.route('/consultoria')
 @login_required
 def consultoria():
     return render_template('consultoria.html')
+
+GEMINI_SYSTEM_PROMPT = """És o Assistente Agrícola Virtual da plataforma AGRI.vendasMz, especializado em agricultura de Moçambique.
+
+Responde SEMPRE em português de Moçambique. Sê prático, claro e útil.
+
+As tuas áreas de especialização incluem:
+- Culturas principais de Moçambique: milho, mandioca, arroz, feijão, amendoim, soja, sorgo, mapira, cajueiro, algodão, tabaco, cana-de-açúcar, tomate, couve, cebola, banana, manga, citrinos, papaia, abacate
+- Condições climáticas e solos das províncias moçambicanas (Maputo, Gaza, Inhambane, Sofala, Manica, Tete, Zambézia, Nampula, Cabo Delgado, Niassa)
+- Épocas de plantio e colheita para cada região
+- Pragas e doenças comuns e como as controlar
+- Adubação e fertilização (incluindo fertilizantes locais e orgânicos)
+- Técnicas de irrigação adaptadas ao contexto moçambicano
+- Pós-colheita, armazenamento e comercialização
+- Preços de mercado orientativos
+- Acesso a crédito agrícola e subsídios disponíveis em Moçambique
+
+Regras:
+- Respostas concisas (máximo 4-5 parágrafos)
+- Usa exemplos práticos relevantes para Moçambique
+- Se não souberes algo específico, diz honestamente e sugere onde obter ajuda (IIAM, serviços de extensão rural)
+- Não faças diagnósticos médicos para humanos ou animais fora do âmbito agrícola"""
+
+@app.route('/assistente_ia', methods=['POST'])
+@login_required
+def assistente_ia():
+    try:
+        data = request.get_json()
+        pergunta = data.get('pergunta', '').strip()
+        if not pergunta:
+            return jsonify({'resposta': 'Por favor escreva uma pergunta.'})
+
+        api_key = os.environ.get('GEMINI_API_KEY')
+        if not api_key:
+            return jsonify({'resposta': 'Assistente IA não configurado. Contacte o administrador.'})
+
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=pergunta,
+            config=types.GenerateContentConfig(
+                system_instruction=GEMINI_SYSTEM_PROMPT,
+                max_output_tokens=1024,
+            )
+        )
+        resposta = response.text or 'Não consegui gerar uma resposta. Tente novamente.'
+        return jsonify({'resposta': resposta})
+    except Exception as e:
+        erro = str(e)
+        if 'API_KEY_INVALID' in erro or 'invalid' in erro.lower():
+            return jsonify({'resposta': 'Chave API inválida. Verifique a configuração.'})
+        return jsonify({'resposta': 'Ocorreu um erro ao contactar o assistente. Tente novamente mais tarde.'})
 
 @app.route('/calcular_plantio', methods=['POST'])
 @login_required

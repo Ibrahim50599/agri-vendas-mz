@@ -1308,16 +1308,31 @@ function enviarPerguntaIA() {
     const chat = document.getElementById('chatArea');
     chat.innerHTML += `<div class="chat-msg-user">${pergunta}</div>`;
     input.value = '';
-    const pergLower = pergunta.toLowerCase();
-    let resposta = 'Entendido! Para essa questão específica, recomendo consultar um técnico agrícola local para uma avaliação no terreno. O que mais posso ajudar?';
-    for (let chave in respostasIA) {
-        if (pergLower.includes(chave)) { resposta = respostasIA[chave]; break; }
-    }
-    setTimeout(() => {
-        chat.innerHTML += `<div class="chat-msg-bot"><i class="fas fa-seedling me-1 text-success"></i>${resposta}</div>`;
-        chat.scrollTop = chat.scrollHeight;
-    }, 500);
     chat.scrollTop = chat.scrollHeight;
+
+    const loadingId = 'loading-' + Date.now();
+    chat.innerHTML += `<div class="chat-msg-bot" id="${loadingId}"><i class="fas fa-spinner fa-spin me-1 text-success"></i>A pensar...</div>`;
+    chat.scrollTop = chat.scrollHeight;
+
+    fetch('/assistente_ia', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({pergunta: pergunta})
+    })
+    .then(r => r.json())
+    .then(data => {
+        const loading = document.getElementById(loadingId);
+        if (loading) loading.remove();
+        const resposta = data.resposta || 'Desculpe, não consegui processar a sua pergunta.';
+        chat.innerHTML += `<div class="chat-msg-bot"><i class="fas fa-seedling me-1 text-success"></i>${resposta.replace(/\n/g, '<br>')}</div>`;
+        chat.scrollTop = chat.scrollHeight;
+    })
+    .catch(() => {
+        const loading = document.getElementById(loadingId);
+        if (loading) loading.remove();
+        chat.innerHTML += `<div class="chat-msg-bot"><i class="fas fa-seedling me-1 text-success"></i>Erro de ligação. Verifique a sua internet e tente novamente.</div>`;
+        chat.scrollTop = chat.scrollHeight;
+    });
 }
 function perguntaRapida(p) {
     document.getElementById('perguntaIA').value = p;
