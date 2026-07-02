@@ -1,437 +1,671 @@
 {% extends "base.html" %}
 
-{% block title %}Loja de Equipamentos - AGRI.vendasMz{% endblock %}
+{% block title %}Loja de Equipamentos Agrícolas - AGRI.vendasMz{% endblock %}
 
 {% block content %}
-<div class="page-header reveal">
-    <div class="page-header-inner text-center">
-        <h1><i class="fas fa-tractor me-2"></i>Loja de Equipamentos</h1>
-        <p class="lead mb-0">Encontre ferramentas e máquinas para aumentar sua produção.</p>
-    </div>
-</div>
-
 <style>
-    .hero-loja {
-        background: linear-gradient(135deg, #1B5E20 0%, #388E3C 50%, #4CAF50 100%);
+    .loja-hero {
+        background: linear-gradient(135deg, #0a3d0a 0%, #1B5E20 45%, #2E7D32 100%);
         color: white;
-        padding: 60px 0;
-        margin: -24px -12px 30px -12px;
-        text-align: center;
+        --text-color: #ffffff;
+        padding: 70px 0 50px;
+        margin: -24px -12px 0 -12px;
         position: relative;
         overflow: hidden;
     }
-    
-    .hero-loja::before {
+    .loja-hero::before {
         content: '';
         position: absolute;
-        top: 0;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M0 0h40v40H0zm40 40h40v40H40z'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    .loja-hero::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
         left: 0;
         right: 0;
-        bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        height: 60px;
+        background: #f8f9fa;
+        clip-path: ellipse(55% 100% at 50% 100%);
     }
-    
-    .hero-loja h1 {
-        font-size: 3rem;
-        font-weight: 700;
-        margin-bottom: 15px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        position: relative;
-        z-index: 1;
-    }
-    
-    .hero-loja p {
-        font-size: 1.2rem;
-        opacity: 0.95;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .equip-card {
-        border: none;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        background: white;
-    }
-    
-    .equip-card:hover {
-        transform: translateY(-15px) scale(1.02);
-        box-shadow: 0 25px 60px rgba(0,0,0,0.2);
-    }
-    
-    .equip-card .card-img-container {
-        position: relative;
-        height: 250px;
-        overflow: hidden;
-    }
-    
-    .equip-card .card-img-top {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-    }
-    
-    .equip-card:hover .card-img-top {
-        transform: scale(1.1);
-    }
-    
-    .equip-card .badge-categoria {
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        padding: 8px 15px;
+    .loja-hero .container { position: relative; z-index: 1; }
+    .loja-hero h1 { font-size: 2.8rem; font-weight: 800; letter-spacing: -0.5px; color: #fff !important; text-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+    .loja-hero p { font-size: 1.15rem; opacity: 0.9; color: #fff !important; }
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.25);
+        color: white;
+        padding: 5px 14px;
+        border-radius: 30px;
         font-size: 0.85rem;
-        font-weight: 600;
-        border-radius: 30px;
-        background: linear-gradient(135deg, #1B5E20, #4CAF50);
-        color: white;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-    
-    .equip-card .badge-estoque {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        padding: 6px 12px;
-        font-size: 0.8rem;
-        border-radius: 20px;
-    }
-    
-    .equip-card .card-body {
-        padding: 25px;
-    }
-    
-    .equip-card .card-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #1B5E20;
-        margin-bottom: 10px;
-    }
-    
-    .equip-card .preco {
-        font-size: 1.8rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, #1B5E20, #4CAF50);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    
-    .equip-card .card-text {
-        color: #666;
-        font-size: 0.95rem;
-        line-height: 1.6;
-    }
-    
-    .equip-card .info-item {
-        display: flex;
-        align-items: center;
-        padding: 8px 0;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    
-    .equip-card .info-item:last-child {
-        border-bottom: none;
-    }
-    
-    .equip-card .info-item i {
-        width: 30px;
-        color: #4CAF50;
-    }
-    
-    .btn-contactar {
-        background: linear-gradient(135deg, #25D366, #128C7E);
-        border: none;
-        padding: 15px 25px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        border-radius: 12px;
-        color: white;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-    }
-    
-    .btn-contactar:hover {
-        background: linear-gradient(135deg, #128C7E, #075E54);
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(37, 211, 102, 0.3);
-        color: white;
-    }
-    
-    .filter-section {
-        background: white;
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-        margin-bottom: 40px;
-    }
-    
-    .filter-section .form-control,
-    .filter-section .form-select {
-        border-radius: 12px;
-        padding: 15px 20px;
-        border: 2px solid #e0e0e0;
-        transition: all 0.3s ease;
-    }
-    
-    .filter-section .form-control:focus,
-    .filter-section .form-select:focus {
-        border-color: #4CAF50;
-        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
-    }
-    
-    .btn-filtrar {
-        background: linear-gradient(135deg, #1B5E20, #4CAF50);
-        border: none;
-        padding: 15px 30px;
-        font-weight: 600;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-filtrar:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(27, 94, 32, 0.3);
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 80px 20px;
-    }
-    
-    .empty-state i {
-        font-size: 5rem;
-        color: #e0e0e0;
-        margin-bottom: 20px;
-    }
-    
-    .empty-state h3 {
-        color: #666;
-        margin-bottom: 15px;
-    }
-    
-    .categoria-chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 30px;
-        justify-content: center;
-    }
-    
-    .categoria-chip {
-        padding: 10px 20px;
-        border-radius: 30px;
-        background: white;
-        border: 2px solid #e0e0e0;
-        color: #666;
         font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
+        margin-bottom: 20px;
+        backdrop-filter: blur(4px);
     }
-    
-    .categoria-chip:hover,
-    .categoria-chip.active {
+    .loja-search-bar {
+        background: white;
+        border-radius: 16px;
+        padding: 8px 8px 8px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        max-width: 680px;
+        margin: 30px auto 0;
+    }
+    .loja-search-bar input {
+        border: none;
+        outline: none;
+        flex: 1;
+        font-size: 1rem;
+        color: #333;
+        background: transparent;
+    }
+    .loja-search-bar select {
+        border: none;
+        border-left: 2px solid #e0e0e0;
+        outline: none;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        color: #555;
+        background: transparent;
+        cursor: pointer;
+    }
+    .loja-search-bar button {
+        background: linear-gradient(135deg, #1B5E20, #4CAF50);
+        border: none;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .loja-search-bar button:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .stats-bar {
+        background: white;
+        border-bottom: 1px solid #e8e8e8;
+        padding: 18px 0;
+    }
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 20px;
+        border-right: 1px solid #e8e8e8;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+    .stat-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 1.1rem; font-weight: 700; color: #1B5E20; }
+
+    .cat-tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding: 28px 0 20px;
+    }
+    .cat-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 18px;
+        border-radius: 30px;
+        border: 1.5px solid #e0e0e0;
+        color: #555;
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s;
+        background: white;
+    }
+    .cat-tab i { font-size: 0.85rem; }
+    .cat-tab:hover { border-color: #4CAF50; color: #1B5E20; background: #f1f8f1; }
+    .cat-tab.active {
         background: linear-gradient(135deg, #1B5E20, #4CAF50);
         border-color: transparent;
         color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(27, 94, 32, 0.2);
+        box-shadow: 0 4px 14px rgba(27,94,32,0.3);
     }
-    
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
+
     .equip-card {
-        animation: fadeInUp 0.6s ease forwards;
+        border: 1px solid #eee;
+        border-radius: 16px;
+        overflow: hidden;
+        background: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
-    
-    .equip-card:nth-child(1) { animation-delay: 0.1s; }
-    .equip-card:nth-child(2) { animation-delay: 0.2s; }
-    .equip-card:nth-child(3) { animation-delay: 0.3s; }
-    .equip-card:nth-child(4) { animation-delay: 0.4s; }
+    .equip-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+        border-color: #c8e6c9;
+    }
+    .equip-img-wrap {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+        background: #f5f5f5;
+    }
+    .equip-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+    .equip-card:hover .equip-img-wrap img { transform: scale(1.07); }
+    .equip-img-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+        color: #a5d6a7;
+        gap: 8px;
+    }
+    .equip-img-placeholder span { font-size: 0.8rem; color: #bbb; font-style: italic; }
+    .badge-cat {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: rgba(27,94,32,0.9);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        backdrop-filter: blur(4px);
+    }
+    .badge-stock {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-stock.in { background: rgba(232,245,233,0.95); color: #2E7D32; border: 1px solid #a5d6a7; }
+    .badge-stock.out { background: rgba(255,235,238,0.95); color: #c62828; border: 1px solid #ef9a9a; }
+
+    .equip-body {
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .equip-cat-text {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #4CAF50;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 6px;
+    }
+    .equip-name {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+        line-height: 1.3;
+    }
+    .equip-desc {
+        font-size: 0.88rem;
+        color: #777;
+        line-height: 1.55;
+        margin-bottom: 14px;
+        flex: 1;
+    }
+    .equip-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 14px;
+        padding: 12px;
+        background: #f9fafb;
+        border-radius: 10px;
+    }
+    .equip-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.83rem;
+        color: #666;
+    }
+    .equip-meta-row i { color: #81C784; width: 16px; text-align: center; }
+    .equip-price-row {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 14px;
+    }
+    .equip-price {
+        font-size: 1.7rem;
+        font-weight: 800;
+        color: #1B5E20;
+        line-height: 1;
+    }
+    .equip-price span { font-size: 0.9rem; font-weight: 500; color: #888; margin-left: 3px; }
+    .stock-badge-bottom {
+        font-size: 0.78rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+    .btn-wa {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        background: #25D366;
+        color: white;
+        border: none;
+        padding: 12px 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: all 0.25s;
+    }
+    .btn-wa:hover { background: #1ebe5d; color: white; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,211,102,0.35); }
+    .btn-wa.disabled-wa {
+        background: #e0e0e0;
+        color: #999;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .empty-wrap {
+        text-align: center;
+        padding: 100px 20px;
+    }
+    .empty-icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: #f1f8f1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        font-size: 2.5rem;
+        color: #a5d6a7;
+    }
+
+    .trust-section {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        margin-top: 60px;
+        border: 1px solid #e8e8e8;
+    }
+    .trust-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+    }
+    .trust-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    .trust-title { font-weight: 700; font-size: 0.95rem; color: #222; margin-bottom: 3px; }
+    .trust-text { font-size: 0.83rem; color: #888; line-height: 1.45; }
+
+    .cta-section {
+        background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #388E3C 100%);
+        border-radius: 24px;
+        padding: 50px;
+        text-align: center;
+        color: white;
+        margin-top: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    .cta-section .container { position: relative; z-index: 1; }
+    .btn-wa-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: #25D366;
+        color: white;
+        padding: 14px 32px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        text-decoration: none;
+        transition: all 0.2s;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    .btn-wa-cta:hover { background: #1ebe5d; color: white; transform: translateY(-2px); }
+
+    @media(max-width: 768px) {
+        .loja-hero h1 { font-size: 2rem; }
+        .loja-search-bar { flex-direction: column; padding: 12px; gap: 8px; }
+        .loja-search-bar select { border-left: none; border-top: 2px solid #e0e0e0; padding: 8px 0; }
+        .loja-search-bar button { width: 100%; }
+        .stat-item { border-right: none; padding: 8px 12px; }
+        .cta-section { padding: 30px 20px; }
+        .trust-section { padding: 24px; }
+    }
 </style>
 
-<div class="hero-loja">
-    <div class="container">
-        <h1><i class="fas fa-tractor me-3"></i>Loja de Equipamentos</h1>
-        <p>Encontre os melhores equipamentos e ferramentas agrícolas para sua produção</p>
+<!-- HERO -->
+<div class="loja-hero bg-hero">
+    <div class="container text-center">
+        <div class="hero-badge">
+            <i class="fas fa-certificate"></i>
+            Equipamentos Certificados para Moçambique
+        </div>
+        <h1 style="color:#fff!important;text-shadow:0 2px 8px rgba(0,0,0,0.3);"><i class="fas fa-tractor me-2"></i>Loja de Equipamentos</h1>
+        <p class="mb-0" style="color:rgba(255,255,255,0.92)!important;">Os melhores equipamentos e ferramentas agrícolas — directamente ao seu alcance</p>
+
+        <form method="GET" action="{{ url_for('loja_equipamentos') }}" class="loja-search-bar">
+            <i class="fas fa-search text-muted"></i>
+            <input type="hidden" name="pesquisa" value="">
+            <select name="categoria">
+                <option value="">Todas as categorias</option>
+                <option value="Tratores"      {% if request.args.get('categoria') == 'Tratores' %}selected{% endif %}>Tratores</option>
+                <option value="Irrigação"     {% if request.args.get('categoria') == 'Irrigação' %}selected{% endif %}>Irrigação</option>
+                <option value="Ferramentas"   {% if request.args.get('categoria') == 'Ferramentas' %}selected{% endif %}>Ferramentas</option>
+                <option value="Pulverizadores"{% if request.args.get('categoria') == 'Pulverizadores' %}selected{% endif %}>Pulverizadores</option>
+                <option value="Colheita"      {% if request.args.get('categoria') == 'Colheita' %}selected{% endif %}>Colheita</option>
+                <option value="Armazenamento" {% if request.args.get('categoria') == 'Armazenamento' %}selected{% endif %}>Armazenamento</option>
+                <option value="Outros"        {% if request.args.get('categoria') == 'Outros' %}selected{% endif %}>Outros</option>
+            </select>
+            <button type="submit"><i class="fas fa-search me-1"></i>Pesquisar</button>
+        </form>
     </div>
 </div>
 
-<div class="container">
-    <div class="categoria-chips">
-        <a href="{{ url_for('loja_equipamentos') }}" class="categoria-chip {% if not request.args.get('categoria') %}active{% endif %}">
-            <i class="fas fa-th-large me-2"></i>Todos
-        </a>
-        <a href="{{ url_for('loja_equipamentos', categoria='Tratores') }}" class="categoria-chip {% if request.args.get('categoria') == 'Tratores' %}active{% endif %}">
-            <i class="fas fa-tractor me-2"></i>Tratores
-        </a>
-        <a href="{{ url_for('loja_equipamentos', categoria='Irrigação') }}" class="categoria-chip {% if request.args.get('categoria') == 'Irrigação' %}active{% endif %}">
-            <i class="fas fa-tint me-2"></i>Irrigação
-        </a>
-        <a href="{{ url_for('loja_equipamentos', categoria='Ferramentas') }}" class="categoria-chip {% if request.args.get('categoria') == 'Ferramentas' %}active{% endif %}">
-            <i class="fas fa-tools me-2"></i>Ferramentas
-        </a>
-        <a href="{{ url_for('loja_equipamentos', categoria='Pulverizadores') }}" class="categoria-chip {% if request.args.get('categoria') == 'Pulverizadores' %}active{% endif %}">
-            <i class="fas fa-spray-can me-2"></i>Pulverizadores
-        </a>
-        <a href="{{ url_for('loja_equipamentos', categoria='Colheita') }}" class="categoria-chip {% if request.args.get('categoria') == 'Colheita' %}active{% endif %}">
-            <i class="fas fa-wheat-awn me-2"></i>Colheita
-        </a>
-    </div>
-
-    <div class="filter-section">
-        <form method="GET" class="row g-3 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label fw-semibold"><i class="fas fa-tag me-2 text-success"></i>Categoria</label>
-                <select class="form-select" name="categoria">
-                    <option value="">Todas as categorias</option>
-                    <option value="Tratores" {% if request.args.get('categoria') == 'Tratores' %}selected{% endif %}>Tratores</option>
-                    <option value="Irrigação" {% if request.args.get('categoria') == 'Irrigação' %}selected{% endif %}>Sistemas de Irrigação</option>
-                    <option value="Ferramentas" {% if request.args.get('categoria') == 'Ferramentas' %}selected{% endif %}>Ferramentas Manuais</option>
-                    <option value="Pulverizadores" {% if request.args.get('categoria') == 'Pulverizadores' %}selected{% endif %}>Pulverizadores</option>
-                    <option value="Colheita" {% if request.args.get('categoria') == 'Colheita' %}selected{% endif %}>Equipamentos de Colheita</option>
-                    <option value="Armazenamento" {% if request.args.get('categoria') == 'Armazenamento' %}selected{% endif %}>Armazenamento</option>
-                    <option value="Outros" {% if request.args.get('categoria') == 'Outros' %}selected{% endif %}>Outros</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-semibold"><i class="fas fa-money-bill-wave me-2 text-success"></i>Preço Máximo</label>
-                <div class="input-group">
-                    <span class="input-group-text" style="border-radius: 12px 0 0 12px;">MT</span>
-                    <input type="number" class="form-control" name="preco_max" placeholder="Ex: 50000" 
-                           value="{{ request.args.get('preco_max', '') }}" style="border-radius: 0 12px 12px 0;">
+<!-- STATS BAR -->
+<div class="stats-bar">
+    <div class="container">
+        <div class="row g-0 justify-content-center">
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success"><i class="fas fa-boxes"></i></div>
+                    <div>
+                        <div class="stat-value">{{ equipamentos|length }}</div>
+                        <div class="stat-label">Equipamentos</div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <button type="submit" class="btn btn-filtrar btn-success w-100">
-                    <i class="fas fa-search me-2"></i>Buscar Equipamentos
-                </button>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary"><i class="fas fa-tags"></i></div>
+                    <div>
+                        <div class="stat-value">6</div>
+                        <div class="stat-label">Categorias</div>
+                    </div>
+                </div>
             </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning"><i class="fab fa-whatsapp"></i></div>
+                    <div>
+                        <div class="stat-value">Directo</div>
+                        <div class="stat-label">Contacto WhatsApp</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <div class="stat-icon bg-info bg-opacity-10 text-info"><i class="fas fa-shield-alt"></i></div>
+                    <div>
+                        <div class="stat-value">100%</div>
+                        <div class="stat-label">Verificados</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container" style="padding-top: 10px; padding-bottom: 60px;">
+
+    <!-- CATEGORY TABS -->
+    <div class="cat-tabs">
+        <a href="{{ url_for('loja_equipamentos') }}" class="cat-tab {% if not request.args.get('categoria') %}active{% endif %}">
+            <i class="fas fa-th-large"></i>Todos
+        </a>
+        <a href="{{ url_for('loja_equipamentos', categoria='Tratores') }}" class="cat-tab {% if request.args.get('categoria') == 'Tratores' %}active{% endif %}">
+            <i class="fas fa-tractor"></i>Tratores
+        </a>
+        <a href="{{ url_for('loja_equipamentos', categoria='Irrigação') }}" class="cat-tab {% if request.args.get('categoria') == 'Irrigação' %}active{% endif %}">
+            <i class="fas fa-tint"></i>Irrigação
+        </a>
+        <a href="{{ url_for('loja_equipamentos', categoria='Ferramentas') }}" class="cat-tab {% if request.args.get('categoria') == 'Ferramentas' %}active{% endif %}">
+            <i class="fas fa-tools"></i>Ferramentas
+        </a>
+        <a href="{{ url_for('loja_equipamentos', categoria='Pulverizadores') }}" class="cat-tab {% if request.args.get('categoria') == 'Pulverizadores' %}active{% endif %}">
+            <i class="fas fa-spray-can"></i>Pulverizadores
+        </a>
+        <a href="{{ url_for('loja_equipamentos', categoria='Colheita') }}" class="cat-tab {% if request.args.get('categoria') == 'Colheita' %}active{% endif %}">
+            <i class="fas fa-seedling"></i>Colheita
+        </a>
+        <a href="{{ url_for('loja_equipamentos', categoria='Armazenamento') }}" class="cat-tab {% if request.args.get('categoria') == 'Armazenamento' %}active{% endif %}">
+            <i class="fas fa-warehouse"></i>Armazenamento
+        </a>
+        {% if request.args.get('preco_max') %}
+        <span class="cat-tab active" style="cursor:default;">
+            <i class="fas fa-money-bill-wave"></i>Até {{ request.args.get('preco_max') }} MT
+            <a href="{{ url_for('loja_equipamentos', categoria=request.args.get('categoria','')) }}" class="ms-1 text-white" style="text-decoration:none;">✕</a>
+        </span>
+        {% endif %}
+    </div>
+
+    <!-- FILTER ROW -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <p class="mb-0 text-muted small">
+            {% if equipamentos %}
+                <strong class="text-success">{{ equipamentos|length }}</strong> equipamento{{ 's' if equipamentos|length != 1 else '' }} encontrado{{ 's' if equipamentos|length != 1 else '' }}
+                {% if request.args.get('categoria') %} em <strong>{{ request.args.get('categoria') }}</strong>{% endif %}
+            {% endif %}
+        </p>
+        <form method="GET" action="{{ url_for('loja_equipamentos') }}" class="d-flex gap-2 align-items-center">
+            {% if request.args.get('categoria') %}
+                <input type="hidden" name="categoria" value="{{ request.args.get('categoria') }}">
+            {% endif %}
+            <div class="input-group input-group-sm" style="width:220px;">
+                <span class="input-group-text bg-white border-end-0"><i class="fas fa-money-bill-wave text-success"></i></span>
+                <input type="number" class="form-control border-start-0 ps-0" name="preco_max"
+                       placeholder="Preço máximo (MT)"
+                       value="{{ request.args.get('preco_max', '') }}"
+                       style="border-radius:0 8px 8px 0;">
+            </div>
+            <button type="submit" class="btn btn-sm btn-success" style="border-radius:8px; white-space:nowrap;">
+                <i class="fas fa-filter me-1"></i>Filtrar
+            </button>
         </form>
     </div>
 
+    <!-- PRODUCT GRID -->
     {% if equipamentos %}
         <div class="row g-4">
             {% for equip in equipamentos %}
-                <div class="col-lg-4 col-md-6">
-                    <div class="card equip-card h-100">
-                        <div class="card-img-container">
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="equip-card">
+                        <!-- IMAGE -->
+                        <div class="equip-img-wrap">
                             {% if equip[6] %}
                                 <img src="{{ url_for('static', filename=equip[6]) }}"
-                                     class="card-img-top" alt="{{ equip[1] }}"
-                                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';this.onerror=null;">
-                                <div class="w-100 h-100 bg-light d-none align-items-center justify-content-center">
-                                    <i class="fas fa-tractor fa-4x text-muted opacity-50"></i>
-                                </div>
+                                     alt="{{ equip[1] }}"
+                                     onerror="this.parentElement.innerHTML='<div class=\'equip-img-placeholder\'><i class=\'fas fa-tractor fa-3x\'></i><span>Sem imagem</span></div>'">
                             {% else %}
-                                <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-tractor fa-4x text-muted opacity-50"></i>
+                                <div class="equip-img-placeholder">
+                                    {% if equip[4] == 'Tratores' %}<i class="fas fa-tractor fa-3x"></i>
+                                    {% elif equip[4] == 'Irrigação' %}<i class="fas fa-tint fa-3x"></i>
+                                    {% elif equip[4] == 'Ferramentas' %}<i class="fas fa-tools fa-3x"></i>
+                                    {% elif equip[4] == 'Pulverizadores' %}<i class="fas fa-spray-can fa-3x"></i>
+                                    {% elif equip[4] == 'Colheita' %}<i class="fas fa-seedling fa-3x"></i>
+                                    {% elif equip[4] == 'Armazenamento' %}<i class="fas fa-warehouse fa-3x"></i>
+                                    {% else %}<i class="fas fa-cog fa-3x"></i>{% endif %}
+                                    <span>Sem imagem</span>
                                 </div>
                             {% endif %}
-                            {% if equip[4] %}
-                                <span class="badge-categoria">{{ equip[4] }}</span>
-                            {% endif %}
-                            {% if equip[5] > 0 %}
-                                <span class="badge-estoque bg-success text-white">
-                                    <i class="fas fa-check me-1"></i>Em estoque ({{ equip[5] }})
-                                </span>
-                            {% else %}
-                                <span class="badge-estoque bg-danger text-white">
-                                    <i class="fas fa-times me-1"></i>Esgotado
-                                </span>
+                            {% if equip[4] %}<span class="badge-cat">{{ equip[4] }}</span>{% endif %}
+                            {% if equip[5] is not none %}
+                                {% if equip[5] > 0 %}
+                                    <span class="badge-stock in"><i class="fas fa-check-circle me-1"></i>Disponível</span>
+                                {% else %}
+                                    <span class="badge-stock out"><i class="fas fa-times-circle me-1"></i>Esgotado</span>
+                                {% endif %}
                             {% endif %}
                         </div>
-                        <div class="card-body">
-                            <h5 class="card-title">{{ equip[1] }}</h5>
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="preco">{{ "%.2f"|format(equip[3]) }} MT</div>
-                                {% if equip[5] > 0 %}
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3">Disponível</span>
-                                {% else %}
-                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3">Esgotado</span>
-                                {% endif %}
-                            </div>
-                            
+
+                        <!-- BODY -->
+                        <div class="equip-body">
+                            {% if equip[4] %}<div class="equip-cat-text">{{ equip[4] }}</div>{% endif %}
+                            <div class="equip-name">{{ equip[1] }}</div>
+
                             {% if equip[2] %}
-                                <p class="card-text mb-3">
-                                    {{ equip[2][:150] }}{% if equip[2]|length > 150 %}...{% endif %}
-                                </p>
+                                <p class="equip-desc">{{ equip[2][:120] }}{% if equip[2]|length > 120 %}…{% endif %}</p>
                             {% endif %}
-                            
-                            <div class="info-section mb-3">
+
+                            {% if equip[7] or equip[8] %}
+                            <div class="equip-meta">
                                 {% if equip[7] %}
-                                    <div class="info-item">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span>{{ equip[7] }}</span>
-                                    </div>
+                                <div class="equip-meta-row">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>{{ equip[7] }}</span>
+                                </div>
                                 {% endif %}
                                 {% if equip[8] %}
-                                    <div class="info-item">
-                                        <i class="fas fa-phone"></i>
-                                        <span>{{ equip[8] }}</span>
-                                    </div>
+                                <div class="equip-meta-row">
+                                    <i class="fas fa-phone-alt"></i>
+                                    <span>{{ equip[8] }}</span>
+                                </div>
+                                {% endif %}
+                                {% if equip[5] is not none and equip[5] > 0 %}
+                                <div class="equip-meta-row">
+                                    <i class="fas fa-cubes"></i>
+                                    <span>{{ equip[5] }} unidade{{ 's' if equip[5] != 1 else '' }} em stock</span>
+                                </div>
                                 {% endif %}
                             </div>
-                            
-                            {% if equip[8] %}
-                                <a href="https://wa.me/258{{ equip[8]|replace(' ', '')|replace('-', '') }}?text=Olá! Vi o equipamento '{{ equip[1] }}' no AGRI.vendasMz e tenho interesse!" 
-                                   class="btn btn-contactar w-100" target="_blank">
-                                    <i class="fab fa-whatsapp fa-lg"></i>
-                                    Contactar via WhatsApp
-                                </a>
-                            {% else %}
-                                <a href="https://wa.me/258878312890?text=Olá! Vi o equipamento '{{ equip[1] }}' no AGRI.vendasMz e tenho interesse!" 
-                                   class="btn btn-contactar w-100" target="_blank">
-                                    <i class="fab fa-whatsapp fa-lg"></i>
-                                    Contactar via WhatsApp
-                                </a>
                             {% endif %}
+
+                            <div class="equip-price-row">
+                                <div class="equip-price">{{ "%.0f"|format(equip[3]) }}<span>MT</span></div>
+                            </div>
+
+                            {% set tel = equip[8]|replace(' ','')|replace('-','') if equip[8] else '878312890' %}
+                            <a href="https://wa.me/258{{ tel }}?text=Olá!%20Vi%20o%20equipamento%20*{{ equip[1]|urlencode }}*%20no%20AGRI.vendasMz%20e%20tenho%20interesse.%20Pode%20dar%20mais%20informações?"
+                               class="btn-wa {% if equip[5] is not none and equip[5] == 0 %}disabled-wa{% endif %}"
+                               target="_blank">
+                                <i class="fab fa-whatsapp fa-lg"></i>
+                                {% if equip[5] is not none and equip[5] == 0 %}Esgotado{% else %}Contactar via WhatsApp{% endif %}
+                            </a>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
     {% else %}
-        <div class="empty-state">
-            <i class="fas fa-tractor"></i>
-            <h3>Nenhum equipamento encontrado</h3>
-            <p class="text-muted">Ainda não há equipamentos disponíveis nesta categoria.</p>
-            <a href="{{ url_for('loja_equipamentos') }}" class="btn btn-success btn-lg mt-3">
-                <i class="fas fa-refresh me-2"></i>Ver Todos os Equipamentos
+        <div class="empty-wrap">
+            <div class="empty-icon"><i class="fas fa-search"></i></div>
+            <h3 class="fw-700 mb-2">Nenhum equipamento encontrado</h3>
+            <p class="text-muted mb-4">
+                {% if request.args.get('categoria') or request.args.get('preco_max') %}
+                    Nenhum resultado com os filtros seleccionados. Tente remover os filtros.
+                {% else %}
+                    Ainda não há equipamentos disponíveis. Volte em breve!
+                {% endif %}
+            </p>
+            <a href="{{ url_for('loja_equipamentos') }}" class="btn btn-success btn-lg" style="border-radius:12px;">
+                <i class="fas fa-undo me-2"></i>Ver Todos os Equipamentos
             </a>
         </div>
     {% endif %}
-</div>
 
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-12">
-            <div class="card border-0" style="background: linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 100%); border-radius: 20px;">
-                <div class="card-body text-center py-5">
-                    <h3 class="text-success mb-3"><i class="fas fa-headset me-2"></i>Precisa de ajuda?</h3>
-                    <p class="text-muted mb-4">Nossa equipe está pronta para ajudar você a encontrar o equipamento ideal para sua produção</p>
-                    <a href="https://wa.me/258878312890" class="btn btn-success btn-lg" target="_blank">
-                        <i class="fab fa-whatsapp me-2"></i>Falar com Suporte
-                    </a>
+    <!-- TRUST BADGES -->
+    <div class="trust-section">
+        <h6 class="text-center text-muted text-uppercase fw-bold mb-4" style="letter-spacing:1px;">Porquê comprar na AGRI.vendasMz?</h6>
+        <div class="row g-4">
+            <div class="col-md-3 col-6">
+                <div class="trust-item">
+                    <div class="trust-icon bg-success bg-opacity-10 text-success"><i class="fas fa-shield-alt"></i></div>
+                    <div>
+                        <div class="trust-title">Vendedores Verificados</div>
+                        <div class="trust-text">Todos os anunciantes são validados pela equipa AGRI.vendasMz</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="trust-item">
+                    <div class="trust-icon bg-primary bg-opacity-10 text-primary"><i class="fab fa-whatsapp"></i></div>
+                    <div>
+                        <div class="trust-title">Contacto Directo</div>
+                        <div class="trust-text">Fale directamente com o vendedor via WhatsApp</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="trust-item">
+                    <div class="trust-icon bg-warning bg-opacity-10 text-warning"><i class="fas fa-map-marker-alt"></i></div>
+                    <div>
+                        <div class="trust-title">Todo o País</div>
+                        <div class="trust-text">Equipamentos de todas as províncias de Moçambique</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="trust-item">
+                    <div class="trust-icon bg-danger bg-opacity-10 text-danger"><i class="fas fa-headset"></i></div>
+                    <div>
+                        <div class="trust-title">Suporte Dedicado</div>
+                        <div class="trust-text">A nossa equipa ajuda-o a encontrar o equipamento certo</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- CTA -->
+    <div class="cta-section mt-4">
+        <div class="container">
+            <h3 class="fw-800 mb-2">Não encontrou o que procura?</h3>
+            <p class="mb-4" style="opacity:0.85;">A nossa equipa encontra o equipamento ideal para a sua produção agrícola</p>
+            <a href="https://wa.me/258878312890?text=Olá!%20Preciso%20de%20ajuda%20para%20encontrar%20um%20equipamento%20agrícola." 
+               class="btn-wa-cta" target="_blank">
+                <i class="fab fa-whatsapp fa-lg"></i>Falar com a Nossa Equipa
+            </a>
+        </div>
+    </div>
+
 </div>
 {% endblock %}
