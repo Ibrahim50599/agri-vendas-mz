@@ -530,6 +530,13 @@ def calcular_plantio():
         return jsonify({'erro': 'Valor de área inválido'})
 
     unidade_area = request.form.get('unidade_area', 'hectares')
+    provincia = request.form.get('provincia', '').strip()
+    distrito = request.form.get('distrito', '').strip()
+    tipo_solo = request.form.get('tipo_solo', 'franco').strip()
+    irrigacao = request.form.get('irrigacao', 'manual').strip()
+    nivel_investimento = request.form.get('nivel_investimento', 'medio').strip()
+    tipo_semente = request.form.get('tipo_semente', 'melhorada').strip()
+    controle_pragas = request.form.get('controle_pragas', 'quimico_basico').strip()
 
     if cultura not in DADOS_CULTURAS:
         return jsonify({'erro': f'Cultura "{cultura}" não encontrada na base de dados'})
@@ -537,13 +544,92 @@ def calcular_plantio():
     dados = DADOS_CULTURAS[cultura]
     preco_venda = dados.get('preco_venda', 30)
 
-    # Converter metros quadrados para hectares se necessário
     if unidade_area == 'metros':
         hectares = area_valor / 10000
         metros_quadrados = area_valor
     else:
         hectares = area_valor
         metros_quadrados = area_valor * 10000
+
+    # ---- Multiplicadores por condições do campo ----
+    mult_solo_rend   = {'franco': 1.0, 'humifero': 1.15, 'argiloso': 0.95, 'arenoso': 0.80, 'calcario': 0.75}
+    mult_solo_fert   = {'franco': 1.0, 'humifero': 0.85, 'argiloso': 1.10, 'arenoso': 1.25, 'calcario': 1.30}
+    mult_solo_custo  = {'franco': 1.0, 'humifero': 0.95, 'argiloso': 1.05, 'arenoso': 1.10, 'calcario': 1.15}
+
+    mult_irrig_rend  = {'manual': 0.90, 'gotejamento': 1.20, 'aspersao': 1.15, 'inundacao': 1.05, 'nenhuma': 0.68}
+    mult_irrig_custo = {'manual': 1.05, 'gotejamento': 1.22, 'aspersao': 1.14, 'inundacao': 1.08, 'nenhuma': 0.88}
+
+    mult_inv_rend    = {'baixo': 0.72, 'medio': 1.0, 'alto': 1.35}
+    mult_inv_custo   = {'baixo': 0.58, 'medio': 1.0, 'alto': 1.42}
+    mult_inv_sem     = {'baixo': 0.70, 'medio': 1.0, 'alto': 1.20}
+
+    mult_sem_rend    = {'local': 0.82, 'melhorada': 1.10, 'hibrida': 1.38}
+    mult_sem_custo   = {'local': 0.78, 'melhorada': 1.10, 'hibrida': 1.32}
+
+    mult_pragas_rend = {'nenhum': 0.72, 'natural': 0.90, 'quimico_basico': 1.05, 'quimico_avancado': 1.18}
+    mult_pragas_custo= {'nenhum': 0.88, 'natural': 1.05, 'quimico_basico': 1.12, 'quimico_avancado': 1.22}
+
+    r_rend  = (mult_solo_rend .get(tipo_solo, 1.0) * mult_irrig_rend .get(irrigacao, 1.0)
+               * mult_inv_rend.get(nivel_investimento, 1.0) * mult_sem_rend .get(tipo_semente, 1.0)
+               * mult_pragas_rend.get(controle_pragas, 1.0))
+    r_custo = (mult_solo_custo.get(tipo_solo, 1.0) * mult_irrig_custo.get(irrigacao, 1.0)
+               * mult_inv_custo.get(nivel_investimento, 1.0) * mult_sem_custo.get(tipo_semente, 1.0)
+               * mult_pragas_custo.get(controle_pragas, 1.0))
+    r_fert  = mult_solo_fert.get(tipo_solo, 1.0) * mult_inv_sem.get(nivel_investimento, 1.0)
+
+    rendimento_ajustado = round(dados['rendimento_medio'] * hectares * r_rend, 2)
+    custo_ajustado      = round(dados['custo_por_ha'] * hectares * r_custo, 2)
+    receita_ajustada    = round(rendimento_ajustado * preco_venda, 2)
+    lucro_ajustado      = round(receita_ajustada - custo_ajustado, 2)
+    sementes_ajustadas  = round(dados['sementes_por_ha'] * hectares * mult_inv_sem.get(nivel_investimento, 1.0), 2)
+    fertilizante_ajust  = round(dados['fertilizante_npk'] * hectares * r_fert, 2)
+
+    # ---- Alertas de pragas personalizados por controle ----
+    alertas_pragas_map = {
+        'nenhum': [
+            {'estagio': 'Germinação',  'risco': 'Lagarta-rosca',  'acao': 'Alto risco — sem controlo, pode perder 30% da germinação'},
+            {'estagio': 'Crescimento', 'risco': 'Pulgões/Tripes', 'acao': 'Alto risco — recomenda-se pelo menos óleo de neem'},
+            {'estagio': 'Floração',    'risco': 'Percevejos',     'acao': 'Monitoramento diário obrigatório'}
+        ],
+        'natural': [
+            {'estagio': 'Germinação',  'risco': 'Lagarta-rosca',  'acao': 'Aplicar Bacillus thuringiensis no solo'},
+            {'estagio': 'Crescimento', 'risco': 'Pulgões',        'acao': 'Óleo de neem 2% a cada 10 dias'},
+            {'estagio': 'Floração',    'risco': 'Percevejos',     'acao': 'Armadilhas amarelas + extrato de alho'}
+        ],
+        'quimico_basico': [
+            {'estagio': 'Germinação',  'risco': 'Lagarta-rosca',  'acao': 'Inseticida clorpirifós no plantio'},
+            {'estagio': 'Crescimento', 'risco': 'Pulgões',        'acao': 'Imidacloprido sistémico se necessário'},
+            {'estagio': 'Floração',    'risco': 'Percevejos',     'acao': 'Piretroide ao amanhecer'}
+        ],
+        'quimico_avancado': [
+            {'estagio': 'Germinação',  'risco': 'Pragas do solo', 'acao': 'Tratamento de sementes + nematicida preventivo'},
+            {'estagio': 'Crescimento', 'risco': 'Complexo de pragas', 'acao': 'Monitoramento semanal + rotação de princípios ativos'},
+            {'estagio': 'Floração',    'risco': 'Percevejos/Mosca', 'acao': 'Programa IPM integrado com fungicida preventivo'}
+        ]
+    }
+
+    # ---- Aviso climático por província ----
+    info_clima_provincia = {
+        'maputo':       {'estacao': 'Subtropical',  'chuva': 'Out–Abr', 'risco': 'Ciclones Jan–Mar, Seca Jun–Ago'},
+        'gaza':         {'estacao': 'Semiárido',    'chuva': 'Nov–Mar', 'risco': 'Secas prolongadas, cheias do Limpopo'},
+        'inhambane':    {'estacao': 'Tropical',     'chuva': 'Out–Abr', 'risco': 'Ciclones, ventos salinos'},
+        'sofala':       {'estacao': 'Tropical',     'chuva': 'Nov–Abr', 'risco': 'Cheias do Búzi e Pungwe'},
+        'manica':       {'estacao': 'Temperado',    'chuva': 'Nov–Abr', 'risco': 'Granizo Jan–Fev, Geadas Jun–Jul'},
+        'tete':         {'estacao': 'Semiárido',    'chuva': 'Nov–Mar', 'risco': 'Calor extremo até 40°C, Secas'},
+        'zambezia':     {'estacao': 'Tropical',     'chuva': 'Nov–Abr', 'risco': 'Ciclones, cheias do Zambeze'},
+        'nampula':      {'estacao': 'Tropical',     'chuva': 'Nov–Abr', 'risco': 'Ciclones, chuvas irregulares'},
+        'cabo-delgado': {'estacao': 'Tropical',     'chuva': 'Nov–Abr', 'risco': 'Ciclones'},
+        'niassa':       {'estacao': 'Temperado',    'chuva': 'Nov–Abr', 'risco': 'Geadas Jun–Jul, solo ácido'},
+    }
+
+    # Nomes legíveis para o resultado
+    nomes_legiveis = {
+        'tipo_solo':    {'franco': 'Franco', 'humifero': 'Humífero', 'argiloso': 'Argiloso', 'arenoso': 'Arenoso', 'calcario': 'Calcário'},
+        'irrigacao':    {'manual': 'Manual', 'gotejamento': 'Gotejamento', 'aspersao': 'Aspersão', 'inundacao': 'Inundação', 'nenhuma': 'Sem irrigação'},
+        'investimento': {'baixo': 'Baixo (subsistência)', 'medio': 'Médio', 'alto': 'Alto (comercial)'},
+        'semente':      {'local': 'Local/Tradicional', 'melhorada': 'Melhorada/Certificada', 'hibrida': 'Híbrida'},
+        'pragas':       {'nenhum': 'Nenhum', 'natural': 'Natural/Biológico', 'quimico_basico': 'Químico Básico', 'quimico_avancado': 'Químico Avançado'},
+    }
 
     resultado = {
         'cultura': dados.get('nome', cultura),
@@ -552,37 +638,43 @@ def calcular_plantio():
         'metros_quadrados': round(metros_quadrados, 2),
         'unidade_usada': unidade_area,
         'area_original': area_valor,
-        'sementes_necessarias': round(dados['sementes_por_ha'] * hectares, 2),
-        'fertilizante_npk': round(dados['fertilizante_npk'] * hectares, 2),
+        'sementes_necessarias': sementes_ajustadas,
+        'fertilizante_npk': fertilizante_ajust,
         'cronograma_irrigacao': dados['irrigacao_dias'],
         'dias_para_colheita': dados['colheita_dias'],
-        'rendimento_esperado': round(dados['rendimento_medio'] * hectares, 2),
-        'custo_estimado': round(dados['custo_por_ha'] * hectares, 2),
-        'receita_estimada': round(dados['rendimento_medio'] * hectares * preco_venda, 2),
-        'lucro_estimado': round((dados['rendimento_medio'] * hectares * preco_venda) - (dados['custo_por_ha'] * hectares), 2),
+        'rendimento_esperado': rendimento_ajustado,
+        'custo_estimado': custo_ajustado,
+        'receita_estimada': receita_ajustada,
+        'lucro_estimado': lucro_ajustado,
         'preco_venda_kg': preco_venda,
         'categoria': dados.get('categoria', 'geral'),
         'recomenda_solo': dados.get('recomenda_solo', 'Prepare o solo com matéria orgânica e verifique o pH.'),
         'pos_colheita': dados.get('pos_colheita', 'Armazene em local seco e arejado após a secagem.'),
         'npk_recomendado': {
-            'N': round(dados['fertilizante_npk'] * 0.4 * hectares, 1),
-            'P': round(dados['fertilizante_npk'] * 0.3 * hectares, 1),
-            'K': round(dados['fertilizante_npk'] * 0.3 * hectares, 1)
+            'N': round(fertilizante_ajust * 0.4, 1),
+            'P': round(fertilizante_ajust * 0.3, 1),
+            'K': round(fertilizante_ajust * 0.3, 1)
         },
-        'alerta_pragas': [
-            {'estagio': 'Germinação', 'risco': 'Lagarta-rosca', 'acao': 'Monitorar solo e umidade'},
-            {'estagio': 'Crescimento', 'risco': 'Pulgões', 'acao': 'Aplicação de óleo de neem se necessário'},
-            {'estagio': 'Floração', 'risco': 'Percevejos', 'acao': 'Monitoramento rigoroso matinal'}
-        ]
+        'alerta_pragas': alertas_pragas_map.get(controle_pragas, alertas_pragas_map['quimico_basico']),
+        'contexto': {
+            'provincia': provincia.replace('-', ' ').title() if provincia else None,
+            'distrito': distrito if distrito else None,
+            'tipo_solo': nomes_legiveis['tipo_solo'].get(tipo_solo, tipo_solo),
+            'irrigacao': nomes_legiveis['irrigacao'].get(irrigacao, irrigacao),
+            'nivel_investimento': nomes_legiveis['investimento'].get(nivel_investimento, nivel_investimento),
+            'tipo_semente': nomes_legiveis['semente'].get(tipo_semente, tipo_semente),
+            'controle_pragas': nomes_legiveis['pragas'].get(controle_pragas, controle_pragas),
+            'clima': info_clima_provincia.get(provincia, None) if provincia else None,
+            'ajuste_rendimento_pct': round((r_rend - 1) * 100, 1),
+            'ajuste_custo_pct': round((r_custo - 1) * 100, 1),
+        }
     }
 
-    # Informações detalhadas para todos (básico) e premium (completo)
     resultado['detalhes_basico'] = {
         'densidade_plantio': dados.get('densidade_plantio', 'Consulte um técnico'),
         'epoca_plantio': dados.get('epoca_plantio', 'Consulte um técnico')
     }
 
-    # Informações detalhadas completas apenas para premium
     if session.get('is_premium'):
         resultado['detalhes_premium'] = {
             'solo_ideal': dados['solo_ideal'],

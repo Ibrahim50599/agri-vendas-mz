@@ -195,12 +195,91 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label class="form-label fw-semibold" id="areaLabel">Área em Hectares</label>
                             <input type="number" step="0.01" class="form-control" name="area_valor" id="areaInput" placeholder="Ex: 2.5 hectares">
                             <small class="text-muted" id="areaHelp">1 hectare = 10.000 m²</small>
                             <input type="hidden" name="unidade_area" id="unidadeArea" value="hectares">
                         </div>
+
+                        <hr class="my-3">
+                        <p class="text-muted small mb-3"><i class="fas fa-sliders-h me-1"></i>Preencha os campos abaixo para resultados mais realistas</p>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small">Província</label>
+                                <select class="form-select form-select-sm" name="provincia" id="provinciaForm">
+                                    <option value="">-- Selecione --</option>
+                                    <option value="maputo">Maputo</option>
+                                    <option value="gaza">Gaza</option>
+                                    <option value="inhambane">Inhambane</option>
+                                    <option value="sofala">Sofala</option>
+                                    <option value="manica">Manica</option>
+                                    <option value="tete">Tete</option>
+                                    <option value="zambezia">Zambézia</option>
+                                    <option value="nampula">Nampula</option>
+                                    <option value="cabo-delgado">Cabo Delgado</option>
+                                    <option value="niassa">Niassa</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small">Distrito</label>
+                                <input type="text" class="form-control form-control-sm" name="distrito" placeholder="Ex: Chókwè">
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small">Tipo de Solo</label>
+                                <select class="form-select form-select-sm" name="tipo_solo">
+                                    <option value="franco">Franco (equilibrado)</option>
+                                    <option value="humifero">Humífero (rico em matéria orgânica)</option>
+                                    <option value="argiloso">Argiloso (retém água)</option>
+                                    <option value="arenoso">Arenoso (drena rápido)</option>
+                                    <option value="calcario">Calcário (pH alto)</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small">Irrigação</label>
+                                <select class="form-select form-select-sm" name="irrigacao">
+                                    <option value="manual">Irrigação manual</option>
+                                    <option value="gotejamento">Gotejamento</option>
+                                    <option value="aspersao">Aspersão</option>
+                                    <option value="inundacao">Inundação (arroz)</option>
+                                    <option value="nenhuma">Sem irrigação (chuva)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small">Nível de Investimento</label>
+                                <select class="form-select form-select-sm" name="nivel_investimento">
+                                    <option value="medio">Médio</option>
+                                    <option value="baixo">Baixo (subsistência)</option>
+                                    <option value="alto">Alto (comercial)</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small">Tipo de Semente</label>
+                                <select class="form-select form-select-sm" name="tipo_semente">
+                                    <option value="melhorada">Semente melhorada</option>
+                                    <option value="local">Semente local/tradicional</option>
+                                    <option value="hibrida">Semente híbrida</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold small">Controle de Pragas</label>
+                            <select class="form-select form-select-sm" name="controle_pragas">
+                                <option value="quimico_basico">Químico básico</option>
+                                <option value="natural">Natural / Biológico</option>
+                                <option value="quimico_avancado">Químico avançado integrado</option>
+                                <option value="nenhum">Nenhum</option>
+                            </select>
+                        </div>
+
                         <button type="submit" class="btn btn-consultar btn-success w-100">
                             <i class="fas fa-search me-2"></i>Consultar Cultura
                         </button>
@@ -776,15 +855,28 @@ document.getElementById('cultivoForm').addEventListener('submit', function(e) {
 
 // ===================== EXIBIR RESULTADO =====================
 function exibirResultadoCultivo(data) {
+    const ctx = data.contexto || {};
     let areaInfo = data.unidade_usada === 'metros'
         ? `${data.metros_quadrados.toLocaleString()} m² (${data.hectares.toFixed(4)} ha)`
         : `${data.hectares} ha (${data.metros_quadrados.toLocaleString()} m²)`;
 
     const roi = data.custo_estimado > 0 ? ((data.lucro_estimado / data.custo_estimado) * 100).toFixed(0) : 0;
     const lucroClass = data.lucro_estimado > 0 ? 'text-success' : 'text-danger';
+    const ajusteRend = ctx.ajuste_rendimento_pct;
+    const ajusteRendTxt = ajusteRend >= 0
+        ? `<span class="text-success">+${ajusteRend}%</span> vs. condições base`
+        : `<span class="text-danger">${ajusteRend}%</span> vs. condições base`;
+
+    // --- Cabeçalho com localização ---
+    let localizacao = '';
+    if (ctx.provincia || ctx.distrito) {
+        localizacao = `<span class="badge bg-secondary me-1"><i class="fas fa-map-marker-alt me-1"></i>${[ctx.distrito, ctx.provincia].filter(Boolean).join(', ')}</span>`;
+    }
 
     let html = `
-    <h5 class="text-success mb-3"><i class="fas fa-leaf me-2"></i>${data.cultura} — Relatório Completo</h5>
+    <h5 class="text-success mb-2"><i class="fas fa-leaf me-2"></i>${data.cultura} — Relatório Personalizado ${localizacao}</h5>
+    <p class="text-muted small mb-3">Rendimento ajustado ${ajusteRendTxt} com base nas condições que indicou.</p>
+
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3"><div class="stat-box"><div class="value">${data.sementes_necessarias.toLocaleString()}</div><div class="label">kg Sementes</div></div></div>
         <div class="col-6 col-md-3"><div class="stat-box"><div class="value">${data.fertilizante_npk.toLocaleString()}</div><div class="label">kg Fertilizante NPK</div></div></div>
@@ -796,14 +888,18 @@ function exibirResultadoCultivo(data) {
         <div class="col-md-6">
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body">
-                    <h6 class="text-success mb-3"><i class="fas fa-info-circle me-2"></i>Informações Gerais</h6>
+                    <h6 class="text-success mb-3"><i class="fas fa-info-circle me-2"></i>Condições da Exploração</h6>
                     <table class="table table-sm table-borderless mb-0">
                         <tr><td class="text-muted">Cultura</td><td class="fw-semibold">${data.cultura}</td></tr>
-                        <tr><td class="text-muted">Categoria</td><td class="fw-semibold text-capitalize">${data.categoria}</td></tr>
                         <tr><td class="text-muted">Área Total</td><td class="fw-semibold">${areaInfo}</td></tr>
-                        <tr><td class="text-muted">Preço Médio</td><td class="fw-semibold">${data.preco_venda_kg} MT/kg</td></tr>
-                        ${data.detalhes_basico ? `<tr><td class="text-muted">Época Plantio</td><td class="fw-semibold">${data.detalhes_basico.epoca_plantio}</td></tr>` : ''}
-                        ${data.detalhes_basico ? `<tr><td class="text-muted">Densidade</td><td class="fw-semibold">${data.detalhes_basico.densidade_plantio}</td></tr>` : ''}
+                        ${ctx.provincia ? `<tr><td class="text-muted">Província</td><td class="fw-semibold">${ctx.provincia}</td></tr>` : ''}
+                        ${ctx.distrito ? `<tr><td class="text-muted">Distrito</td><td class="fw-semibold">${ctx.distrito}</td></tr>` : ''}
+                        <tr><td class="text-muted">Solo</td><td class="fw-semibold">${ctx.tipo_solo || '—'}</td></tr>
+                        <tr><td class="text-muted">Irrigação</td><td class="fw-semibold">${ctx.irrigacao || '—'}</td></tr>
+                        <tr><td class="text-muted">Semente</td><td class="fw-semibold">${ctx.tipo_semente || '—'}</td></tr>
+                        <tr><td class="text-muted">Investimento</td><td class="fw-semibold">${ctx.nivel_investimento || '—'}</td></tr>
+                        <tr><td class="text-muted">Controle pragas</td><td class="fw-semibold">${ctx.controle_pragas || '—'}</td></tr>
+                        ${data.detalhes_basico ? `<tr><td class="text-muted">Época plantio</td><td class="fw-semibold">${data.detalhes_basico.epoca_plantio}</td></tr>` : ''}
                     </table>
                 </div>
             </div>
@@ -817,9 +913,10 @@ function exibirResultadoCultivo(data) {
                         <tr><td class="text-muted">Receita estimada</td><td class="fw-semibold text-primary">${data.receita_estimada.toLocaleString()} MT</td></tr>
                         <tr><td class="text-muted fw-bold">Lucro estimado</td><td class="fw-bold ${lucroClass}">${data.lucro_estimado.toLocaleString()} MT</td></tr>
                         <tr><td class="text-muted">Retorno (ROI)</td><td class="fw-semibold ${roi > 0 ? 'text-success':'text-danger'}">${roi}%</td></tr>
+                        <tr><td class="text-muted">Preço médio</td><td class="fw-semibold">${data.preco_venda_kg} MT/kg</td></tr>
                     </table>
                     <div class="mt-3">
-                        <small class="text-muted">Margem de lucro</small>
+                        <small class="text-muted">Margem de lucro estimada</small>
                         <div class="progress progress-thin mt-1">
                             <div class="progress-bar bg-success" style="width:${Math.min(Math.max(roi,0),100)}%"></div>
                         </div>
@@ -827,7 +924,18 @@ function exibirResultadoCultivo(data) {
                 </div>
             </div>
         </div>
-    </div>
+    </div>`;
+
+    // Aviso climático da província
+    if (ctx.clima) {
+        const c = ctx.clima;
+        html += `
+        <div class="alert alert-info border-0 mb-3 py-2">
+            <i class="fas fa-cloud-sun me-2"></i>
+            <strong>Clima em ${ctx.provincia}:</strong> ${c.estacao} — chuvas: ${c.chuva} —
+            <span class="text-danger small"><i class="fas fa-exclamation-triangle me-1"></i>${c.risco}</span>
+        </div>`;
+    }
 
     <div class="card border-0 shadow-sm mb-3">
         <div class="card-body">
