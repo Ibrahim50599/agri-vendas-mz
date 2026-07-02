@@ -372,3 +372,13 @@
 2026-06-28 17:08:47,841 - AUDIT - {"timestamp": "2026-06-28T17:08:47.841676", "action": "START_publish_product", "user_id": 10, "details": {}, "ip_address": null}
 2026-06-28 17:08:47,940 - AUDIT - {"timestamp": "2026-06-28T17:08:47.940549", "action": "SUCCESS_publish_product", "user_id": 10, "details": {}, "ip_address": null}
 2026-06-28 17:08:47,940 - AUDIT - {"timestamp": "2026-06-28T17:08:47.940549", "action": "SUCCESS_publish_product", "user_id": 10, "details": {}, "ip_address": null}
+2026-07-02 16:01:18,197 - AUDIT - {"timestamp": "2026-07-02T16:01:18.197049", "action": "START_ADMIN_PANEL_ACCESS", "user_id": 10, "details": {}, "ip_address": null}
+2026-07-02 16:01:18,197 - AUDIT - {"timestamp": "2026-07-02T16:01:18.197049", "action": "START_ADMIN_PANEL_ACCESS", "user_id": 10, "details": {}, "ip_address": null}
+2026-07-02 16:01:18,454 - AUDIT - {"timestamp": "2026-07-02T16:01:18.454204", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": 10, "details": {}, "ip_address": null}
+2026-07-02 16:01:18,454 - AUDIT - {"timestamp": "2026-07-02T16:01:18.454204", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": 10, "details": {}, "ip_address": null}
+2026-07-02 16:02:11,045 - AUDIT - {"timestamp": "2026-07-02T16:02:11.045365", "action": "START_ADMIN_PANEL_ACCESS", "user_id": 10, "details": {}, "ip_address": null}
+2026-07-02 16:02:11,045 - AUDIT - {"timestamp": "2026-07-02T16:02:11.045365", "action": "START_ADMIN_PANEL_ACCESS", "user_id": 10, "details": {}, "ip_address": null}
+2026-07-02 16:02:11,045 - AUDIT - {"timestamp": "2026-07-02T16:02:11.045365", "action": "START_ADMIN_PANEL_ACCESS", "user_id": 10, "details": {}, "ip_address": null}
+2026-07-02 16:02:11,050 - AUDIT - {"timestamp": "2026-07-02T16:02:11.050290", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": 10, "details": {}, "ip_address": null}
+2026-07-02 16:02:11,050 - AUDIT - {"timestamp": "2026-07-02T16:02:11.050290", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": 10, "details": {}, "ip_address": null}
+2026-07-02 16:02:11,050 - AUDIT - {"timestamp": "2026-07-02T16:02:11.050290", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": 10, "details": {}, "ip_address": null}
