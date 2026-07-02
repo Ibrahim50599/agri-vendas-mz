@@ -554,22 +554,42 @@ def assistente_ia():
         if not api_key:
             return jsonify({'resposta': 'Assistente IA não configurado. Contacte o administrador.'})
 
+        historico = session.get('chat_historico', [])
+
+        contents = []
+        for msg in historico:
+            contents.append({'role': msg['role'], 'parts': [{'text': msg['text']}]})
+        contents.append({'role': 'user', 'parts': [{'text': pergunta}]})
+
         client = genai.Client(api_key=api_key)
         response = client.models.generate_content(
             model='gemini-2.5-flash',
-            contents=pergunta,
+            contents=contents,
             config=types.GenerateContentConfig(
                 system_instruction=GEMINI_SYSTEM_PROMPT,
                 max_output_tokens=1024,
             )
         )
         resposta = response.text or 'Não consegui gerar uma resposta. Tente novamente.'
+
+        historico.append({'role': 'user', 'text': pergunta})
+        historico.append({'role': 'model', 'text': resposta})
+        if len(historico) > 20:
+            historico = historico[-20:]
+        session['chat_historico'] = historico
+
         return jsonify({'resposta': resposta})
     except Exception as e:
         erro = str(e)
         if 'API_KEY_INVALID' in erro or 'invalid' in erro.lower():
             return jsonify({'resposta': 'Chave API inválida. Verifique a configuração.'})
         return jsonify({'resposta': 'Ocorreu um erro ao contactar o assistente. Tente novamente mais tarde.'})
+
+@app.route('/assistente_ia/limpar', methods=['POST'])
+@login_required
+def assistente_ia_limpar():
+    session.pop('chat_historico', None)
+    return jsonify({'ok': True})
 
 @app.route('/calcular_plantio', methods=['POST'])
 @login_required

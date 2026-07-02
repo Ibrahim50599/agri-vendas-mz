@@ -627,9 +627,11 @@
 
         <div class="col-lg-6">
             <div class="card module-card border-success">
-                <div class="card-header bg-success text-white">
-                    <i class="fas fa-robot"></i>
-                    <span>10. Assistente Agrícola Virtual (Premium)</span>
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-robot me-1"></i>10. Assistente Agrícola Virtual (Premium)</span>
+                    <button class="btn btn-sm btn-outline-light" onclick="novaConversa()" title="Limpar conversa e começar do zero">
+                        <i class="fas fa-plus me-1"></i>Nova Conversa
+                    </button>
                 </div>
                 <div class="card-body">
                     <div class="chat-area" id="chatArea">
@@ -1337,6 +1339,13 @@ function enviarPerguntaIA() {
 function perguntaRapida(p) {
     document.getElementById('perguntaIA').value = p;
     enviarPerguntaIA();
+}
+function novaConversa() {
+    fetch('/assistente_ia/limpar', {method: 'POST'})
+    .then(() => {
+        const chat = document.getElementById('chatArea');
+        chat.innerHTML = `<div class="chat-msg-bot"><i class="fas fa-seedling me-1 text-success"></i>Conversa reiniciada! Como posso ajudar?</div>`;
+    });
 }
 
 // ===================== MINHA FAZENDA =====================
