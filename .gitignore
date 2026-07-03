@@ -53,7 +53,22 @@ Thumbs.db
 
 # Logs
 *.log
+logs/
 
 # Environment variables
 .env
 .env.local
+.env.*.local
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Backups (keep structure, ignore files)
+backups/
+!backups/.gitkeep
+
+# Deprecated files
+routes_backup.py
+agri-vendas-mz/
