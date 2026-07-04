@@ -1,678 +1,623 @@
-
 {% extends "base.html" %}
 
-{% block title %}AGRI.vendasMz - Marketplace Agrícola Profissional de Moçambique{% endblock %}
+{% block title %}AGRI.vendasMz — Marketplace Agrícola de Moçambique{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="hero-bg"></div>
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-        <h1 class="hero-title">
-            <i class="fas fa-seedling me-3"></i>
-            Revolucione sua Agricultura
-        </h1>
-        <p class="hero-subtitle">
-            O marketplace agrícola mais avançado de Moçambique. Conecte-se com produtores, consultores e fornecedores de equipamentos agrícolas.
-        </p>
-        <div class="hero-buttons">
-            <a href="{{ url_for('listar_produtos') }}" class="btn btn-primary btn-lg me-3">
-                <i class="fas fa-shopping-cart me-2"></i>Explorar Produtos
-            </a>
-            <a href="{{ url_for('consultoria') }}" class="btn btn-outline-primary btn-lg">
-                <i class="fas fa-chart-line me-2"></i>Consultoria Agrícola
-            </a>
-        </div>
-    </div>
-</section>
-
-<!-- Features Section -->
-<section class="py-5">
-    <div class="container">
-        <div class="row text-center mb-5">
-            <div class="col-12">
-                <h2 class="display-4 fw-bold text-primary mb-3" data-aos="fade-up">
-                    Por que escolher AGRI.vendasMz?
-                </h2>
-                <p class="lead text-muted" data-aos="fade-up" data-aos-delay="200">
-                    Tecnologia de ponta para agricultura moderna em Moçambique
-                </p>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon mb-4">
-                            <i class="fas fa-store fa-3x text-primary"></i>
-                        </div>
-                        <h5 class="card-title fw-bold">Marketplace Completo</h5>
-                        <p class="card-text text-muted">
-                            Compre e venda produtos agrícolas com segurança e praticidade. Nossa plataforma conecta produtores de todo o país.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon mb-4">
-                            <i class="fas fa-chart-line fa-3x text-success"></i>
-                        </div>
-                        <h5 class="card-title fw-bold">Consultoria Inteligente</h5>
-                        <p class="card-text text-muted">
-                            Análises avançadas de mercado, previsões climáticas e recomendações personalizadas para maximizar sua produção.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon mb-4">
-                            <i class="fas fa-shield-alt fa-3x text-warning"></i>
-                        </div>
-                        <h5 class="card-title fw-bold">Segurança Total</h5>
-                        <p class="card-text text-muted">
-                            Sistema robusto com criptografia avançada, backups automáticos e monitoramento 24/7 para proteger seus dados.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Stats Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row text-center">
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up">
-                <div class="stat-card">
-                    <div class="stat-number display-4 fw-bold text-primary mb-2">{{ stats.produtos if stats else '500+' }}</div>
-                    <div class="stat-label h6 text-muted">Produtos Disponíveis</div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="stat-card">
-                    <div class="stat-number display-4 fw-bold text-success mb-2">{{ stats.usuarios if stats else '200+' }}</div>
-                    <div class="stat-label h6 text-muted">Usuários Ativos</div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="stat-card">
-                    <div class="stat-number display-4 fw-bold text-warning mb-2">{{ stats.transacoes if stats else '1500+' }}</div>
-                    <div class="stat-label h6 text-muted">Transações Realizadas</div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="stat-card">
-                    <div class="stat-number display-4 fw-bold text-info mb-2">98%</div>
-                    <div class="stat-label h6 text-muted">Satisfação dos Usuários</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Featured Products Section -->
-<section class="py-5">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-12 text-center">
-                <h2 class="display-5 fw-bold text-primary mb-3" data-aos="fade-up">
-                    Produtos em Destaque
-                </h2>
-                <p class="lead text-muted" data-aos="fade-up" data-aos-delay="200">
-                    Descubra os melhores produtos agrícolas disponíveis na nossa plataforma
-                </p>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            {% for produto in produtos[:6] %}
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
-                <div class="card h-100 border-0 shadow-sm product-card">
-                    <div class="card-img-container">
-                        <img src="{{ url_for('static', filename=produto.foto_url) if produto.foto_url else 'https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=400&q=80' }}"
-                             class="card-img-top" alt="{{ produto.nome }}"
-                             onerror="this.src='https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=400&q=80';this.onerror=null;">
-                        <div class="card-img-overlay d-flex align-items-center justify-content-center opacity-0">
-                            <button class="btn btn-primary btn-lg">
-                                <i class="fas fa-eye me-2"></i>Ver Detalhes
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title fw-bold mb-0">{{ produto.nome }}</h5>
-                            <span class="badge bg-success">{{ produto.categoria }}</span>
-                        </div>
-                        <p class="card-text text-muted mb-3">{{ produto.descricao[:100] }}...</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="price">
-                                <span class="h4 text-primary fw-bold mb-0">{{ produto.preco }} MT</span>
-                            </div>
-                            <div class="location">
-                                <i class="fas fa-map-marker-alt text-muted me-1"></i>
-                                <small class="text-muted">{{ produto.localizacao }}</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-transparent border-0">
-                        <button class="btn btn-outline-primary w-100">
-                            <i class="fas fa-shopping-cart me-2"></i>Comprar Agora
-                        </button>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
-        <div class="text-center mt-5" data-aos="fade-up">
-            <a href="{{ url_for('listar_produtos') }}" class="btn btn-primary btn-lg">
-                <i class="fas fa-arrow-right me-2"></i>Ver Todos os Produtos
-            </a>
-        </div>
-    </div>
-</section>
-
-<!-- Testimonials Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-12 text-center">
-                <h2 class="display-5 fw-bold text-primary mb-3" data-aos="fade-up">
-                    O que nossos usuários dizem
-                </h2>
-                <p class="lead text-muted" data-aos="fade-up" data-aos-delay="200">
-                    Histórias de sucesso de produtores que transformaram seus negócios
-                </p>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body p-4">
-                        <div class="mb-3">
-                            <i class="fas fa-quote-left fa-2x text-primary opacity-25"></i>
-                        </div>
-                        <p class="card-text mb-4">
-                            "A AGRI.vendasMz revolucionou minha forma de vender produtos agrícolas. Em poucos meses, consegui expandir meu negócio e aumentar minhas vendas em 300%."
-                        </p>
-                        <div class="d-flex align-items-center">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" class="rounded-circle me-3" width="50" height="50" alt="João Silva">
-                            <div>
-                                <h6 class="mb-0 fw-bold">João Silva</h6>
-                                <small class="text-muted">Produtor de Milho, Manica</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="400">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body p-4">
-                        <div class="mb-3">
-                            <i class="fas fa-quote-left fa-2x text-success opacity-25"></i>
-                        </div>
-                        <p class="card-text mb-4">
-                            "As ferramentas de consultoria me ajudaram a otimizar minha produção de hortaliças. As recomendações são precisas e baseadas em dados reais."
-                        </p>
-                        <div class="d-flex align-items-center">
-                            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&w=100&q=80" class="rounded-circle me-3" width="50" height="50" alt="Maria Santos">
-                            <div>
-                                <h6 class="mb-0 fw-bold">Maria Santos</h6>
-                                <small class="text-muted">Produtora de Hortaliças, Maputo</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="500">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body p-4">
-                        <div class="mb-3">
-                            <i class="fas fa-quote-left fa-2x text-warning opacity-25"></i>
-                        </div>
-                        <p class="card-text mb-4">
-                            "A segurança da plataforma me dá confiança para fazer negócios online. Nunca me senti tão protegido em transações digitais."
-                        </p>
-                        <div class="d-flex align-items-center">
-                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&q=80" class="rounded-circle me-3" width="50" height="50" alt="Carlos Oliveira">
-                            <div>
-                                <h6 class="mb-0 fw-bold">Carlos Oliveira</h6>
-                                <small class="text-muted">Comerciante, Nampula</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="py-5 bg-primary text-white">
-    <div class="container text-center" data-aos="fade-up">
-        <h2 class="display-5 fw-bold mb-3">
-            Pronto para revolucionar sua agricultura?
-        </h2>
-        <p class="lead mb-4 opacity-90">
-            Junte-se a milhares de produtores que já transformaram seus negócios com nossa plataforma.
-        </p>
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <a href="{{ url_for('cadastro') }}" class="btn btn-light btn-lg">
-                <i class="fas fa-rocket me-2"></i>Começar Agora
-            </a>
-            <a href="{{ url_for('consultoria') }}" class="btn btn-outline-light btn-lg">
-                <i class="fas fa-chart-line me-2"></i>Consultoria Gratuita
-            </a>
-        </div>
-    </div>
-</section>
-
 <style>
-.stat-card {
-    padding: 2rem 1rem;
+/* ── HERO ────────────────────────────────────────────── */
+.home-hero {
+    background: linear-gradient(135deg, #062a06 0%, #1B5E20 45%, #2E7D32 100%);
+    --text-color: #fff;
+    color: #fff;
+    padding: 90px 0 70px;
+    margin: -24px -12px 0 -12px;
+    position: relative;
+    overflow: hidden;
+}
+.home-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M0 0h40v40H0zm40 40h40v40H40z'/%3E%3C/g%3E%3C/svg%3E");
+}
+.home-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0; right: 0;
+    height: 64px;
+    background: #f8f9fa;
+    clip-path: ellipse(55% 100% at 50% 100%);
+}
+.home-hero .inner { position: relative; z-index: 1; }
+.home-hero .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: #fff !important;
+    padding: 5px 16px;
+    border-radius: 30px;
+    font-size: 0.83rem;
+    font-weight: 500;
+    margin-bottom: 22px;
+    backdrop-filter: blur(4px);
+}
+.home-hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    color: #fff !important;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    margin-bottom: 18px;
+}
+.home-hero p.sub {
+    font-size: 1.15rem;
+    color: rgba(255,255,255,0.88) !important;
+    max-width: 560px;
+    margin: 0 auto 32px;
+    line-height: 1.65;
+}
+.hero-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: #1B5E20 !important;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.22s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+.hero-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,0.28); color: #1B5E20 !important; }
+.hero-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.12);
+    color: #fff !important;
+    border: 1.5px solid rgba(255,255,255,0.4);
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.22s;
+    backdrop-filter: blur(4px);
+}
+.hero-btn-outline:hover { background: rgba(255,255,255,0.22); color: #fff !important; transform: translateY(-2px); }
+.hero-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 40px;
+}
+.hero-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.9) !important;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.hero-chip:hover { background: rgba(255,255,255,0.2); color: #fff !important; }
+
+/* ── STATS BAR ────────────────────────────────────────── */
+.stats-strip {
+    background: white;
+    border-bottom: 1px solid #eee;
+    padding: 22px 0;
+}
+.stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 24px;
+    border-right: 1px solid #eee;
+}
+.stat-pill:last-child { border-right: none; }
+.stat-ico {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+}
+.stat-num { font-size: 1.4rem; font-weight: 800; color: #1B5E20; line-height: 1; }
+.stat-lbl { font-size: 0.75rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+/* ── HOW IT WORKS ─────────────────────────────────────── */
+.step-card {
+    background: white;
+    border-radius: 20px;
+    padding: 32px 28px;
+    border: 1px solid #eee;
+    transition: all 0.28s;
+    position: relative;
+    overflow: hidden;
+}
+.step-card::before {
+    content: attr(data-step);
+    position: absolute;
+    top: 16px; right: 20px;
+    font-size: 4rem;
+    font-weight: 900;
+    color: rgba(76,175,80,0.08);
+    line-height: 1;
+}
+.step-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.1); border-color: #c8e6c9; }
+.step-icon {
+    width: 60px; height: 60px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+}
+.step-card h5 { font-size: 1.1rem; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; }
+.step-card p { font-size: 0.9rem; color: #777; line-height: 1.6; margin: 0; }
+
+/* ── PRODUCT CARDS ────────────────────────────────────── */
+.prod-card {
     background: white;
     border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease;
+    border: 1px solid #eee;
+    overflow: hidden;
+    transition: all 0.28s;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
-
-.stat-card:hover {
-    transform: translateY(-5px);
+.prod-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.12); border-color: #c8e6c9; }
+.prod-img {
+    height: 190px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
 }
-
-.product-card {
-    transition: all 0.3s ease;
+.prod-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+.prod-card:hover .prod-img img { transform: scale(1.07); }
+.prod-img .cat-badge {
+    position: absolute; bottom: 10px; left: 10px;
+    background: rgba(27,94,32,0.88);
+    color: white; padding: 3px 10px; border-radius: 20px;
+    font-size: 0.75rem; font-weight: 600;
+    backdrop-filter: blur(4px);
 }
-
-.product-card:hover {
-    transform: translateY(-5px);
+.prod-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+.prod-name { font-size: 1rem; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+.prod-price { font-size: 1.3rem; font-weight: 800; color: #1B5E20; margin-bottom: 8px; }
+.prod-price span { font-size: 0.85rem; font-weight: 500; color: #999; }
+.prod-loc { font-size: 0.8rem; color: #888; display: flex; align-items: center; gap: 5px; margin-bottom: 14px; flex: 1; }
+.btn-contact-prod {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    background: #25D366; color: white !important;
+    border: none; padding: 10px; border-radius: 10px;
+    font-weight: 600; font-size: 0.9rem; text-decoration: none;
+    transition: all 0.2s;
 }
+.btn-contact-prod:hover { background: #1ebe5d; transform: translateY(-1px); color: white !important; }
 
-.card-img-container {
+/* ── FEATURES GRID ────────────────────────────────────── */
+.feat-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid #eee;
+    transition: all 0.25s;
+}
+.feat-card:hover { border-color: #a5d6a7; box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-3px); }
+.feat-ico {
+    width: 50px; height: 50px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; flex-shrink: 0;
+}
+.feat-card h6 { font-weight: 700; font-size: 0.95rem; color: #1a1a1a; margin-bottom: 5px; }
+.feat-card p { font-size: 0.83rem; color: #888; line-height: 1.5; margin: 0; }
+
+/* ── TESTIMONIALS ─────────────────────────────────────── */
+.testi-card {
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    border: 1px solid #eee;
+    height: 100%;
+    transition: all 0.25s;
+}
+.testi-card:hover { border-color: #c8e6c9; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+.testi-quote { font-size: 0.95rem; color: #555; line-height: 1.7; margin-bottom: 20px; font-style: italic; }
+.testi-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1B5E20, #4CAF50);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1rem; flex-shrink: 0;
+}
+.testi-name { font-weight: 700; font-size: 0.9rem; color: #1a1a1a; }
+.testi-role { font-size: 0.78rem; color: #999; }
+.stars { color: #FFC107; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 12px; }
+
+/* ── CTA ──────────────────────────────────────────────── */
+.home-cta {
+    background: linear-gradient(135deg, #0a3d0a 0%, #1B5E20 50%, #2E7D32 100%);
+    border-radius: 24px;
+    padding: 60px 40px;
+    text-align: center;
+    color: white;
     position: relative;
     overflow: hidden;
-    height: 200px;
+    margin-top: 60px;
+    margin-bottom: 60px;
 }
-
-.card-img-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
+.home-cta::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/svg%3E");
 }
+.home-cta .inner { position: relative; z-index: 1; }
+.home-cta h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; color: #fff !important; margin-bottom: 12px; }
+.home-cta p { color: rgba(255,255,255,0.85) !important; font-size: 1.05rem; margin-bottom: 30px; }
 
-.card-img-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(27,94,32,0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.3s ease;
+/* ── SECTION LABEL ────────────────────────────────────── */
+.sec-label {
+    display: inline-block;
+    background: #e8f5e9;
+    color: #2E7D32;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 12px;
 }
+.sec-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; color: #1a1a1a; margin-bottom: 10px; }
+.sec-sub { color: #888; font-size: 1rem; }
 
-.product-card:hover .card-img-overlay {
-    opacity: 1;
-}
-
-.product-card:hover img {
-    transform: scale(1.1);
-}
-
-.feature-icon {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, rgba(76,175,80,0.1), rgba(27,94,32,0.1));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem;
-    transition: transform 0.3s ease;
-}
-
-.feature-icon:hover {
-    transform: scale(1.1);
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+@media(max-width: 768px) {
+    .home-hero { padding: 60px 0 50px; }
+    .stat-pill { border-right: none; padding: 8px 14px; }
+    .home-cta { padding: 36px 20px; }
+    .feat-card { flex-direction: column; }
 }
 </style>
 
-.hero-section {
-    background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #4CAF50 100%);
-    position: relative;
-    overflow: hidden;
-}
-
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    animation: float 20s infinite ease-in-out;
-}
-
-.hero-content {
-    animation: fadeInUp 1s ease-out;
-    position: relative;
-    z-index: 1;
-}
-
-.feature-card {
-    animation: fadeInUp 1s ease-out;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.feature-card:nth-child(1) { animation-delay: 0.2s; }
-.feature-card:nth-child(2) { animation-delay: 0.4s; }
-.feature-card:nth-child(3) { animation-delay: 0.6s; }
-
-.feature-card:hover {
-    transform: translateY(-20px) scale(1.03);
-    box-shadow: 0 30px 60px rgba(0,0,0,0.2);
-}
-
-.feature-icon {
-    animation: pulse 2s infinite;
-}
-
-.feature-card:hover .feature-icon {
-    animation: float 2s infinite;
-}
-
-.product-card {
-    animation: fadeInUp 1s ease-out;
-    transition: all 0.3s ease;
-    overflow: hidden;
-}
-
-.product-card:hover {
-    transform: translateY(-15px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-}
-
-.product-card img {
-    transition: transform 0.5s ease;
-}
-
-.product-card:hover img {
-    transform: scale(1.15);
-}
-
-.stat-box {
-    animation: slideInLeft 1s ease-out;
-}
-
-.stat-box:nth-child(2) { animation: slideInRight 1s ease-out 0.2s both; }
-.stat-box:nth-child(3) { animation: slideInLeft 1s ease-out 0.4s both; }
-.stat-box:nth-child(4) { animation: slideInRight 1s ease-out 0.6s both; }
-
-.cta-section {
-    animation: fadeInUp 1s ease-out 0.8s both;
-}
-
-.btn {
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.btn:hover::before {
-    width: 300px;
-    height: 300px;
-}
-
-.section-title {
-    animation: fadeInUp 1s ease-out;
-}
-</style>
-
-<!-- Hero Section -->
-<div class="hero-section py-5 mb-5" style="border-radius: 20px;">
-    <div class="container text-center text-white py-4 hero-content">
-        <h1 class="display-4 fw-bold mb-4">
-            <i class="fas fa-seedling me-3"></i>AGRI.vendasMz
-        </h1>
-        <p class="lead fs-3 mb-4">O Maior Marketplace Agrícola de Moçambique</p>
-        <p class="fs-5 mb-4 opacity-90">
-            Conectamos agricultores e compradores em todo o país. Encontre os melhores produtos agrícolas e receba consultoria especializada.
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<div class="home-hero bg-hero">
+    <div class="container text-center inner">
+        <div class="eyebrow">
+            <i class="fas fa-map-marker-alt"></i> Plataforma nº1 de Agricultura em Moçambique
+        </div>
+        <h1>Compre, Venda e Cresça<br>com a Sua Agricultura</h1>
+        <p class="sub">
+            Conectamos agricultores, compradores e consultores em todo Moçambique. 
+            Acesse o maior marketplace agrícola do país — simples, seguro e gratuito.
         </p>
         <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <a href="{{ url_for('listar_produtos') }}" class="btn btn-light btn-lg px-4 py-3">
-                <i class="fas fa-shopping-cart me-2"></i> Explorar Produtos
+            <a href="{{ url_for('listar_produtos') }}" class="hero-btn-primary">
+                <i class="fas fa-shopping-basket"></i> Explorar Produtos
             </a>
             {% if not session.user_id %}
-                <a href="{{ url_for('cadastro') }}" class="btn btn-outline-light btn-lg px-4 py-3">
-                    <i class="fas fa-user-plus me-2"></i> Criar Conta
-                </a>
+            <a href="{{ url_for('cadastro') }}" class="hero-btn-outline">
+                <i class="fas fa-user-plus"></i> Criar Conta Grátis
+            </a>
+            {% else %}
+            <a href="{{ url_for('consultoria') }}" class="hero-btn-outline">
+                <i class="fas fa-robot"></i> Assistente Agrícola IA
+            </a>
             {% endif %}
         </div>
+        <div class="hero-chips">
+            <a href="{{ url_for('listar_produtos', categoria='Cereais') }}" class="hero-chip"><i class="fas fa-seedling"></i> Cereais</a>
+            <a href="{{ url_for('listar_produtos', categoria='Hortícolas') }}" class="hero-chip"><i class="fas fa-leaf"></i> Hortícolas</a>
+            <a href="{{ url_for('listar_produtos', categoria='Frutícolas') }}" class="hero-chip"><i class="fas fa-apple-alt"></i> Frutícolas</a>
+            <a href="{{ url_for('loja_equipamentos') }}" class="hero-chip"><i class="fas fa-tractor"></i> Equipamentos</a>
+            <a href="{{ url_for('consultoria') }}" class="hero-chip"><i class="fas fa-comment-dots"></i> Consultoria IA</a>
+        </div>
     </div>
 </div>
 
-<!-- Funcionalidades Principais -->
-<div class="row mb-5">
-    <div class="col-12 text-center mb-4 section-title">
-        <h2 class="fw-bold text-dark mb-3">Como Funciona o AGRI.vendasMz</h2>
-        <p class="text-muted fs-5">Uma plataforma completa para o setor agrícola moçambicano</p>
-    </div>
-
-    <div class="col-lg-4 mb-4">
-        <div class="card feature-card text-center h-100 shadow-sm border-0">
-            <div class="card-body p-4">
-                <div class="feature-icon bg-success rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
-                     style="width: 80px; height: 80px;">
-                    <i class="fas fa-store fa-2x text-white"></i>
+<!-- ═══════════════════ STATS STRIP ═══════════════════ -->
+<div class="stats-strip">
+    <div class="container">
+        <div class="row g-0 justify-content-center">
+            <div class="col-6 col-md-3">
+                <div class="stat-pill">
+                    <div class="stat-ico bg-success bg-opacity-10 text-success"><i class="fas fa-boxes"></i></div>
+                    <div>
+                        <div class="stat-num">{{ produtos|length }}+</div>
+                        <div class="stat-lbl">Produtos</div>
+                    </div>
                 </div>
-                <h5 class="card-title fw-bold mb-3">Compre & Venda</h5>
-                <p class="card-text text-muted fs-6 lh-base">
-                    Publique seus produtos agrícolas ou encontre exatamente o que precisa.
-                    Sistema de filtros avançados por categoria, preço e localização.
-                </p>
-                <a href="{{ url_for('listar_produtos') }}" class="btn btn-success btn-lg mt-3">
-                    Ver Marketplace
-                </a>
             </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4 mb-4">
-        <div class="card feature-card text-center h-100 shadow-sm border-0">
-            <div class="card-body p-4">
-                <div class="feature-icon bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
-                     style="width: 80px; height: 80px;">
-                    <i class="fas fa-search fa-2x text-white"></i>
+            <div class="col-6 col-md-3">
+                <div class="stat-pill">
+                    <div class="stat-ico bg-primary bg-opacity-10 text-primary"><i class="fas fa-users"></i></div>
+                    <div>
+                        <div class="stat-num">100+</div>
+                        <div class="stat-lbl">Vendedores</div>
+                    </div>
                 </div>
-                <h5 class="card-title fw-bold mb-3">Busca Inteligente</h5>
-                <p class="card-text text-muted fs-6 lh-base">
-                    Encontre produtos por categoria, faixa de preço e região.
-                    Filtros avançados para resultados precisos e relevantes.
-                </p>
-                <a href="{{ url_for('listar_produtos') }}" class="btn btn-primary btn-lg mt-3">
-                    Buscar Agora
-                </a>
             </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4 mb-4">
-        <div class="card feature-card text-center h-100 shadow-sm border-0">
-            <div class="card-body p-4">
-                <div class="feature-icon bg-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
-                     style="width: 80px; height: 80px;">
-                    <i class="fas fa-leaf fa-2x text-white"></i>
+            <div class="col-6 col-md-3">
+                <div class="stat-pill">
+                    <div class="stat-ico bg-warning bg-opacity-10 text-warning"><i class="fas fa-map"></i></div>
+                    <div>
+                        <div class="stat-num">11</div>
+                        <div class="stat-lbl">Províncias</div>
+                    </div>
                 </div>
-                <h5 class="card-title fw-bold mb-3">Consultoria Técnica</h5>
-                <p class="card-text text-muted fs-6 lh-base">
-                    Acesso a consultores agrícolas especializados, guias de cultivo,
-                    diagnóstico de pragas e muito mais.
-                </p>
-                {% if session.user_id %}
-                    <a href="{{ url_for('consultoria') }}" class="btn btn-warning btn-lg mt-3">
-                        Acessar Consultoria
-                    </a>
-                {% else %}
-                    <a href="{{ url_for('login') }}" class="btn btn-warning btn-lg mt-3">
-                        Fazer Login
-                    </a>
-                {% endif %}
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-pill">
+                    <div class="stat-ico bg-danger bg-opacity-10 text-danger"><i class="fas fa-robot"></i></div>
+                    <div>
+                        <div class="stat-num">IA</div>
+                        <div class="stat-lbl">Assistente 24/7</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Produtos em Destaque -->
-<div class="mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-4 section-title">
+<!-- ═══════════════════ HOW IT WORKS ═══════════════════ -->
+<div class="container" style="padding-top: 70px; padding-bottom: 70px;">
+
+    <div class="text-center mb-5">
+        <span class="sec-label">Como Funciona</span>
+        <div class="sec-title">Tudo o que precisa, numa só plataforma</div>
+        <p class="sec-sub">Simples para começar — poderoso para crescer</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="step-card" data-step="1">
+                <div class="step-icon bg-success bg-opacity-10 text-success"><i class="fas fa-user-plus"></i></div>
+                <h5>Crie a Sua Conta</h5>
+                <p>Registe-se gratuitamente como comprador ou vendedor em menos de 2 minutos.</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="step-card" data-step="2">
+                <div class="step-icon bg-primary bg-opacity-10 text-primary"><i class="fas fa-store"></i></div>
+                <h5>Publique ou Explore</h5>
+                <p>Coloque os seus produtos à venda ou encontre o que precisa com filtros avançados.</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="step-card" data-step="3">
+                <div class="step-icon bg-warning bg-opacity-10 text-warning"><i class="fab fa-whatsapp"></i></div>
+                <h5>Contacte Directamente</h5>
+                <p>Fale directamente com o vendedor via WhatsApp — sem intermediários.</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="step-card" data-step="4">
+                <div class="step-icon bg-info bg-opacity-10 text-info"><i class="fas fa-robot"></i></div>
+                <h5>Consulte a IA Agrícola</h5>
+                <p>Receba conselhos especializados do nosso assistente de inteligência artificial.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ FEATURED PRODUCTS ═══ -->
+    <div class="d-flex justify-content-between align-items-end mt-5 pt-4 mb-4">
         <div>
-            <h2 class="fw-bold text-dark mb-2">Produtos em Destaque</h2>
-            <p class="text-muted mb-0">Os melhores produtos do nosso marketplace</p>
+            <span class="sec-label">Marketplace</span>
+            <div class="sec-title mb-0">Produtos em Destaque</div>
         </div>
-        <a href="{{ url_for('listar_produtos') }}" class="btn btn-outline-success">
-            Ver Todos <i class="fas fa-arrow-right ms-1"></i>
+        <a href="{{ url_for('listar_produtos') }}" class="btn btn-outline-success d-none d-md-inline-flex" style="border-radius:10px; font-weight:600; gap:6px;">
+            Ver todos <i class="fas fa-arrow-right"></i>
         </a>
     </div>
 
-{% if produtos %}
+    {% if produtos %}
     <div class="row g-4">
-        {% for produto in produtos %}
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <div class="card product-card h-100 shadow-sm">
-                    <div class="position-relative overflow-hidden" style="height: 200px;">
-                        <img src="{{ url_for('static', filename=produto[6]) if produto[6] else 'https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=400&q=80' }}"
-                             class="card-img-top w-100 h-100"
-                             style="object-fit: cover;"
-                             onerror="this.src='https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=400&q=80';this.onerror=null;">
-
-                        {% if produto[7] %}
-                            <span class="position-absolute top-0 start-0 m-2 badge bg-success">
-                                {{ produto[7] }}
-                            </span>
-                        {% endif %}
-                    </div>
-
-                    <div class="card-body">
-                        <h6 class="card-title fw-bold">{{ produto[2] }}</h6>
-                        <p class="text-success fw-bold fs-5 mb-2">{{ "%.2f"|format(produto[3]) }} MT</p>
-                        <p class="card-text text-muted small">{{ produto[4][:100] }}...</p>
-
-                        <div class="mt-3">
-                            <p class="text-muted mb-1">
-                                <i class="fas fa-map-marker-alt text-danger me-2"></i>
-                                <strong>{{ produto[5] }}</strong>
-                            </p>
-                            <p class="text-muted mb-0">
-                                <i class="fas fa-user-circle text-primary me-2"></i>
-                                <strong>{{ produto[8] }}</strong>
-                            </p>
+        {% for produto in produtos[:8] %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="prod-card">
+                <div class="prod-img">
+                    {% if produto[6] %}
+                        <img src="{{ url_for('static', filename=produto[6]) }}"
+                             alt="{{ produto[2] }}"
+                             onerror="this.parentElement.style.background='linear-gradient(135deg,#e8f5e9,#f1f8e9)';this.remove();">
+                    {% else %}
+                        <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="background:linear-gradient(135deg,#e8f5e9,#f1f8e9);">
+                            <i class="fas fa-seedling fa-3x" style="color:#a5d6a7;"></i>
                         </div>
+                    {% endif %}
+                    {% if produto[7] %}
+                        <span class="cat-badge">{{ produto[7] }}</span>
+                    {% endif %}
+                </div>
+                <div class="prod-body">
+                    <div class="prod-name">{{ produto[2] }}</div>
+                    <div class="prod-price">{{ "%.0f"|format(produto[3]) }}<span> MT</span></div>
+                    <div class="prod-loc">
+                        <i class="fas fa-map-marker-alt" style="color:#81C784;"></i>
+                        {{ produto[5] or 'Moçambique' }}
                     </div>
+                    <a href="{{ url_for('contato_whatsapp', vendedor_id=produto[1]) }}"
+                       class="btn-contact-prod">
+                        <i class="fab fa-whatsapp"></i> Contactar Vendedor
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="text-center mt-4 d-md-none">
+        <a href="{{ url_for('listar_produtos') }}" class="btn btn-success" style="border-radius:10px; font-weight:600;">
+            Ver todos os produtos <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+    </div>
+    {% else %}
+    <div class="text-center py-5" style="background:white; border-radius:20px; border:1px solid #eee;">
+        <div style="width:80px;height:80px;border-radius:50%;background:#f1f8f1;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <i class="fas fa-seedling fa-2x" style="color:#a5d6a7;"></i>
+        </div>
+        <h5 class="fw-bold mb-2">Novos produtos chegando em breve!</h5>
+        <p class="text-muted mb-4">Seja o primeiro a publicar na plataforma.</p>
+        {% if session.user_id %}
+        <a href="{{ url_for('publicar_produto') }}" class="btn btn-success" style="border-radius:10px;">
+            <i class="fas fa-plus me-2"></i>Publicar Produto
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
 
-                    <div class="card-footer bg-white border-top">
-                        <a href="{{ url_for('contato_whatsapp', vendedor_id=produto[1]) }}"
-                           class="btn btn-success w-100">
-                            <i class="fab fa-whatsapp me-2"></i> Contactar Vendedor
-                        </a>
+    <!-- ═══ FEATURES GRID ═══ -->
+    <div class="text-center mt-5 pt-4 mb-4">
+        <span class="sec-label">Vantagens</span>
+        <div class="sec-title">Porquê AGRI.vendasMz?</div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6 col-lg-4">
+            <div class="feat-card">
+                <div class="feat-ico bg-success bg-opacity-10 text-success"><i class="fas fa-shield-alt"></i></div>
+                <div>
+                    <h6>Vendedores Verificados</h6>
+                    <p>Todos os anunciantes são validados pela nossa equipa antes de publicar.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feat-card">
+                <div class="feat-ico bg-primary bg-opacity-10 text-primary"><i class="fas fa-robot"></i></div>
+                <div>
+                    <h6>Assistente Agrícola com IA</h6>
+                    <p>Pergunte sobre culturas, pragas, solos e épocas de plantio — 24 horas por dia.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feat-card">
+                <div class="feat-ico bg-warning bg-opacity-10 text-warning"><i class="fas fa-map-marker-alt"></i></div>
+                <div>
+                    <h6>Todo o País</h6>
+                    <p>Produtos de todas as 11 províncias de Moçambique, perto de si.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feat-card">
+                <div class="feat-ico bg-info bg-opacity-10 text-info"><i class="fas fa-tractor"></i></div>
+                <div>
+                    <h6>Loja de Equipamentos</h6>
+                    <p>Tractores, ferramentas, sistemas de irrigação e muito mais.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feat-card">
+                <div class="feat-ico bg-danger bg-opacity-10 text-danger"><i class="fab fa-whatsapp"></i></div>
+                <div>
+                    <h6>Contacto Directo</h6>
+                    <p>Comunique directamente com compradores ou vendedores via WhatsApp.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="feat-card">
+                <div class="feat-ico" style="background:rgba(156,39,176,0.08);color:#7b1fa2;"><i class="fas fa-crown"></i></div>
+                <div>
+                    <h6>Plano Premium</h6>
+                    <p>Listagens ilimitadas, prioridade nos resultados e relatórios avançados.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TESTIMONIALS ═══ -->
+    <div class="text-center mt-5 pt-4 mb-4">
+        <span class="sec-label">Testemunhos</span>
+        <div class="sec-title">O que dizem os nossos utilizadores</div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="testi-card">
+                <div class="stars">★★★★★</div>
+                <p class="testi-quote">"A AGRI.vendasMz mudou o meu negócio. Em dois meses consegui vender toda a minha colheita de milho sem sair da machamba."</p>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="testi-avatar">J</div>
+                    <div>
+                        <div class="testi-name">João Machava</div>
+                        <div class="testi-role">Produtor de Milho · Manica</div>
                     </div>
                 </div>
             </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <div class="text-center py-5">
-        <i class="fas fa-seedling fa-4x text-muted mb-3"></i>
-        <h4 class="text-muted">Novos produtos chegando em breve!</h4>
-        <p class="text-muted">Seja o primeiro a publicar produtos na nossa plataforma.</p>
-    </div>
-{% endif %}
-</div>
-
-<!-- Estatísticas -->
-<div class="card shadow-sm border-0 mb-5" style="background: linear-gradient(135deg, #E8F5E8 0%, #F1F8E9 100%);">
-    <div class="card-body py-5">
-        <div class="row text-center">
-            <div class="col-md-3 mb-4 stat-box">
-                <h2 class="text-success fw-bold display-6">{{ produtos|length }}+</h2>
-                <p class="fw-semibold text-dark mb-0">Produtos Disponíveis</p>
+        </div>
+        <div class="col-lg-4">
+            <div class="testi-card">
+                <div class="stars">★★★★★</div>
+                <p class="testi-quote">"O Assistente Agrícola com IA ajudou-me a identificar uma praga no tomate e a tratar a tempo. Salvou toda a minha produção!"</p>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="testi-avatar" style="background:linear-gradient(135deg,#1565C0,#1E88E5);">M</div>
+                    <div>
+                        <div class="testi-name">Maria Sitoe</div>
+                        <div class="testi-role">Produtora de Hortaliças · Maputo</div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-3 mb-4 stat-box">
-                <h2 class="text-success fw-bold display-6">100+</h2>
-                <p class="fw-semibold text-dark mb-0">Vendedores Ativos</p>
-            </div>
-            <div class="col-md-3 mb-4 stat-box">
-                <h2 class="text-success fw-bold display-6">11</h2>
-                <p class="fw-semibold text-dark mb-0">Províncias</p>
-            </div>
-            <div class="col-md-3 mb-4 stat-box">
-                <h2 class="text-success fw-bold display-6">24/7</h2>
-                <p class="fw-semibold text-dark mb-0">Suporte Online</p>
+        </div>
+        <div class="col-lg-4">
+            <div class="testi-card">
+                <div class="stars">★★★★★</div>
+                <p class="testi-quote">"Encontrei o tractor que precisava na loja de equipamentos por um preço justo. O contacto directo via WhatsApp foi muito fácil."</p>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="testi-avatar" style="background:linear-gradient(135deg,#E65100,#FF8F00);">A</div>
+                    <div>
+                        <div class="testi-name">António Cossa</div>
+                        <div class="testi-role">Agricultor · Nampula</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Call to Action -->
-<div class="text-center cta-section">
-    <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #1B5E20 0%, #4CAF50 100%);">
-        <div class="card-body py-5 text-white">
-            <h3 class="fw-bold mb-3">Pronto para começar?</h3>
-            <p class="fs-5 mb-4">Junte-se à maior comunidade agrícola de Moçambique</p>
+    <!-- ═══ CTA ═══ -->
+    <div class="home-cta bg-hero">
+        <div class="inner">
+            <h2>Pronto para transformar a sua agricultura?</h2>
+            <p>Junte-se a centenas de produtores que já crescem com a AGRI.vendasMz</p>
             <div class="d-flex justify-content-center gap-3 flex-wrap">
                 {% if not session.user_id %}
-                    <a href="{{ url_for('cadastro') }}" class="btn btn-light btn-lg px-4">
-                        <i class="fas fa-user-plus me-2"></i> Criar Conta Grátis
-                    </a>
-                {% endif %}
-                <a href="{{ url_for('listar_produtos') }}" class="btn btn-outline-light btn-lg px-4">
-                    <i class="fas fa-shopping-cart me-2"></i> Explorar Marketplace
+                <a href="{{ url_for('cadastro') }}" class="hero-btn-primary">
+                    <i class="fas fa-rocket"></i> Começar Agora — É Grátis
                 </a>
+                <a href="{{ url_for('listar_produtos') }}" class="hero-btn-outline">
+                    <i class="fas fa-shopping-basket"></i> Ver Produtos
+                </a>
+                {% else %}
+                <a href="{{ url_for('publicar_produto') }}" class="hero-btn-primary">
+                    <i class="fas fa-plus"></i> Publicar Produto
+                </a>
+                <a href="{{ url_for('loja_equipamentos') }}" class="hero-btn-outline">
+                    <i class="fas fa-tractor"></i> Loja de Equipamentos
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>
+
 </div>
 {% endblock %}

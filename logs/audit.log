@@ -382,3 +382,4 @@
 2026-07-02 16:02:11,050 - AUDIT - {"timestamp": "2026-07-02T16:02:11.050290", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": 10, "details": {}, "ip_address": null}
 2026-07-02 16:02:11,050 - AUDIT - {"timestamp": "2026-07-02T16:02:11.050290", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": 10, "details": {}, "ip_address": null}
 2026-07-02 16:02:11,050 - AUDIT - {"timestamp": "2026-07-02T16:02:11.050290", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": 10, "details": {}, "ip_address": null}
+2026-07-04 21:19:35,594 - AUDIT - {"timestamp": "2026-07-04T21:19:35.594715", "action": "LOGIN_SUCCESS", "user_id": 10, "details": {"ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36"}, "ip_address": null}
