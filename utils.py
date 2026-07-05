@@ -27,11 +27,49 @@ def validate_phone(phone):
     pattern = r'^8[2-7][0-9]{7}$'
     return re.match(pattern, cleaned) is not None
 
-def allowed_file(filename, allowed_extensions={'png', 'jpg', 'jpeg', 'gif'}):
+# MIME types permitidos para upload
+ALLOWED_MIME_TYPES = {
+    'png': 'image/png',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'gif': 'image/gif',
+    'webp': 'image/webp'
+}
+
+def allowed_file(filename, allowed_extensions={'png', 'jpg', 'jpeg', 'gif', 'webp'}):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
+def validate_file_mime(file, allowed_extensions={'png', 'jpg', 'jpeg', 'gif', 'webp'}):
+    """Valida o tipo MIME real do arquivo, não apenas a extensão"""
+    if not file or not file.filename:
+        return False
+
+    ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+    if ext not in allowed_extensions:
+        return False
+
+    # Ler primeiros bytes para verificar magic number
+    file.seek(0)
+    header = file.read(32)
+    file.seek(0)
+
+    # Verificar assinaturas de arquivo conhecidas
+    signatures = {
+        b'\x89PNG\r\n\x1a\n': 'png',
+        b'\xff\xd8\xff': 'jpg',
+        b'GIF87a': 'gif',
+        b'GIF89a': 'gif',
+        b'RIFF': 'webp',  # WebP começa com RIFF
+    }
+
+    for sig, file_type in signatures.items():
+        if header.startswith(sig):
+            return ext == file_type or (ext == 'jpeg' and file_type == 'jpg')
+
+    return False
+
 def save_uploaded_file(file, upload_folder):
-    if file and allowed_file(file.filename):
+    if file and allowed_file(file.filename) and validate_file_mime(file):
         filename = secure_filename(file.filename)
         filepath = os.path.join(upload_folder, filename)
         file.save(filepath)

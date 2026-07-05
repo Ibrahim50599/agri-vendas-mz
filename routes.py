@@ -334,7 +334,7 @@ def login():
 
         # Verificar rate limiting
         client_ip = request.remote_addr
-        if not security_manager.check_rate_limit(f"login_{client_ip}"):
+        if not security_manager.check_rate_limit(f"login_{client_ip}", max_attempts=5, window_minutes=15):
             flash('Muitas tentativas de login. Tente novamente em 15 minutos.')
             db.audit_log('RATE_LIMIT_EXCEEDED', details={'ip': client_ip})
             return render_template('login.html')

@@ -452,11 +452,20 @@ def with_error_handling(f):
                 raise  # Re-raise se não conseguiu recuperar
     return wrapper
 
+# Instância global do PerformanceMonitor para evitar criação a cada request
+_performance_monitor = None
+
+def _get_performance_monitor():
+    global _performance_monitor
+    if _performance_monitor is None:
+        _performance_monitor = PerformanceMonitor()
+    return _performance_monitor
+
 def with_performance_monitoring(operation_name):
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            monitor = PerformanceMonitor()
+            monitor = _get_performance_monitor()
             monitor.start_timer(operation_name)
             try:
                 result = f(*args, **kwargs)
@@ -466,12 +475,21 @@ def with_performance_monitoring(operation_name):
         return wrapper
     return decorator
 
+# Instância global do RobustDatabase para evitar criação a cada request
+_audit_db = None
+
+def _get_audit_db():
+    global _audit_db
+    if _audit_db is None:
+        _audit_db = RobustDatabase('agri_vendas.db')
+    return _audit_db
+
 def with_audit_trail(action_name):
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
             # Registrar início da ação
-            db = RobustDatabase('agri_vendas.db')
+            db = _get_audit_db()
             db.audit_log(f"START_{action_name}", session.get('user_id'))
 
             try:

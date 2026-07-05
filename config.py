@@ -1,7 +1,10 @@
 import os
+import secrets
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'agri_vendas_mz_secret_key_2024'
+    # Gera uma chave segura se não estiver definida no ambiente
+    # IMPORTANTE: Em produção, sempre defina SECRET_KEY no .env
+    SECRET_KEY = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
     UPLOAD_FOLDER = 'static/uploads'
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
     DATABASE = 'agri_vendas.db'
