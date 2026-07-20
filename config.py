@@ -8,3 +8,10 @@ class Config:
     DEBUG = os.environ.get('DEBUG') == 'True'
     HOST = os.environ.get('HOST') or '0.0.0.0'
     PORT = int(os.environ.get('PORT') or 5000)
+
+    # Sessão — funciona atrás de qualquer proxy (Render, Railway, Heroku, etc.)
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    # Secure só activo quando HTTPS está confirmado (em produção via env var)
+    SESSION_COOKIE_SECURE = os.environ.get('HTTPS_ENABLED') == 'true'
+    PERMANENT_SESSION_LIFETIME = 60 * 60 * 24 * 7  # 7 dias

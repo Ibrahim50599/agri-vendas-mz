@@ -1319,9 +1319,21 @@ function enviarPerguntaIA() {
     fetch('/assistente_ia', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
+        credentials: 'same-origin',
         body: JSON.stringify({pergunta: pergunta})
     })
-    .then(r => r.json())
+    .then(r => {
+        // Se sessão expirou o servidor devolve 401 com JSON
+        if (r.status === 401) {
+            return r.json().then(d => ({ _status: 401, ...d }));
+        }
+        // Verificar se é realmente JSON antes de parsear
+        const ct = r.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+            throw new Error('resposta_nao_json');
+        }
+        return r.json();
+    })
     .then(data => {
         const loading = document.getElementById(loadingId);
         if (loading) loading.remove();
@@ -1329,10 +1341,14 @@ function enviarPerguntaIA() {
         chat.innerHTML += `<div class="chat-msg-bot"><i class="fas fa-seedling me-1 text-success"></i>${resposta.replace(/\n/g, '<br>')}</div>`;
         chat.scrollTop = chat.scrollHeight;
     })
-    .catch(() => {
+    .catch(err => {
         const loading = document.getElementById(loadingId);
         if (loading) loading.remove();
-        chat.innerHTML += `<div class="chat-msg-bot"><i class="fas fa-seedling me-1 text-success"></i>Erro de ligação. Verifique a sua internet e tente novamente.</div>`;
+        let msg = '❌ Erro de ligação. Verifique a sua internet e tente novamente.';
+        if (err.message === 'resposta_nao_json') {
+            msg = '⚠️ A sua sessão expirou. Por favor <a href="/login" style="color:#4CAF50;font-weight:bold;">faça login novamente</a>.';
+        }
+        chat.innerHTML += `<div class="chat-msg-bot"><i class="fas fa-exclamation-triangle me-1 text-warning"></i>${msg}</div>`;
         chat.scrollTop = chat.scrollHeight;
     });
 }

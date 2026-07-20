@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
 from flask.json.provider import DefaultJSONProvider
+from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import datetime
@@ -27,6 +28,10 @@ app.json_provider_class = CustomJSONProvider
 app.json = CustomJSONProvider(app)
 app.config.from_object(Config)
 
+# ProxyFix: necessário para sessões funcionarem atrás de qualquer proxy reverso
+# (Render, Railway, Heroku, Nginx, etc.) — corrige IP, protocolo e host
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
 # Criar pasta de uploads se não existir
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
@@ -42,6 +47,12 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
+            # Para pedidos AJAX/fetch, devolver JSON em vez de redirect HTML
+            if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes.best == 'application/json':
+                return jsonify({
+                    'erro': 'sessao_expirada',
+                    'resposta': '⚠️ A sua sessão expirou. Por favor <a href="/login" style="color:#4CAF50;font-weight:bold;">faça login novamente</a> para continuar a usar o Assistente Agrícola.'
+                }), 401
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -552,7 +563,7 @@ def assistente_ia():
 
         api_key = os.environ.get('GEMINI_API_KEY')
         if not api_key:
-            return jsonify({'resposta': 'Assistente IA não configurado. Contacte o administrador.'})
+            return jsonify({'resposta': '⚠️ O Assistente IA não está configurado neste servidor. O administrador precisa de adicionar a variável de ambiente <strong>GEMINI_API_KEY</strong> nas definições do hosting (Render → Environment → Add Environment Variable).'})
 
         historico = session.get('chat_historico', [])
 
