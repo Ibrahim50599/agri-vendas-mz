@@ -4,7 +4,12 @@ services:
     env: python
     buildCommand: ""
     startCommand: gunicorn main:app --bind 0.0.0.0:$PORT --workers 1
-
-
-
-
+    envVars:
+      - key: DATA_DIR
+        value: /data
+      - key: HTTPS_ENABLED
+        value: "true"
+    disk:
+      name: agri-vendas-data
+      mountPath: /data
+      sizeGB: 1

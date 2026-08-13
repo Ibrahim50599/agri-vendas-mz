@@ -1,3 +1,5 @@
+import os
+import shutil
 import sqlite3
 from werkzeug.security import generate_password_hash
 import datetime
@@ -6,10 +8,19 @@ class Database:
     """Database class com funcionalidades básicas"""
 
     def __init__(self, db_path):
-        self.db_path = db_path
+        self.db_path = os.path.abspath(db_path)
+        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+
+        # Migração única e não destrutiva: se um disco persistente acabou de
+        # ser configurado, reaproveita a base antiga que ainda esteja no
+        # diretório da aplicação. Nunca substitui uma base já existente.
+        legacy_path = os.path.abspath('agri_vendas.db')
+        if self.db_path != legacy_path and not os.path.exists(self.db_path):
+            if os.path.isfile(legacy_path):
+                shutil.copy2(legacy_path, self.db_path)
 
     def get_connection(self):
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path, timeout=30)
         conn.row_factory = sqlite3.Row
         return conn
 

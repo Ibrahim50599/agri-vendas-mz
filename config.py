@@ -3,9 +3,9 @@ import os
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'agri_vendas_mz_secret_key_2024'
 
-    # DATA_DIR: em produção (Render, Railway, etc.) aponta para disco persistente.
-    # Exemplo: DATA_DIR=/data  → base de dados em /data/agri_vendas.db
-    # Em desenvolvimento fica vazio e usa a pasta local.
+    # DATA_DIR deve apontar para armazenamento persistente em produção.
+    # Exemplo no Render: DATA_DIR=/data -> /data/agri_vendas.db
+    # Sem esta variável, o desenvolvimento usa a pasta do projeto.
     _DATA_DIR = os.environ.get('DATA_DIR', '').strip()
     DATABASE = os.path.join(_DATA_DIR, 'agri_vendas.db') if _DATA_DIR else 'agri_vendas.db'
 
