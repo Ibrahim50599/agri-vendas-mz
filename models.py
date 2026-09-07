@@ -1,7 +1,7 @@
 import os
 import shutil
 import sqlite3
-from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 import datetime
 
 class Database:
@@ -65,9 +65,17 @@ class Database:
             data_nomeacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             nomeado_por INTEGER,
             ativo INTEGER DEFAULT 1,
+            codigo_acesso_hash TEXT,
             FOREIGN KEY (usuario_id) REFERENCES usuarios (id),
             FOREIGN KEY (nomeado_por) REFERENCES usuarios (id)
         )''')
+
+        # Migração segura para bases criadas antes do acesso individual dos
+        # administradores. ALTER TABLE só é executado quando a coluna falta.
+        c.execute("PRAGMA table_info(administradores)")
+        admin_columns = {column[1] for column in c.fetchall()}
+        if 'codigo_acesso_hash' not in admin_columns:
+            c.execute("ALTER TABLE administradores ADD COLUMN codigo_acesso_hash TEXT")
 
         # Tabela de configurações do sistema
         c.execute('''CREATE TABLE IF NOT EXISTS configuracoes_sistema (
@@ -369,7 +377,12 @@ class Database:
     def get_admin_users(self):
         conn = self.get_connection()
         c = conn.cursor()
-        c.execute('''SELECT a.*, u.nome_completo, u.telefone, u2.nome_completo as nomeado_por_nome
+        # Colunas explícitas mantêm os índices usados pelos templates antigos
+        # mesmo depois da adição do hash de acesso individual.
+        c.execute('''SELECT a.id, a.usuario_id, a.nivel_acesso, a.data_nomeacao,
+                            a.nomeado_por, a.ativo, u.nome_completo, u.telefone,
+                            u2.nome_completo as nomeado_por_nome,
+                            CASE WHEN a.codigo_acesso_hash IS NOT NULL THEN 1 ELSE 0 END as tem_codigo
                     FROM administradores a
                     JOIN usuarios u ON a.usuario_id = u.id
                     LEFT JOIN usuarios u2 ON a.nomeado_por = u2.id
@@ -378,6 +391,29 @@ class Database:
         admins = c.fetchall()
         conn.close()
         return admins
+
+    def authenticate_secondary_admin(self, codigo):
+        """Encontra um administrador secundário pelo código atribuído."""
+        if not codigo:
+            return None
+
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''SELECT a.id, a.usuario_id, a.nivel_acesso,
+                            a.codigo_acesso_hash, u.nome_completo,
+                            u.tipo, u.premium
+                     FROM administradores a
+                     JOIN usuarios u ON a.usuario_id = u.id
+                     WHERE a.ativo = 1 AND u.ativo = 1
+                       AND a.nivel_acesso != 'superadmin'
+                       AND a.codigo_acesso_hash IS NOT NULL''')
+        admins = c.fetchall()
+        conn.close()
+
+        for admin in admins:
+            if check_password_hash(admin[3], codigo):
+                return admin
+        return None
 
     def get_users(self):
         conn = self.get_connection()
@@ -474,7 +510,7 @@ class Database:
         conn.close()
         return configs
 
-    def nomear_admin(self, user_id, nivel, nomeado_por):
+    def nomear_admin(self, user_id, nivel, nomeado_por, codigo_acesso=None):
         conn = self.get_connection()
         c = conn.cursor()
 
@@ -499,9 +535,29 @@ class Database:
         c.execute('''INSERT INTO administradores (usuario_id, nivel_acesso, nomeado_por)
                     VALUES (?, ?, ?)''', (user_id, nivel, nomeado_por))
 
+        # O código nunca é guardado em texto simples.
+        codigo_hash = generate_password_hash(codigo_acesso) if codigo_acesso else None
+        c.execute('''UPDATE administradores
+                     SET codigo_acesso_hash = ?
+                     WHERE id = ?''', (codigo_hash, c.lastrowid))
+
         conn.commit()
         conn.close()
         return True
+
+    def set_admin_access_code(self, admin_id, codigo_acesso):
+        """Define ou substitui o código de um administrador secundário."""
+        codigo_hash = generate_password_hash(codigo_acesso)
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''UPDATE administradores
+                     SET codigo_acesso_hash = ?
+                     WHERE id = ? AND ativo = 1 AND nivel_acesso != 'superadmin' ''',
+                  (codigo_hash, admin_id))
+        updated = c.rowcount > 0
+        conn.commit()
+        conn.close()
+        return updated
 
     def remover_admin(self, admin_id):
         conn = self.get_connection()

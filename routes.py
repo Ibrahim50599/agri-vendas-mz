@@ -812,7 +812,7 @@ def validar_acesso_admin():
     if request.method == 'GET':
         return render_template('admin_acesso.html')
 
-    codigo = request.form.get('codigo')
+    codigo = request.form.get('codigo', '').strip()
 
     config = db.get_admin_config()
     if config and codigo == config[1]:
@@ -820,9 +820,33 @@ def validar_acesso_admin():
         session['admin_level'] = 'superadmin'
         flash('Acesso de super administrador concedido!')
         return redirect(url_for('admin_panel'))
-    else:
-        flash('Código de acesso incorreto!')
-        return render_template('admin_acesso.html')
+
+    # Administradores secundários usam o código individual atribuído pelo
+    # super administrador. O hash é verificado no banco, sem guardar o
+    # código original na sessão ou na base de dados.
+    secondary_admin = db.authenticate_secondary_admin(codigo)
+    if secondary_admin:
+        session.clear()
+        session.permanent = True
+        session['user_id'] = secondary_admin[1]
+        session['user_name'] = secondary_admin[4]
+        session['user_type'] = secondary_admin[5]
+        session['is_premium'] = secondary_admin[6]
+        session['admin_level'] = secondary_admin[2]
+        session['admin_auth_method'] = 'secondary_code'
+        flash(f'Bem-vindo, {secondary_admin[4]}!')
+
+        workspace_routes = {
+            'supervisor': 'admin_supervisor',
+            'usuarios': 'admin_usuarios',
+            'produtos': 'admin_produtos',
+            'financeiro': 'admin_financeiro',
+            'equipamentos': 'admin_equipamentos_gestao',
+        }
+        return redirect(url_for(workspace_routes.get(secondary_admin[2], 'admin_panel')))
+
+    flash('Código de acesso incorreto!')
+    return render_template('admin_acesso.html')
 
 @app.route('/controle-agri')
 @admin_required
@@ -904,7 +928,10 @@ def remover_produto(produto_id):
             return redirect(url_for('admin_panel'))
 
         # Verificar atividade suspeita (remoção em massa)
-        admin_id = session['user_id']
+        # O super administrador pode entrar pelo código global sem uma
+        # sessão de usuário comum. Nesse caso, a nomeação continua válida e
+        # o campo de auditoria fica sem utilizador associado.
+        admin_id = session.get('user_id')
         activity_data = {
             'admin_id': admin_id,
             'action': 'remove_product',
@@ -994,13 +1021,20 @@ def reativar_usuario(user_id):
 @with_performance_monitoring('admin_appointment')
 @with_audit_trail('ADMIN_APPOINTMENT')
 def nomear_admin():
-    user_id = request.form.get('user_id')
+    user_id_raw = request.form.get('user_id', '').strip()
     nivel = request.form.get('nivel', 'admin')
+    codigo_acesso = request.form.get('codigo_acesso', '').strip()
+
+    try:
+        user_id = int(user_id_raw)
+    except (TypeError, ValueError):
+        user_id = None
 
     # Validações de segurança
     form_data = {
         'user_id': user_id,
-        'nivel': nivel
+        'nivel': nivel,
+        'codigo_acesso': codigo_acesso
     }
 
     validation_rules = {
@@ -1012,15 +1046,24 @@ def nomear_admin():
         'nivel': {
             'required': True,
             'type': 'string',
-            'pattern': r'^(admin|moderator|superadmin)$'
+            'pattern': r'^(admin|supervisor|usuarios|produtos|financeiro|equipamentos)$'
+        },
+        'codigo_acesso': {
+            'required': True,
+            'type': 'string',
+            'min_length': 6,
+            'max_length': 128,
+            'pattern': r'^\S+$'
         }
     }
 
     try:
         db.security_manager.validate_input(form_data, validation_rules)
 
-        # Verificar atividade suspeita (elevação de privilégios)
-        admin_id = session['user_id']
+        # Verificar atividade suspeita (elevação de privilégios). O
+        # superadmin também pode estar autenticado pelo código global, sem
+        # um user_id na sessão comum.
+        admin_id = session.get('user_id')
         activity_data = {
             'admin_id': admin_id,
             'action': 'appoint_admin',
@@ -1033,7 +1076,7 @@ def nomear_admin():
             flash('Atividade suspeita detectada. Nomeação registrada para análise.')
             return redirect(url_for('admin_panel'))
 
-        if not db.nomear_admin(user_id, nivel, session.get('user_id', 1)):
+        if not db.nomear_admin(user_id, nivel, admin_id, codigo_acesso):
             flash('Usuário não encontrado ou já é administrador!')
             return redirect(url_for('admin_panel'))
 
@@ -1050,6 +1093,36 @@ def nomear_admin():
         db.logger.error(f"Erro ao nomear admin: {str(e)}")
         flash(f'Erro ao nomear administrador: {str(e)}')
 
+    return redirect(url_for('admin_panel'))
+
+@app.route('/admin/administradores/<int:admin_id>/codigo', methods=['POST'])
+@superadmin_required
+def configurar_codigo_admin_secundario(admin_id):
+    codigo_acesso = request.form.get('codigo_acesso', '').strip()
+    try:
+        if len(codigo_acesso) < 6 or len(codigo_acesso) > 128 or re.search(r'\s', codigo_acesso):
+            raise ValueError('O código deve ter entre 6 e 128 caracteres e não pode conter espaços.')
+
+        # Evitar que um registo de superadmin seja alterado por esta rota,
+        # mesmo que alguém tente manipular o formulário.
+        conn = db.get_connection()
+        c = conn.cursor()
+        c.execute("SELECT nivel_acesso FROM administradores WHERE id = ? AND ativo = 1", (admin_id,))
+        admin = c.fetchone()
+        conn.close()
+        if not admin or admin[0] == 'superadmin':
+            flash('Só é possível definir código para administradores secundários.')
+            return redirect(url_for('admin_panel'))
+
+        if db.set_admin_access_code(admin_id, codigo_acesso):
+            flash('Código do administrador secundário guardado com segurança.')
+        else:
+            flash('Administrador secundário não encontrado.')
+    except ValueError as e:
+        flash(f'Dados inválidos: {str(e)}')
+    except Exception as e:
+        db.logger.error(f"Erro ao configurar código do administrador {admin_id}: {str(e)}")
+        flash('Erro ao guardar o código do administrador.')
     return redirect(url_for('admin_panel'))
 
 @app.route('/admin/remover_admin/<int:admin_id>')

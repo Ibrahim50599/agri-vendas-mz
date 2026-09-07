@@ -1503,6 +1503,7 @@
                                 <th>Nome</th>
                                 <th>Telefone</th>
                                 <th>Nível</th>
+                                <th>Acesso individual</th>
                                 <th>Nomeado por</th>
                                 <th>Data</th>
                                 <th>Acção</th>
@@ -1527,6 +1528,28 @@
                                     <span class="badge-nivel badge bg-info">
                                         <i class="fas fa-user-shield me-1"></i>Admin
                                     </span>
+                                    {% endif %}
+                                </td>
+                                <td style="min-width:220px;">
+                                    {% if adm[2] == 'superadmin' %}
+                                    <span class="badge bg-light text-muted">
+                                        <i class="fas fa-lock me-1"></i>Código principal
+                                    </span>
+                                    {% else %}
+                                    <span class="badge {% if adm[9] %}bg-success{% else %}bg-warning text-dark{% endif %} mb-2">
+                                        <i class="fas fa-key me-1"></i>
+                                        {% if adm[9] %}Código definido{% else %}Sem código{% endif %}
+                                    </span>
+                                    <form method="POST" action="{{ url_for('configurar_codigo_admin_secundario', admin_id=adm[0]) }}" class="d-flex gap-1">
+                                        <input type="password" name="codigo_acesso" class="form-control form-control-sm"
+                                               minlength="6" maxlength="128" required
+                                               placeholder="{% if adm[9] %}Novo código{% else %}Definir código{% endif %}"
+                                               autocomplete="new-password">
+                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Guardar código">
+                                            <i class="fas fa-save"></i>
+                                        </button>
+                                    </form>
+                                    <small class="text-muted">O código não é exibido depois.</small>
                                     {% endif %}
                                 </td>
                                 <td><small class="text-muted">{{ adm[8] if adm|length > 8 else 'Sistema' }}</small></td>
@@ -1782,7 +1805,22 @@
                         <label class="form-label fw-semibold"><i class="fas fa-award me-1"></i>Nível</label>
                         <select class="form-select" name="nivel">
                             <option value="admin">Administrador Secundário</option>
+                            <option value="supervisor">Supervisor</option>
+                            <option value="usuarios">Gestor de Usuários</option>
+                            <option value="produtos">Gestor de Produtos</option>
+                            <option value="financeiro">Gestor Financeiro</option>
+                            <option value="equipamentos">Gestor de Equipamentos</option>
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold"><i class="fas fa-key me-1"></i>Código individual</label>
+                        <input type="password" class="form-control" name="codigo_acesso"
+                               minlength="6" maxlength="128" required
+                               placeholder="Crie o código que vai entregar ao administrador"
+                               autocomplete="new-password">
+                        <div class="form-text">
+                            Guarde este código e entregue-o ao administrador. Por segurança, ele não será mostrado novamente.
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-0">
