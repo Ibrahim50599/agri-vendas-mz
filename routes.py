@@ -4,6 +4,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import datetime
+import math
 import os
 import re
 import sqlite3
@@ -427,9 +428,31 @@ def publicar_produto():
 
     if request.method == 'POST':
         # Validações de segurança usando SecurityManager
+        # Os campos HTML chegam sempre como texto. O preço precisa ser
+        # convertido antes da validação, caso contrário a regra `float`
+        # rejeita qualquer publicação válida.
+        preco_texto = request.form.get('preco', '').strip().replace('\u00a0', '').replace(' ', '')
+        if ',' in preco_texto and '.' in preco_texto:
+            # Aceitar formatos como 10.000,50 e 10,000.50.
+            if preco_texto.rfind(',') > preco_texto.rfind('.'):
+                preco_texto = preco_texto.replace('.', '').replace(',', '.')
+            else:
+                preco_texto = preco_texto.replace(',', '')
+        elif ',' in preco_texto:
+            preco_texto = preco_texto.replace(',', '.')
+
+        try:
+            preco = float(preco_texto) if preco_texto else None
+            if isinstance(preco, float) and not math.isfinite(preco):
+                preco = preco_texto
+        except (TypeError, ValueError):
+            # Mantém o valor inválido para o SecurityManager devolver uma
+            # mensagem de validação, em vez de gerar erro 500.
+            preco = preco_texto
+
         form_data = {
             'nome': request.form.get('nome', '').strip(),
-            'preco': request.form.get('preco', ''),
+            'preco': preco,
             'descricao': request.form.get('descricao', '').strip(),
             'localizacao': request.form.get('localizacao', '').strip(),
             'categoria': request.form.get('categoria', '')
@@ -442,7 +465,9 @@ def publicar_produto():
                 'type': 'string',
                 'min_length': 3,
                 'max_length': 100,
-                'pattern': r'^[a-zA-Z0-9\s\-\.\,\(\)]+$'  # Apenas caracteres seguros
+                # \w inclui letras acentuadas em Python (Unicode), além de
+                # números e letras ASCII.
+                'pattern': r'^[\w\s\-\.\,\(\)]+$'
             },
             'preco': {
                 'required': True,

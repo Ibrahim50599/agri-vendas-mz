@@ -331,7 +331,12 @@ class SecurityManager:
         if pattern == 'multiple_failed_logins':
             return data.get('failed_attempts', 0) > 3
         elif pattern == 'unusual_login_time':
-            hour = datetime.now().hour
+            # Esta regra é específica para tentativas de login. Não deve
+            # bloquear cadastros, publicações ou outras ações legítimas
+            # realizadas fora do horário comercial.
+            if data.get('action') != 'login_attempt':
+                return False
+            hour = data.get('time', datetime.now().hour)
             return hour < 6 or hour > 22  # Login fora do horário comercial
         elif pattern == 'mass_data_deletion':
             return data.get('deleted_records', 0) > 10
