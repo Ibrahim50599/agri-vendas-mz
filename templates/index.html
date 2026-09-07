@@ -6,7 +6,9 @@
 <style>
 /* ── HERO ────────────────────────────────────────────── */
 .home-hero {
-    background: linear-gradient(135deg, #062a06 0%, #1B5E20 45%, #2E7D32 100%);
+    background:
+        linear-gradient(90deg, rgba(3, 25, 5, 0.94) 0%, rgba(27, 94, 32, 0.82) 48%, rgba(46, 125, 50, 0.56) 100%),
+        url('https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=1800&q=85') center/cover;
     --text-color: #fff;
     color: #fff;
     padding: 90px 0 70px;
@@ -30,6 +32,42 @@
     clip-path: ellipse(55% 100% at 50% 100%);
 }
 .home-hero .inner { position: relative; z-index: 1; }
+.hero-photo {
+    position: absolute;
+    right: clamp(24px, 6vw, 100px);
+    bottom: 86px;
+    width: 218px;
+    padding: 7px;
+    border: 1px solid rgba(255,255,255,0.38);
+    border-radius: 22px;
+    background: rgba(255,255,255,0.14);
+    box-shadow: 0 18px 42px rgba(0,0,0,0.28);
+    transform: rotate(4deg);
+    transition: transform 0.45s ease, box-shadow 0.45s ease;
+    z-index: 2;
+    backdrop-filter: blur(7px);
+}
+.hero-photo:hover {
+    transform: rotate(0deg) translateY(-10px) scale(1.03);
+    box-shadow: 0 28px 56px rgba(0,0,0,0.34);
+}
+.hero-photo img {
+    display: block;
+    width: 100%;
+    height: 158px;
+    object-fit: cover;
+    border-radius: 16px;
+}
+.hero-photo-caption {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: rgba(255,255,255,0.95);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 9px 5px 3px;
+}
+.hero-photo-caption i { color: #B9F6CA; }
 .home-hero .eyebrow {
     display: inline-flex;
     align-items: center;
@@ -292,6 +330,7 @@
 
 @media(max-width: 768px) {
     .home-hero { padding: 60px 0 50px; }
+    .hero-photo { display: none; }
     .stat-pill { border-right: none; padding: 8px 14px; }
     .home-cta { padding: 36px 20px; }
     .feat-card { flex-direction: column; }
@@ -300,6 +339,14 @@
 
 <!-- ═══════════════════ HERO ═══════════════════ -->
 <div class="home-hero bg-hero">
+    <div class="hero-photo" aria-hidden="true">
+        <img src="https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=700&q=85"
+             alt="" loading="eager">
+        <div class="hero-photo-caption">
+            <i class="fas fa-leaf"></i>
+            Agricultura que aproxima pessoas
+        </div>
+    </div>
     <div class="container text-center inner">
         <div class="eyebrow">
             <i class="fas fa-map-marker-alt"></i> Plataforma nº1 de Agricultura em Moçambique
