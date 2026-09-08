@@ -522,9 +522,13 @@
         </div>
         <h5 class="fw-bold mb-2">Novos produtos chegando em breve!</h5>
         <p class="text-muted mb-4">Seja o primeiro a publicar na plataforma.</p>
-        {% if session.user_id %}
+        {% if session.user_type in ['vendedor', 'admin'] %}
         <a href="{{ url_for('publicar_produto') }}" class="btn btn-success" style="border-radius:10px;">
             <i class="fas fa-plus me-2"></i>Publicar Produto
+        </a>
+        {% elif session.user_id %}
+        <a href="{{ url_for('listar_produtos') }}" class="btn btn-success" style="border-radius:10px;">
+            <i class="fas fa-shopping-basket me-2"></i>Explorar Produtos
         </a>
         {% endif %}
     </div>
@@ -654,9 +658,16 @@
                 <a href="{{ url_for('listar_produtos') }}" class="hero-btn-outline">
                     <i class="fas fa-shopping-basket"></i> Ver Produtos
                 </a>
-                {% else %}
+                {% elif session.user_type in ['vendedor', 'admin'] %}
                 <a href="{{ url_for('publicar_produto') }}" class="hero-btn-primary">
                     <i class="fas fa-plus"></i> Publicar Produto
+                </a>
+                <a href="{{ url_for('loja_equipamentos') }}" class="hero-btn-outline">
+                    <i class="fas fa-tractor"></i> Loja de Equipamentos
+                </a>
+                {% else %}
+                <a href="{{ url_for('listar_produtos') }}" class="hero-btn-primary">
+                    <i class="fas fa-shopping-basket"></i> Ver Produtos
                 </a>
                 <a href="{{ url_for('loja_equipamentos') }}" class="hero-btn-outline">
                     <i class="fas fa-tractor"></i> Loja de Equipamentos
