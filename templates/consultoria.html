@@ -711,6 +711,18 @@
                         </div>
                         <div class="row g-2 mt-1">
                             <div class="col-md-6">
+                                <label class="form-label">Distrito</label>
+                                <input type="text" class="form-control form-control-sm" id="iaDistrito" placeholder="Ex.: Chimoio">
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end gap-2">
+                                <button type="button" class="btn btn-outline-success btn-sm" onclick="guardarPerfilAgricola()">
+                                    <i class="fas fa-save me-1"></i>Guardar perfil
+                                </button>
+                                <span id="perfilAgricolaStatus" class="small text-muted" role="status"></span>
+                            </div>
+                        </div>
+                        <div class="row g-2 mt-1">
+                            <div class="col-md-6">
                                 <label class="form-label">Tipo de solo</label>
                                 <select class="form-select form-select-sm" id="iaSolo">
                                     <option value="">Não indicado</option>
@@ -1432,6 +1444,61 @@ function adicionarMensagemChat(tipo, texto) {
     return mensagem;
 }
 
+function lerContextoAssistente() {
+    return {
+        provincia: document.getElementById('iaProvincia')?.value || '',
+        distrito: document.getElementById('iaDistrito')?.value || '',
+        cultura: document.getElementById('iaCultura')?.value || '',
+        area: document.getElementById('iaArea')?.value || '',
+        solo: document.getElementById('iaSolo')?.value || '',
+        irrigacao: document.getElementById('iaIrrigacao')?.value || '',
+        investimento: document.getElementById('iaInvestimento')?.value || ''
+    };
+}
+
+function aplicarContextoAssistente(perfil) {
+    Object.entries(perfil || {}).forEach(([chave, valor]) => {
+        const campo = document.getElementById('ia' + chave.charAt(0).toUpperCase() + chave.slice(1));
+        if (campo && valor !== null && valor !== undefined) campo.value = valor;
+    });
+}
+
+async function carregarPerfilAgricola() {
+    try {
+        const resposta = await fetch('/api/perfil-agricola', {credentials: 'same-origin'});
+        if (!resposta.ok) return;
+        const dados = await resposta.json();
+        aplicarContextoAssistente(dados.perfil);
+        if (Object.values(dados.perfil || {}).some(Boolean)) {
+            document.getElementById('perfilAgricolaStatus').textContent = 'Perfil carregado';
+        }
+    } catch (error) {
+        console.warn('Não foi possível carregar o perfil agrícola:', error);
+    }
+}
+
+async function guardarPerfilAgricola() {
+    const status = document.getElementById('perfilAgricolaStatus');
+    status.textContent = 'A guardar...';
+    try {
+        const resposta = await fetch('/api/perfil-agricola', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            credentials: 'same-origin',
+            body: JSON.stringify({contexto: lerContextoAssistente()})
+        });
+        const dados = await resposta.json();
+        if (!resposta.ok || !dados.ok) throw new Error('não foi possível guardar');
+        status.textContent = 'Perfil guardado';
+        status.className = 'small text-success';
+    } catch (error) {
+        status.textContent = 'Erro ao guardar';
+        status.className = 'small text-danger';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', carregarPerfilAgricola);
+
 function enviarPerguntaIA() {
     const input = document.getElementById('perguntaIA');
     const pergunta = input.value.trim();
@@ -1445,14 +1512,7 @@ function enviarPerguntaIA() {
     chat.innerHTML += `<div class="chat-msg-bot" id="${loadingId}"><i class="fas fa-spinner fa-spin me-1 text-success"></i>A pensar...</div>`;
     chat.scrollTop = chat.scrollHeight;
 
-    const contexto = {
-        provincia: document.getElementById('iaProvincia')?.value || '',
-        cultura: document.getElementById('iaCultura')?.value || '',
-        area: document.getElementById('iaArea')?.value || '',
-        solo: document.getElementById('iaSolo')?.value || '',
-        irrigacao: document.getElementById('iaIrrigacao')?.value || '',
-        investimento: document.getElementById('iaInvestimento')?.value || ''
-    };
+    const contexto = lerContextoAssistente();
 
     fetch('/assistente_ia', {
         method: 'POST',

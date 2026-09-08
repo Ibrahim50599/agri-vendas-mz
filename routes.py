@@ -596,6 +596,7 @@ def _extrair_contexto_assistente(data):
 
     cultura = _normalizar_contexto_assistente(contexto.get('cultura'), 40).lower()
     provincia = _normalizar_contexto_assistente(contexto.get('provincia'), 40)
+    distrito = _normalizar_contexto_assistente(contexto.get('distrito'), 60)
     area = _normalizar_contexto_assistente(contexto.get('area'), 30)
     solo = _normalizar_contexto_assistente(contexto.get('solo'), 40)
     irrigacao = _normalizar_contexto_assistente(contexto.get('irrigacao'), 40)
@@ -604,6 +605,7 @@ def _extrair_contexto_assistente(data):
     return {
         'cultura': cultura,
         'provincia': provincia,
+        'distrito': distrito,
         'area': area,
         'solo': solo,
         'irrigacao': irrigacao,
@@ -717,6 +719,7 @@ def _formatar_contexto_assistente(pergunta, contexto):
 
     campos = {
         'provincia': 'Província',
+        'distrito': 'Distrito',
         'cultura': 'Cultura',
         'area': 'Área disponível',
         'solo': 'Tipo de solo',
@@ -753,6 +756,19 @@ def _formatar_contexto_assistente(pergunta, contexto):
 
     return '\n'.join(blocos)
 
+@app.route('/api/perfil-agricola', methods=['GET', 'POST'])
+@login_required
+def perfil_agricola():
+    """Lê ou guarda o perfil agrícola persistente do utilizador autenticado."""
+    if request.method == 'GET':
+        return jsonify({'perfil': db.get_agricultural_profile(session['user_id'])})
+
+    data = request.get_json(silent=True) or {}
+    perfil = _extrair_contexto_assistente({'contexto': data.get('contexto', data)})
+    db.save_agricultural_profile(session['user_id'], perfil)
+    session['chat_context'] = perfil
+    return jsonify({'ok': True, 'perfil': perfil})
+
 @app.route('/assistente_ia', methods=['POST'])
 @login_required
 def assistente_ia():
@@ -762,7 +778,12 @@ def assistente_ia():
         if not pergunta:
             return jsonify({'resposta': 'Por favor escreva uma pergunta.'})
 
-        contexto = _extrair_contexto_assistente(data)
+        contexto_enviado = _extrair_contexto_assistente(data)
+        perfil_guardado = db.get_agricultural_profile(session['user_id'])
+        contexto = {
+            chave: contexto_enviado.get(chave) or perfil_guardado.get(chave, '')
+            for chave in ('provincia', 'distrito', 'cultura', 'area', 'solo', 'irrigacao', 'investimento')
+        }
         session['chat_context'] = contexto
         api_key = os.environ.get('GEMINI_API_KEY')
         if not api_key:

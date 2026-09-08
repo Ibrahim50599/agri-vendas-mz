@@ -119,6 +119,21 @@ class Database:
             FOREIGN KEY (criado_por) REFERENCES usuarios (id)
         )''')
 
+        # Perfil agrícola persistente usado pelo Assistente e pelas recomendações.
+        # A chave do utilizador torna a operação idempotente e segura para migrações.
+        c.execute('''CREATE TABLE IF NOT EXISTS perfis_agricolas (
+            usuario_id INTEGER PRIMARY KEY,
+            provincia TEXT,
+            distrito TEXT,
+            cultura TEXT,
+            area TEXT,
+            solo TEXT,
+            irrigacao TEXT,
+            investimento TEXT,
+            data_alteracao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+        )''')
+
         # Inserir configurações padrão
         c.execute("INSERT OR IGNORE INTO configuracoes_sistema (chave, valor, descricao) VALUES (?, ?, ?)",
                   ('numero_emola', '878312890', 'Número E-MOLA para pagamentos'))
@@ -373,6 +388,53 @@ class Database:
         user = c.fetchone()
         conn.close()
         return user
+
+    def get_agricultural_profile(self, user_id):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''SELECT provincia, distrito, cultura, area, solo, irrigacao, investimento
+                     FROM perfis_agricolas WHERE usuario_id = ?''', (user_id,))
+        profile = c.fetchone()
+        conn.close()
+        if not profile:
+            return {}
+        return {
+            'provincia': profile[0] or '',
+            'distrito': profile[1] or '',
+            'cultura': profile[2] or '',
+            'area': profile[3] or '',
+            'solo': profile[4] or '',
+            'irrigacao': profile[5] or '',
+            'investimento': profile[6] or '',
+        }
+
+    def save_agricultural_profile(self, user_id, profile):
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute('''INSERT INTO perfis_agricolas
+                     (usuario_id, provincia, distrito, cultura, area, solo, irrigacao, investimento, data_alteracao)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                     ON CONFLICT(usuario_id) DO UPDATE SET
+                         provincia = excluded.provincia,
+                         distrito = excluded.distrito,
+                         cultura = excluded.cultura,
+                         area = excluded.area,
+                         solo = excluded.solo,
+                         irrigacao = excluded.irrigacao,
+                         investimento = excluded.investimento,
+                         data_alteracao = CURRENT_TIMESTAMP''',
+                  (
+                      user_id,
+                      profile.get('provincia', ''),
+                      profile.get('distrito', ''),
+                      profile.get('cultura', ''),
+                      profile.get('area', ''),
+                      profile.get('solo', ''),
+                      profile.get('irrigacao', ''),
+                      profile.get('investimento', ''),
+                  ))
+        conn.commit()
+        conn.close()
 
     def get_admin_users(self):
         conn = self.get_connection()
