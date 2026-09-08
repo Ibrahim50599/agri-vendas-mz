@@ -2099,27 +2099,33 @@ function showAnomalyAlert(message, severity) {
 
 // ATUALIZAÇÃO AUTOMÁTICA DE MÉTRICAS
 function updateMetrics() {
-    // Em produção, fazer chamada AJAX para atualizar métricas
     fetch('/admin/metrics/update', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Falha ao atualizar métricas (${response.status})`);
+        }
+        return response.json();
+    })
     .then(data => {
-        // Atualizar valores das métricas
         updateMetricValues(data);
     })
     .catch(error => {
-        console.log('Erro ao atualizar métricas:', error);
+        console.warn('Não foi possível atualizar as métricas:', error.message);
     });
 }
 
 function updateMetricValues(data) {
-    // Atualizar valores dinamicamente
-    const metricElements = document.querySelectorAll('.stat-number');
-    // Implementar atualização dos valores...
+    const values = [data.usuarios, data.premium, data.produtos, data.administradores];
+    document.querySelectorAll('.intelligence-card .stat-number').forEach((element, index) => {
+        if (values[index] !== undefined) {
+            element.textContent = values[index];
+        }
+    });
 }
 
 // FUNÇÕES DE RECOMENDAÇÃO DA IA

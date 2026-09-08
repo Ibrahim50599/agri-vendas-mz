@@ -1220,6 +1220,20 @@ def api_stats():
         'timestamp': datetime.datetime.now().isoformat()
     })
 
+@app.route('/admin/metrics/update')
+@admin_required
+def admin_metrics_update():
+    """Return the live metric values used by the admin dashboard."""
+    stats = db.get_stats()
+    return jsonify({
+        'usuarios': stats['total_usuarios'],
+        'premium': stats['usuarios_premium'],
+        'produtos': stats['total_produtos'],
+        'administradores': stats.get('total_admins', 0),
+        'equipamentos': stats.get('total_equipamentos', 0),
+        'timestamp': datetime.datetime.now().isoformat()
+    })
+
 @app.route('/admin/supervisor')
 @nivel_admin_required('supervisor')
 def admin_supervisor():
