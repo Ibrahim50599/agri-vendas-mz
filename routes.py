@@ -575,7 +575,183 @@ Regras:
 - Respostas concisas (máximo 4-5 parágrafos)
 - Usa exemplos práticos relevantes para Moçambique
 - Se não souberes algo específico, diz honestamente e sugere onde obter ajuda (IIAM, serviços de extensão rural)
-- Não faças diagnósticos médicos para humanos ou animais fora do âmbito agrícola"""
+- Não faças diagnósticos médicos para humanos ou animais fora do âmbito agrícola
+- Quando faltar província, área, cultura ou tipo de solo para uma recomendação, faz no máximo duas perguntas objetivas antes de recomendar
+- Nunca inventes preços, produtos ou equipamentos: usa apenas os dados do marketplace fornecidos no contexto
+- Diferencia claramente uma estimativa de uma recomendação confirmada
+- Quando recomendares um produto ou equipamento, menciona o nome, preço e localização exatamente como aparecem nos dados"""
+
+
+def _normalizar_contexto_assistente(value, max_length=80):
+    """Limita e limpa contexto enviado pelo navegador antes de o usar na IA."""
+    if value is None:
+        return ''
+    return str(value).strip().replace('\x00', '')[:max_length]
+
+
+def _extrair_contexto_assistente(data):
+    contexto = data.get('contexto') if isinstance(data, dict) else {}
+    if not isinstance(contexto, dict):
+        contexto = {}
+
+    cultura = _normalizar_contexto_assistente(contexto.get('cultura'), 40).lower()
+    provincia = _normalizar_contexto_assistente(contexto.get('provincia'), 40)
+    area = _normalizar_contexto_assistente(contexto.get('area'), 30)
+    solo = _normalizar_contexto_assistente(contexto.get('solo'), 40)
+    irrigacao = _normalizar_contexto_assistente(contexto.get('irrigacao'), 40)
+    investimento = _normalizar_contexto_assistente(contexto.get('investimento'), 40)
+
+    return {
+        'cultura': cultura,
+        'provincia': provincia,
+        'area': area,
+        'solo': solo,
+        'irrigacao': irrigacao,
+        'investimento': investimento,
+    }
+
+
+def _formatar_contexto_marketplace(pergunta):
+    """Consulta dados reais apenas quando a pergunta pede mercado ou produtos."""
+    pergunta_normalizada = pergunta.lower()
+    termos_mercado = (
+        'produto', 'preço', 'preco', 'comprar', 'vender', 'mercado',
+        'equipamento', 'trator', 'semente', 'adubo', 'fertilizante',
+        'pulverizador', 'irrigação', 'irrigacao'
+    )
+    if not any(termo in pergunta_normalizada for termo in termos_mercado):
+        return ''
+
+    linhas = ['DADOS ATUAIS DO MARKETPLACE (não inventar além destes registos):']
+    try:
+        produtos = db.get_filtered_products()[:5]
+        if produtos:
+            linhas.append('Produtos publicados:')
+            for produto in produtos:
+                linhas.append(
+                    f"- {produto[2]} | {produto[3]:.2f} MT | "
+                    f"{produto[5] or 'Moçambique'} | categoria: {produto[7] or 'não indicada'}"
+                )
+        else:
+            linhas.append('Produtos publicados: nenhum registo disponível.')
+
+        equipamentos = db.get_filtered_equipments()[:5]
+        if equipamentos:
+            linhas.append('Equipamentos disponíveis:')
+            for equipamento in equipamentos:
+                linhas.append(
+                    f"- {equipamento[1]} | {equipamento[3]:.2f} MT | "
+                    f"{equipamento[7] or 'Moçambique'} | estoque: {equipamento[5]}"
+                )
+        else:
+            linhas.append('Equipamentos disponíveis: nenhum registo disponível.')
+    except Exception as error:
+        db.logger.warning(f'Não foi possível obter contexto do marketplace para a IA: {error}')
+        return 'DADOS DO MARKETPLACE: indisponíveis nesta consulta; informa o utilizador sem inventar resultados.'
+
+    return '\n'.join(linhas)
+
+
+def _formatar_estimativa_plantio(contexto):
+    """Gera uma prévia conservadora para o Assistente com os dados disponíveis."""
+    cultura = contexto.get('cultura')
+    area_texto = contexto.get('area', '').lower().replace(',', '.')
+    if cultura not in DADOS_CULTURAS or not area_texto:
+        return ''
+
+    area_match = re.search(r'\d+(?:\.\d+)?', area_texto)
+    if not area_match:
+        return ''
+
+    try:
+        area_valor = float(area_match.group())
+    except ValueError:
+        return ''
+
+    hectares = area_valor / 10000 if ('m2' in area_texto or 'metro' in area_texto) else area_valor
+    if hectares <= 0 or hectares > 10000:
+        return ''
+
+    dados = DADOS_CULTURAS[cultura]
+    solo = contexto.get('solo') or 'franco'
+    irrigacao = contexto.get('irrigacao') or 'manual'
+    investimento = contexto.get('investimento') or 'medio'
+
+    rendimento_solo = {'franco': 1.0, 'humifero': 1.15, 'argiloso': 0.95, 'arenoso': 0.80, 'calcario': 0.75}
+    rendimento_irrigacao = {'manual': 0.90, 'gotejamento': 1.20, 'aspersao': 1.15, 'inundacao': 1.05, 'nenhuma': 0.68}
+    rendimento_investimento = {'baixo': 0.72, 'medio': 1.0, 'alto': 1.35}
+    custo_solo = {'franco': 1.0, 'humifero': 0.95, 'argiloso': 1.05, 'arenoso': 1.10, 'calcario': 1.15}
+    custo_irrigacao = {'manual': 1.05, 'gotejamento': 1.22, 'aspersao': 1.14, 'inundacao': 1.08, 'nenhuma': 0.88}
+    custo_investimento = {'baixo': 0.58, 'medio': 1.0, 'alto': 1.42}
+
+    rendimento = round(
+        dados['rendimento_medio'] * hectares
+        * rendimento_solo.get(solo, 1.0)
+        * rendimento_irrigacao.get(irrigacao, 1.0)
+        * rendimento_investimento.get(investimento, 1.0),
+        2
+    )
+    custo = round(
+        dados['custo_por_ha'] * hectares
+        * custo_solo.get(solo, 1.0)
+        * custo_irrigacao.get(irrigacao, 1.0)
+        * custo_investimento.get(investimento, 1.0),
+        2
+    )
+    receita = round(rendimento * dados.get('preco_venda', 30), 2)
+    lucro = round(receita - custo, 2)
+
+    return (
+        'PRÉVIA ESTIMADA (confirma no Calculador de Plantio antes de investir): '
+        f'{rendimento:,.2f} kg de produção; custo aproximado de {custo:,.2f} MT; '
+        f'receita de referência de {receita:,.2f} MT; lucro estimado de {lucro:,.2f} MT. '
+        'Esta prévia não substitui análise de solo nem cotação local.'
+    )
+
+
+def _formatar_contexto_assistente(pergunta, contexto):
+    blocos = [
+        f"Data atual: {datetime.date.today().isoformat()}",
+        f"Perfil do utilizador: {session.get('user_type', 'utilizador autenticado')}.",
+    ]
+
+    campos = {
+        'provincia': 'Província',
+        'cultura': 'Cultura',
+        'area': 'Área disponível',
+        'solo': 'Tipo de solo',
+        'irrigacao': 'Irrigação',
+        'investimento': 'Nível de investimento',
+    }
+    preenchidos = [
+        f"{label}: {contexto[chave]}"
+        for chave, label in campos.items()
+        if contexto.get(chave)
+    ]
+    if preenchidos:
+        blocos.append('Contexto fornecido pelo agricultor: ' + '; '.join(preenchidos) + '.')
+    else:
+        blocos.append('Contexto do agricultor: ainda não fornecido.')
+
+    cultura = contexto.get('cultura')
+    if cultura in DADOS_CULTURAS:
+        dados = DADOS_CULTURAS[cultura]
+        blocos.append(
+            'Dados agrícolas locais confirmados para esta cultura: '
+            f"rendimento médio {dados.get('rendimento_medio')} kg/ha; "
+            f"custo de referência {dados.get('custo_por_ha')} MT/ha; "
+            f"colheita aproximada em {dados.get('colheita_dias')} dias; "
+            f"época de plantio: {dados.get('epoca_plantio', 'não indicada')}."
+        )
+        estimativa = _formatar_estimativa_plantio(contexto)
+        if estimativa:
+            blocos.append(estimativa)
+
+    mercado = _formatar_contexto_marketplace(pergunta)
+    if mercado:
+        blocos.append(mercado)
+
+    return '\n'.join(blocos)
 
 @app.route('/assistente_ia', methods=['POST'])
 @login_required
@@ -586,6 +762,8 @@ def assistente_ia():
         if not pergunta:
             return jsonify({'resposta': 'Por favor escreva uma pergunta.'})
 
+        contexto = _extrair_contexto_assistente(data)
+        session['chat_context'] = contexto
         api_key = os.environ.get('GEMINI_API_KEY')
         if not api_key:
             return jsonify({'resposta': '⚠️ O Assistente IA não está configurado neste servidor. O administrador precisa de adicionar a variável de ambiente <strong>GEMINI_API_KEY</strong> nas definições do hosting (Render → Environment → Add Environment Variable).'})
@@ -597,12 +775,17 @@ def assistente_ia():
             contents.append({'role': msg['role'], 'parts': [{'text': msg['text']}]})
         contents.append({'role': 'user', 'parts': [{'text': pergunta}]})
 
+        system_instruction = (
+            GEMINI_SYSTEM_PROMPT
+            + '\n\nCONTEXTO DINÂMICO DA CONSULTA:\n'
+            + _formatar_contexto_assistente(pergunta, contexto)
+        )
         client = genai.Client(api_key=api_key)
         response = client.models.generate_content(
             model='gemini-2.5-flash',
             contents=contents,
             config=types.GenerateContentConfig(
-                system_instruction=GEMINI_SYSTEM_PROMPT,
+                system_instruction=system_instruction,
                 max_output_tokens=1024,
             )
         )
@@ -625,6 +808,7 @@ def assistente_ia():
 @login_required
 def assistente_ia_limpar():
     session.pop('chat_historico', None)
+    session.pop('chat_context', None)
     return jsonify({'ok': True})
 
 @app.route('/calcular_plantio', methods=['POST'])

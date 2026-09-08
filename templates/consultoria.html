@@ -151,6 +151,18 @@
         border-radius: 10px;
         padding: 15px;
     }
+    .assistant-context {
+        background: linear-gradient(135deg, #f1f8e9, #ffffff);
+        border: 1px solid #dcedc8;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    .assistant-context .form-label {
+        color: #33691e;
+        font-size: 0.78rem;
+        margin-bottom: 4px;
+    }
     .chat-msg-bot { background: #E8F5E9; border-radius: 12px 12px 12px 0; padding: 10px 14px; margin-bottom: 10px; max-width: 90%; }
     .chat-msg-user { background: #1B5E20; color: white; border-radius: 12px 12px 0 12px; padding: 10px 14px; margin-bottom: 10px; max-width: 90%; margin-left: auto; }
     .preco-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
@@ -655,6 +667,83 @@
                     </button>
                 </div>
                 <div class="card-body">
+                    <div class="assistant-context">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fas fa-sliders-h text-success"></i>
+                            <strong class="small">Dê contexto para uma recomendação mais precisa</strong>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="form-label">Província</label>
+                                <select class="form-select form-select-sm" id="iaProvincia">
+                                    <option value="">Não indicada</option>
+                                    <option value="Maputo">Maputo</option>
+                                    <option value="Gaza">Gaza</option>
+                                    <option value="Inhambane">Inhambane</option>
+                                    <option value="Sofala">Sofala</option>
+                                    <option value="Manica">Manica</option>
+                                    <option value="Tete">Tete</option>
+                                    <option value="Zambézia">Zambézia</option>
+                                    <option value="Nampula">Nampula</option>
+                                    <option value="Cabo Delgado">Cabo Delgado</option>
+                                    <option value="Niassa">Niassa</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Cultura</label>
+                                <select class="form-select form-select-sm" id="iaCultura">
+                                    <option value="">Não indicada</option>
+                                    <option value="milho">Milho</option>
+                                    <option value="mandioca">Mandioca</option>
+                                    <option value="arroz">Arroz</option>
+                                    <option value="feijao">Feijão</option>
+                                    <option value="tomate">Tomate</option>
+                                    <option value="soja">Soja</option>
+                                    <option value="amendoim">Amendoim</option>
+                                    <option value="couve">Couve</option>
+                                    <option value="cebola">Cebola</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Área</label>
+                                <input type="text" class="form-control form-control-sm" id="iaArea" placeholder="Ex.: 2 hectares">
+                            </div>
+                        </div>
+                        <div class="row g-2 mt-1">
+                            <div class="col-md-6">
+                                <label class="form-label">Tipo de solo</label>
+                                <select class="form-select form-select-sm" id="iaSolo">
+                                    <option value="">Não indicado</option>
+                                    <option value="franco">Franco</option>
+                                    <option value="arenoso">Arenoso</option>
+                                    <option value="argiloso">Argiloso</option>
+                                    <option value="humifero">Humífero</option>
+                                    <option value="calcario">Calcário</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Irrigação</label>
+                                <select class="form-select form-select-sm" id="iaIrrigacao">
+                                    <option value="">Não indicada</option>
+                                    <option value="manual">Manual</option>
+                                    <option value="gotejamento">Gotejamento</option>
+                                    <option value="aspersao">Aspersão</option>
+                                    <option value="nenhuma">Sem irrigação</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-2 mt-1">
+                            <div class="col-md-6">
+                                <label class="form-label">Investimento</label>
+                                <select class="form-select form-select-sm" id="iaInvestimento">
+                                    <option value="">Não indicado</option>
+                                    <option value="baixo">Baixo / subsistência</option>
+                                    <option value="medio">Médio</option>
+                                    <option value="alto">Alto / comercial</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="chat-area" id="chatArea">
                         <div class="chat-msg-bot">
                             <i class="fas fa-seedling me-1 text-success"></i>
@@ -1324,12 +1413,31 @@ const respostasIA = {
     'ajuda': 'Posso ajudar com: plantio, irrigação, pragas e doenças, adubação, tipos de solo, épocas de colheita e preços. Basta perguntar!'
 };
 
+function adicionarMensagemChat(tipo, texto) {
+    const chat = document.getElementById('chatArea');
+    const mensagem = document.createElement('div');
+    mensagem.className = tipo === 'user' ? 'chat-msg-user' : 'chat-msg-bot';
+
+    if (tipo === 'bot') {
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-seedling me-1 text-success';
+        mensagem.appendChild(icon);
+    }
+
+    const conteudo = document.createElement('span');
+    conteudo.textContent = texto;
+    conteudo.style.whiteSpace = 'pre-line';
+    mensagem.appendChild(conteudo);
+    chat.appendChild(mensagem);
+    return mensagem;
+}
+
 function enviarPerguntaIA() {
     const input = document.getElementById('perguntaIA');
     const pergunta = input.value.trim();
     if (!pergunta) return;
     const chat = document.getElementById('chatArea');
-    chat.innerHTML += `<div class="chat-msg-user">${pergunta}</div>`;
+    adicionarMensagemChat('user', pergunta);
     input.value = '';
     chat.scrollTop = chat.scrollHeight;
 
@@ -1337,11 +1445,20 @@ function enviarPerguntaIA() {
     chat.innerHTML += `<div class="chat-msg-bot" id="${loadingId}"><i class="fas fa-spinner fa-spin me-1 text-success"></i>A pensar...</div>`;
     chat.scrollTop = chat.scrollHeight;
 
+    const contexto = {
+        provincia: document.getElementById('iaProvincia')?.value || '',
+        cultura: document.getElementById('iaCultura')?.value || '',
+        area: document.getElementById('iaArea')?.value || '',
+        solo: document.getElementById('iaSolo')?.value || '',
+        irrigacao: document.getElementById('iaIrrigacao')?.value || '',
+        investimento: document.getElementById('iaInvestimento')?.value || ''
+    };
+
     fetch('/assistente_ia', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         credentials: 'same-origin',
-        body: JSON.stringify({pergunta: pergunta})
+        body: JSON.stringify({pergunta: pergunta, contexto: contexto})
     })
     .then(r => {
         // Se sessão expirou o servidor devolve 401 com JSON
@@ -1359,7 +1476,7 @@ function enviarPerguntaIA() {
         const loading = document.getElementById(loadingId);
         if (loading) loading.remove();
         const resposta = data.resposta || 'Desculpe, não consegui processar a sua pergunta.';
-        chat.innerHTML += `<div class="chat-msg-bot"><i class="fas fa-seedling me-1 text-success"></i>${resposta.replace(/\n/g, '<br>')}</div>`;
+        adicionarMensagemChat('bot', resposta);
         chat.scrollTop = chat.scrollHeight;
     })
     .catch(err => {
