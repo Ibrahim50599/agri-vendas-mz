@@ -603,3 +603,81 @@
 2026-09-07 23:59:05,417 - AUDIT - {"timestamp": "2026-09-07T23:59:05.416965", "action": "START_user_registration", "user_id": null, "details": {}, "ip_address": null}
 2026-09-07 23:59:05,424 - AUDIT - {"timestamp": "2026-09-07T23:59:05.424187", "action": "SUCCESS_user_registration", "user_id": null, "details": {}, "ip_address": null}
 2026-09-07 23:59:05,424 - AUDIT - {"timestamp": "2026-09-07T23:59:05.424187", "action": "SUCCESS_user_registration", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:04,262 - AUDIT - {"timestamp": "2026-09-08T00:01:04.262718", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:04,262 - AUDIT - {"timestamp": "2026-09-08T00:01:04.262718", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:04,262 - AUDIT - {"timestamp": "2026-09-08T00:01:04.262718", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:04,320 - AUDIT - {"timestamp": "2026-09-08T00:01:04.320490", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:04,320 - AUDIT - {"timestamp": "2026-09-08T00:01:04.320490", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:04,320 - AUDIT - {"timestamp": "2026-09-08T00:01:04.320490", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:19,298 - AUDIT - {"timestamp": "2026-09-08T00:01:19.298287", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:19,298 - AUDIT - {"timestamp": "2026-09-08T00:01:19.298287", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:19,298 - AUDIT - {"timestamp": "2026-09-08T00:01:19.298287", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:19,298 - AUDIT - {"timestamp": "2026-09-08T00:01:19.298287", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:19,303 - AUDIT - {"timestamp": "2026-09-08T00:01:19.303280", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:19,303 - AUDIT - {"timestamp": "2026-09-08T00:01:19.303280", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:19,303 - AUDIT - {"timestamp": "2026-09-08T00:01:19.303280", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:01:19,303 - AUDIT - {"timestamp": "2026-09-08T00:01:19.303280", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:02:24,487 - AUDIT - {"timestamp": "2026-09-08T00:02:24.487508", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:02:24,487 - AUDIT - {"timestamp": "2026-09-08T00:02:24.487508", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:02:24,487 - AUDIT - {"timestamp": "2026-09-08T00:02:24.487508", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:02:24,487 - AUDIT - {"timestamp": "2026-09-08T00:02:24.487508", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:02:24,487 - AUDIT - {"timestamp": "2026-09-08T00:02:24.487508", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:02:24,493 - AUDIT - {"timestamp": "2026-09-08T00:02:24.493305", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:02:24,493 - AUDIT - {"timestamp": "2026-09-08T00:02:24.493305", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:02:24,493 - AUDIT - {"timestamp": "2026-09-08T00:02:24.493305", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:02:24,493 - AUDIT - {"timestamp": "2026-09-08T00:02:24.493305", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:02:24,493 - AUDIT - {"timestamp": "2026-09-08T00:02:24.493305", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:19,634 - AUDIT - {"timestamp": "2026-09-08T00:03:19.634537", "action": "START_ADMIN_APPOINTMENT", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:19,634 - AUDIT - {"timestamp": "2026-09-08T00:03:19.634537", "action": "START_ADMIN_APPOINTMENT", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:19,634 - AUDIT - {"timestamp": "2026-09-08T00:03:19.634537", "action": "START_ADMIN_APPOINTMENT", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:19,634 - AUDIT - {"timestamp": "2026-09-08T00:03:19.634537", "action": "START_ADMIN_APPOINTMENT", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:19,634 - AUDIT - {"timestamp": "2026-09-08T00:03:19.634537", "action": "START_ADMIN_APPOINTMENT", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:19,634 - AUDIT - {"timestamp": "2026-09-08T00:03:19.634537", "action": "START_ADMIN_APPOINTMENT", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:19,797 - AUDIT - {"timestamp": "2026-09-08T00:03:19.797803", "action": "SUCCESS_ADMIN_APPOINTMENT", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:19,797 - AUDIT - {"timestamp": "2026-09-08T00:03:19.797803", "action": "SUCCESS_ADMIN_APPOINTMENT", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:19,797 - AUDIT - {"timestamp": "2026-09-08T00:03:19.797803", "action": "SUCCESS_ADMIN_APPOINTMENT", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:19,797 - AUDIT - {"timestamp": "2026-09-08T00:03:19.797803", "action": "SUCCESS_ADMIN_APPOINTMENT", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:19,797 - AUDIT - {"timestamp": "2026-09-08T00:03:19.797803", "action": "SUCCESS_ADMIN_APPOINTMENT", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:19,797 - AUDIT - {"timestamp": "2026-09-08T00:03:19.797803", "action": "SUCCESS_ADMIN_APPOINTMENT", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,096 - AUDIT - {"timestamp": "2026-09-08T00:03:20.096292", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,096 - AUDIT - {"timestamp": "2026-09-08T00:03:20.096292", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,096 - AUDIT - {"timestamp": "2026-09-08T00:03:20.096292", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,096 - AUDIT - {"timestamp": "2026-09-08T00:03:20.096292", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,096 - AUDIT - {"timestamp": "2026-09-08T00:03:20.096292", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,096 - AUDIT - {"timestamp": "2026-09-08T00:03:20.096292", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,096 - AUDIT - {"timestamp": "2026-09-08T00:03:20.096292", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,102 - AUDIT - {"timestamp": "2026-09-08T00:03:20.102059", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,102 - AUDIT - {"timestamp": "2026-09-08T00:03:20.102059", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,102 - AUDIT - {"timestamp": "2026-09-08T00:03:20.102059", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,102 - AUDIT - {"timestamp": "2026-09-08T00:03:20.102059", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,102 - AUDIT - {"timestamp": "2026-09-08T00:03:20.102059", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,102 - AUDIT - {"timestamp": "2026-09-08T00:03:20.102059", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:03:20,102 - AUDIT - {"timestamp": "2026-09-08T00:03:20.102059", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-08 00:05:13,399 - AUDIT - {"timestamp": "2026-09-08T00:05:13.399840", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:13,399 - AUDIT - {"timestamp": "2026-09-08T00:05:13.399840", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:13,399 - AUDIT - {"timestamp": "2026-09-08T00:05:13.399840", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:13,399 - AUDIT - {"timestamp": "2026-09-08T00:05:13.399840", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:13,399 - AUDIT - {"timestamp": "2026-09-08T00:05:13.399840", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:13,399 - AUDIT - {"timestamp": "2026-09-08T00:05:13.399840", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:13,399 - AUDIT - {"timestamp": "2026-09-08T00:05:13.399840", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:13,495 - AUDIT - {"timestamp": "2026-09-08T00:05:13.495021", "action": "LOGIN_FAILED", "user_id": null, "details": {"login_field": "imamomus@gmail.com", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:13,495 - AUDIT - {"timestamp": "2026-09-08T00:05:13.495021", "action": "LOGIN_FAILED", "user_id": null, "details": {"login_field": "imamomus@gmail.com", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:13,495 - AUDIT - {"timestamp": "2026-09-08T00:05:13.495021", "action": "LOGIN_FAILED", "user_id": null, "details": {"login_field": "imamomus@gmail.com", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:13,495 - AUDIT - {"timestamp": "2026-09-08T00:05:13.495021", "action": "LOGIN_FAILED", "user_id": null, "details": {"login_field": "imamomus@gmail.com", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:13,495 - AUDIT - {"timestamp": "2026-09-08T00:05:13.495021", "action": "LOGIN_FAILED", "user_id": null, "details": {"login_field": "imamomus@gmail.com", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:13,495 - AUDIT - {"timestamp": "2026-09-08T00:05:13.495021", "action": "LOGIN_FAILED", "user_id": null, "details": {"login_field": "imamomus@gmail.com", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:13,495 - AUDIT - {"timestamp": "2026-09-08T00:05:13.495021", "action": "LOGIN_FAILED", "user_id": null, "details": {"login_field": "imamomus@gmail.com", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:37,392 - AUDIT - {"timestamp": "2026-09-08T00:05:37.392462", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:37,392 - AUDIT - {"timestamp": "2026-09-08T00:05:37.392462", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:37,392 - AUDIT - {"timestamp": "2026-09-08T00:05:37.392462", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:37,392 - AUDIT - {"timestamp": "2026-09-08T00:05:37.392462", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:37,392 - AUDIT - {"timestamp": "2026-09-08T00:05:37.392462", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:37,392 - AUDIT - {"timestamp": "2026-09-08T00:05:37.392462", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:37,392 - AUDIT - {"timestamp": "2026-09-08T00:05:37.392462", "action": "SUSPICIOUS_ACTIVITY", "user_id": null, "details": {"type": "unusual_login_time", "ip": "127.0.0.1"}, "ip_address": null}
+2026-09-08 00:05:37,480 - AUDIT - {"timestamp": "2026-09-08T00:05:37.480773", "action": "LOGIN_SUCCESS", "user_id": 12, "details": {"ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}, "ip_address": null}
+2026-09-08 00:05:37,480 - AUDIT - {"timestamp": "2026-09-08T00:05:37.480773", "action": "LOGIN_SUCCESS", "user_id": 12, "details": {"ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}, "ip_address": null}
+2026-09-08 00:05:37,480 - AUDIT - {"timestamp": "2026-09-08T00:05:37.480773", "action": "LOGIN_SUCCESS", "user_id": 12, "details": {"ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}, "ip_address": null}
+2026-09-08 00:05:37,480 - AUDIT - {"timestamp": "2026-09-08T00:05:37.480773", "action": "LOGIN_SUCCESS", "user_id": 12, "details": {"ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}, "ip_address": null}
+2026-09-08 00:05:37,480 - AUDIT - {"timestamp": "2026-09-08T00:05:37.480773", "action": "LOGIN_SUCCESS", "user_id": 12, "details": {"ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}, "ip_address": null}
+2026-09-08 00:05:37,480 - AUDIT - {"timestamp": "2026-09-08T00:05:37.480773", "action": "LOGIN_SUCCESS", "user_id": 12, "details": {"ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}, "ip_address": null}
+2026-09-08 00:05:37,480 - AUDIT - {"timestamp": "2026-09-08T00:05:37.480773", "action": "LOGIN_SUCCESS", "user_id": 12, "details": {"ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36"}, "ip_address": null}

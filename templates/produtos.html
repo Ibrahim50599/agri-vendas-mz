@@ -4,8 +4,114 @@
 {% block title %}Produtos - AGRI.vendasMz{% endblock %}
 
 {% block content %}
-<div class="bg-hero py-5 rounded-4 mb-4">
-    <div class="container text-white text-center">
+<style>
+.products-hero {
+    position: relative;
+    overflow: hidden;
+    background:
+        linear-gradient(90deg, rgba(5, 45, 10, 0.94) 0%, rgba(27, 94, 32, 0.84) 54%, rgba(46, 125, 50, 0.58) 100%),
+        url('https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=1800&q=85') center/cover;
+    border-radius: 24px;
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.products-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.08));
+    pointer-events: none;
+}
+
+.products-hero-content {
+    position: relative;
+    z-index: 1;
+    padding: 3.5rem 2rem;
+}
+
+.products-hero h1 {
+    color: #fff !important;
+    text-shadow: 0 3px 18px rgba(0,0,0,0.28);
+}
+
+.products-hero p {
+    color: rgba(255,255,255,0.92) !important;
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.products-hero-photo {
+    position: absolute;
+    right: clamp(26px, 7vw, 112px);
+    bottom: 24px;
+    width: 190px;
+    padding: 7px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.38);
+    box-shadow: 0 18px 42px rgba(0,0,0,0.3);
+    transform: rotate(4deg);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    z-index: 2;
+    backdrop-filter: blur(7px);
+}
+
+.products-hero-photo:hover {
+    transform: rotate(0deg) translateY(-8px) scale(1.04);
+    box-shadow: 0 28px 58px rgba(0,0,0,0.36);
+}
+
+.products-hero-photo img {
+    display: block;
+    width: 100%;
+    height: 132px;
+    object-fit: cover;
+    border-radius: 14px;
+}
+
+.products-hero-photo figcaption {
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 8px 4px 2px;
+}
+
+.product-image-overlay {
+    opacity: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.72));
+    transition: opacity 0.3s ease;
+}
+
+.product-card:hover .product-image-overlay {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .products-hero {
+        min-height: 210px;
+    }
+
+    .products-hero-content {
+        padding: 2.5rem 1rem;
+    }
+
+    .products-hero-photo {
+        display: none;
+    }
+}
+</style>
+
+<div class="products-hero">
+    <figure class="products-hero-photo m-0" aria-hidden="true">
+        <img src="https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=700&q=85"
+             alt="" loading="eager">
+        <figcaption><i class="fas fa-seedling me-1"></i> Produtos frescos de Moçambique</figcaption>
+    </figure>
+    <div class="container text-white text-center products-hero-content">
         <h1 class="display-5 fw-bold mb-2"><i class="fas fa-store me-2"></i>Marketplace Agrícola</h1>
         <p class="lead opacity-90 mb-0">Encontre os melhores produtos agrícolas de Moçambique com facilidade.</p>
     </div>

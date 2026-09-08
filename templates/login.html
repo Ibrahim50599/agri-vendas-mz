@@ -9,7 +9,9 @@
     min-height: 100vh;
     display: flex;
     align-items: center;
-    background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #4CAF50 100%);
+    background:
+        linear-gradient(90deg, rgba(8, 54, 14, 0.94) 0%, rgba(46, 125, 50, 0.82) 55%, rgba(76, 175, 80, 0.58) 100%),
+        url('https://images.unsplash.com/photo-1574943320219-553eb213f72d?auto=format&fit=crop&w=1800&q=85') center/cover;
     position: relative;
     overflow: hidden;
 }
@@ -30,6 +32,47 @@
     animation: backgroundShift 20s ease-in-out infinite;
 }
 
+.auth-visual {
+    position: absolute;
+    left: clamp(24px, 7vw, 110px);
+    top: 20%;
+    width: 218px;
+    padding: 8px;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.42);
+    box-shadow: 0 20px 48px rgba(0,0,0,0.28);
+    transform: rotate(-5deg);
+    transition: transform 0.45s ease, box-shadow 0.45s ease;
+    z-index: 1;
+    backdrop-filter: blur(8px);
+}
+
+.auth-visual:hover {
+    transform: rotate(0deg) translateY(-10px) scale(1.04);
+    box-shadow: 0 30px 64px rgba(0,0,0,0.34);
+}
+
+.auth-visual img {
+    display: block;
+    width: 100%;
+    height: 238px;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
+.auth-visual figcaption {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: white;
+    font-size: 0.74rem;
+    font-weight: 600;
+    padding: 10px 4px 3px;
+}
+
+.auth-visual figcaption i { color: #C8E6C9; }
+
 @keyframes backgroundShift {
     0%, 100% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -49,7 +92,7 @@
 
 .auth-header {
     text-align: center;
-    padding: 2rem 2rem 1rem;
+    padding: 3.25rem 2rem 1rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -208,8 +251,8 @@
 
 .feature-highlight {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 14px;
+    right: 14px;
     background: rgba(76, 175, 80, 0.9);
     color: white;
     padding: 0.5rem 1rem;
@@ -231,10 +274,22 @@
     .auth-header h2 {
         font-size: 1.5rem;
     }
+
+    .auth-visual {
+        display: none;
+    }
 }
 </style>
 
 <div class="auth-container">
+    <figure class="auth-visual m-0" aria-hidden="true">
+        <img src="https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?auto=format&fit=crop&w=800&q=85"
+             alt="" loading="eager">
+        <figcaption>
+            <i class="fas fa-leaf"></i>
+            Volte a crescer com a sua comunidade
+        </figcaption>
+    </figure>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-12 col-md-8 col-lg-6">
