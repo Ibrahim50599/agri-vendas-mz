@@ -55,6 +55,17 @@ def login_required(f):
                     'resposta': '⚠️ A sua sessão expirou. Por favor <a href="/login" style="color:#4CAF50;font-weight:bold;">faça login novamente</a> para continuar a usar o Assistente Agrícola.'
                 }), 401
             return redirect(url_for('login'))
+        conn = db.get_connection()
+        c = conn.cursor()
+        c.execute("SELECT ativo FROM usuarios WHERE id = ?", (session['user_id'],))
+        active_user = c.fetchone()
+        conn.close()
+        if not active_user or active_user[0] != 1:
+            session.clear()
+            if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'erro': 'conta_banida', 'resposta': 'Esta conta está banida.'}), 403
+            flash('Esta conta está banida ou foi desativada.')
+            return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -551,6 +562,96 @@ def publicar_produto():
 
     return render_template('publicar.html')
 
+@app.route('/produto/<int:produto_id>')
+def ver_produto(produto_id):
+    produto = db.get_product_by_id(produto_id)
+    if not produto:
+        return render_template('404.html'), 404
+    vendedor = db.get_user_by_id(produto[1])
+    return render_template('produto_detalhe.html', produto=produto, vendedor=vendedor)
+
+@app.route('/editar_produto/<int:produto_id>', methods=['GET', 'POST'])
+@login_required
+def editar_produto(produto_id):
+    produto = db.get_product_by_id(produto_id)
+    if not produto:
+        flash('Produto não encontrado ou já removido.')
+        return redirect(url_for('dashboard'))
+
+    e_admin = session.get('user_type') == 'admin' or bool(session.get('admin_level'))
+    e_proprietario = session.get('user_id') == produto[1]
+    if not e_admin and not e_proprietario:
+        flash('Só o agricultor proprietário ou um administrador pode editar este produto.')
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        preco_texto = request.form.get('preco', '').strip().replace(',', '.')
+        try:
+            preco = float(preco_texto)
+        except (TypeError, ValueError):
+            preco = None
+
+        dados = {
+            'nome': request.form.get('nome', '').strip(),
+            'preco': preco,
+            'descricao': request.form.get('descricao', '').strip(),
+            'localizacao': request.form.get('localizacao', '').strip(),
+            'categoria': request.form.get('categoria', '').strip(),
+        }
+        erros = []
+        if len(dados['nome']) < 3 or len(dados['nome']) > 100:
+            erros.append('O nome deve ter entre 3 e 100 caracteres.')
+        if dados['preco'] is None or not math.isfinite(dados['preco']) or not 0.01 <= dados['preco'] <= 999999.99:
+            erros.append('Indique um preço válido entre 0,01 MT e 999.999,99 MT.')
+        if len(dados['descricao']) < 10 or len(dados['descricao']) > 1000:
+            erros.append('A descrição deve ter entre 10 e 1000 caracteres.')
+        if len(dados['localizacao']) < 3 or len(dados['localizacao']) > 100:
+            erros.append('Indique uma localização válida.')
+        if len(dados['categoria']) < 2 or len(dados['categoria']) > 50:
+            erros.append('Indique uma categoria válida.')
+
+        if erros:
+            for erro in erros:
+                flash(erro)
+            return render_template('editar_produto.html', produto=produto, dados=dados)
+
+        foto_url = ''
+        if request.files.get('foto') and request.files['foto'].filename:
+            foto_url = save_uploaded_file(request.files['foto'], app.config['UPLOAD_FOLDER']) or ''
+
+        if not db.update_product(produto_id, dados['nome'], dados['preco'], dados['descricao'],
+                                 dados['localizacao'], dados['categoria'], foto_url):
+            flash('O produto não pôde ser atualizado.')
+            return render_template('editar_produto.html', produto=produto, dados=dados)
+
+        db.audit_log('PRODUCT_UPDATED', session.get('user_id'), {
+            'product_id': produto_id,
+            'owner_id': produto[1],
+            'edited_by_admin': e_admin and not e_proprietario
+        })
+        flash('Produto atualizado com sucesso!')
+        return redirect(url_for('admin_panel') if e_admin else url_for('dashboard'))
+
+    return render_template('editar_produto.html', produto=produto, dados=None)
+
+@app.route('/remover_produto/<int:produto_id>', methods=['POST'])
+@login_required
+def remover_produto_proprio(produto_id):
+    produto = db.get_product_by_id(produto_id)
+    e_admin = session.get('user_type') == 'admin' or bool(session.get('admin_level'))
+    if not produto:
+        return jsonify({'success': False, 'error': 'Produto não encontrado'}), 404
+    if produto[1] != session.get('user_id') and not e_admin:
+        return jsonify({'success': False, 'error': 'Sem permissão para remover este produto'}), 403
+
+    db.remove_product(produto_id)
+    db.audit_log('PRODUCT_REMOVED', session.get('user_id'), {
+        'product_id': produto_id,
+        'owner_id': produto[1],
+        'removed_by_admin': e_admin and produto[1] != session.get('user_id')
+    })
+    return jsonify({'success': True, 'produto_id': produto_id})
+
 @app.route('/consultoria')
 @login_required
 def consultoria():
@@ -824,6 +925,95 @@ def assistente_ia():
         if 'API_KEY_INVALID' in erro or 'invalid' in erro.lower():
             return jsonify({'resposta': 'Chave API inválida. Verifique a configuração.'})
         return jsonify({'resposta': 'Ocorreu um erro ao contactar o assistente. Tente novamente mais tarde.'})
+
+@app.route('/api/identificar-planta', methods=['POST'])
+@login_required
+def identificar_planta():
+    """Analisa uma fotografia agrícola com o Gemini Vision."""
+    imagem = request.files.get('imagem')
+    if not imagem or not imagem.filename:
+        return jsonify({
+            'ok': False,
+            'erro': 'Envie uma fotografia da planta ou da folha.'
+        }), 400
+
+    mime_type = (imagem.mimetype or '').lower()
+    tipos_permitidos = {'image/jpeg', 'image/png', 'image/webp'}
+    if mime_type not in tipos_permitidos:
+        return jsonify({
+            'ok': False,
+            'erro': 'Formato não suportado. Use uma imagem JPG, PNG ou WebP.'
+        }), 415
+
+    image_bytes = imagem.read()
+    limite_bytes = 8 * 1024 * 1024
+    if not image_bytes:
+        return jsonify({'ok': False, 'erro': 'A fotografia está vazia.'}), 400
+    if len(image_bytes) > limite_bytes:
+        return jsonify({
+            'ok': False,
+            'erro': 'A fotografia é muito grande. Escolha uma imagem com até 8 MB.'
+        }), 413
+
+    api_key = os.environ.get('GEMINI_API_KEY')
+    if not api_key:
+        return jsonify({
+            'ok': False,
+            'erro': 'O diagnóstico por imagem ainda não está configurado neste servidor.'
+        }), 503
+
+    contexto = {
+        'província': request.form.get('provincia', '').strip(),
+        'distrito': request.form.get('distrito', '').strip(),
+        'cultura indicada': request.form.get('cultura', '').strip(),
+    }
+    contexto_texto = '; '.join(
+        f'{chave}: {valor}' for chave, valor in contexto.items() if valor
+    ) or 'Nenhum contexto adicional foi fornecido.'
+
+    prompt = f"""És um agrónomo especializado nas culturas de Moçambique.
+Analisa cuidadosamente a fotografia agrícola anexada. O contexto fornecido pelo agricultor é:
+{contexto_texto}
+
+Responde em português de Moçambique, com linguagem simples e prática, usando exatamente estas secções:
+1. IDENTIFICAÇÃO: nome comum, nome científico e nível de confiança. Se a imagem não permitir identificar com segurança, diz isso claramente e apresenta no máximo três possibilidades.
+2. OBSERVAÇÕES: descreve apenas o que é visível na planta, nas folhas, no caule, nos frutos ou no solo.
+3. DOENÇAS OU PRAGAS: indica se há sinais compatíveis com doença, praga, deficiência nutricional ou stress. Não inventes um diagnóstico quando a evidência visual for insuficiente.
+4. MANEJO RECOMENDADO: apresenta passos práticos e seguros, priorizando isolamento das plantas afetadas, higiene, monitorização, manejo integrado e alternativas de baixo risco. Só menciona produtos fitossanitários de forma geral e recomenda seguir sempre o rótulo e a orientação dos serviços agrários locais.
+5. PRÓXIMO PASSO: diz que nova fotografia, informação ou observação o agricultor deve fornecer para confirmar a avaliação.
+
+Não apresentes a análise como substituto de um agrónomo no campo. Não inventes preços, nomes de produtos comerciais ou doses. Se a fotografia não for de uma planta ou estiver desfocada, explica a limitação e pede uma fotografia melhor."""
+
+    try:
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model='gemini-1.5-flash',
+            contents=[
+                types.Part.from_text(text=prompt),
+                types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
+            ],
+            config=types.GenerateContentConfig(
+                temperature=0.2,
+                max_output_tokens=1200,
+            ),
+        )
+        analise = (response.text or '').strip()
+        if not analise:
+            return jsonify({
+                'ok': False,
+                'erro': 'O Gemini não devolveu uma análise. Tente fotografar a folha com mais luz.'
+            }), 502
+        return jsonify({'ok': True, 'analise': analise})
+    except Exception as exc:
+        erro = str(exc)
+        if 'API_KEY_INVALID' in erro or 'invalid' in erro.lower():
+            mensagem = 'A chave do Gemini é inválida ou expirou. Verifique a configuração do servidor.'
+        elif 'safety' in erro.lower() or 'blocked' in erro.lower():
+            mensagem = 'A imagem não pôde ser analisada. Tente uma fotografia clara apenas da planta.'
+        else:
+            mensagem = 'Não foi possível analisar a fotografia agora. Tente novamente em instantes.'
+        app.logger.error('Falha no diagnóstico agrícola por imagem: %s', erro)
+        return jsonify({'ok': False, 'erro': mensagem}), 502
 
 @app.route('/assistente_ia/limpar', methods=['POST'])
 @login_required
@@ -1114,7 +1304,7 @@ def desativar_premium(user_id):
         flash(f'Erro ao desativar premium: {str(e)}')
     return redirect(url_for('admin_panel'))
 
-@app.route('/admin/remover_produto/<int:produto_id>')
+@app.route('/admin/remover_produto/<int:produto_id>', methods=['GET', 'POST'])
 @admin_required
 @with_error_handling
 @with_performance_monitoring('product_removal')
@@ -1129,6 +1319,8 @@ def remover_produto(produto_id):
         conn.close()
 
         if not produto:
+            if request.method == 'POST':
+                return jsonify({'success': False, 'error': 'Produto não encontrado'}), 404
             flash('Produto não encontrado!')
             return redirect(url_for('admin_panel'))
 
@@ -1160,12 +1352,16 @@ def remover_produto(produto_id):
                 db.logger.info(f"Backup automático criado após ação administrativa: {backup_path}")
 
         flash('Produto removido com sucesso!')
+        if request.method == 'POST':
+            return jsonify({'success': True, 'produto_id': produto_id})
     except Exception as e:
         db.logger.error(f"Erro ao remover produto {produto_id}: {str(e)}")
+        if request.method == 'POST':
+            return jsonify({'success': False, 'error': 'Não foi possível remover o produto'}), 500
         flash(f'Erro ao remover produto: {str(e)}')
     return redirect(url_for('admin_panel'))
 
-@app.route('/admin/banir_usuario/<int:user_id>')
+@app.route('/admin/banir_usuario/<int:user_id>', methods=['GET', 'POST'])
 @admin_required
 @with_error_handling
 @with_performance_monitoring('user_ban')
@@ -1183,7 +1379,7 @@ def banir_usuario(user_id):
 
     try:
         # Verificar atividade suspeita (banimento em massa)
-        admin_id = session['user_id']
+        admin_id = session.get('user_id')
         activity_data = {
             'admin_id': admin_id,
             'action': 'ban_user',

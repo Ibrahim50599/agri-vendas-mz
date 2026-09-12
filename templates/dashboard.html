@@ -552,9 +552,13 @@ function editProduct(id) { window.location.href = `/editar_produto/${id}`; }
 function viewProduct(id) { window.location.href = `/produto/${id}`; }
 function deleteProduct(id) {
     if (confirm('Tem certeza que deseja excluir este produto?')) {
-        fetch(`/admin/remover_produto/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
-            .then(r => r.json())
-            .then(data => { if (data.success) location.reload(); else alert('Erro ao excluir produto'); });
+        fetch(`/remover_produto/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+            .then(async r => {
+                const data = await r.json().catch(() => ({}));
+                if (!r.ok || !data.success) throw new Error(data.error || 'Erro ao excluir produto');
+                location.reload();
+            })
+            .catch(error => alert(error.message));
     }
 }
 </script>

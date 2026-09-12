@@ -173,6 +173,27 @@
     .tab-module .nav-link.active { background: #1B5E20; color: white; }
     .risco-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; }
     .progress-thin { height: 6px; border-radius: 3px; }
+    .camera-preview {
+        width: 100%;
+        min-height: 230px;
+        max-height: 360px;
+        object-fit: cover;
+        background: #10251a;
+        border-radius: 14px;
+        display: block;
+    }
+    .camera-result {
+        white-space: pre-wrap;
+        line-height: 1.65;
+        background: #f7fbf5;
+        border: 1px solid #d8ecd5;
+        border-radius: 12px;
+        padding: 16px;
+        color: #26352b;
+    }
+    .camera-status {
+        min-height: 1.4em;
+    }
 </style>
 
 <div class="consultoria-hero reveal">
@@ -794,6 +815,73 @@
     </div>
     {% endif %}
 
+    <!-- Diagnóstico por câmera -->
+    <div class="row g-4 mt-2">
+        <div class="col-12">
+            <div class="card module-card border-success">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-camera me-2"></i>Diagnóstico de Planta e Pragas</span>
+                    <span class="badge bg-light text-success">Gemini IA</span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4 align-items-start">
+                        <div class="col-lg-6">
+                            <p class="text-muted mb-3">
+                                <i class="fas fa-info-circle me-1 text-success"></i>
+                                Aponte a câmera para uma folha ou planta com boa luz. O diagnóstico é uma orientação inicial e não substitui a avaliação de um técnico no campo.
+                            </p>
+                            <video id="cameraVideo" class="camera-preview" autoplay playsinline muted aria-label="Pré-visualização da câmera"></video>
+                            <canvas id="cameraCanvas" class="d-none"></canvas>
+                            <img id="cameraPhotoPreview" class="camera-preview d-none mt-3" alt="Fotografia capturada para análise">
+                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                <button type="button" class="btn btn-outline-success" id="startCameraBtn" onclick="iniciarCamera()">
+                                    <i class="fas fa-video me-1"></i>Ligar câmera
+                                </button>
+                                <button type="button" class="btn btn-success" id="captureAnalyzeBtn" onclick="capturarEAnalisar()" disabled>
+                                    <i class="fas fa-camera me-1"></i>Capturar e Analisar
+                                </button>
+                                <label class="btn btn-outline-secondary mb-0" for="plantImageInput">
+                                    <i class="fas fa-upload me-1"></i>Escolher foto
+                                </label>
+                                <input id="plantImageInput" class="d-none" type="file" accept="image/jpeg,image/png,image/webp" capture="environment">
+                            </div>
+                            <div id="cameraStatus" class="camera-status small text-muted mt-2" role="status" aria-live="polite">
+                                A câmera ainda não está ligada.
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="assistant-context mb-3">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="fas fa-map-marker-alt text-success"></i>
+                                    <strong class="small">Contexto opcional</strong>
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-md-4">
+                                        <label class="form-label" for="cameraProvincia">Província</label>
+                                        <input id="cameraProvincia" class="form-control form-control-sm" type="text" placeholder="Ex.: Manica">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label" for="cameraDistrito">Distrito</label>
+                                        <input id="cameraDistrito" class="form-control form-control-sm" type="text" placeholder="Ex.: Chimoio">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label" for="cameraCultura">Cultura</label>
+                                        <input id="cameraCultura" class="form-control form-control-sm" type="text" placeholder="Ex.: tomate">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="cameraResultEmpty" class="text-center text-muted py-5">
+                                <i class="fas fa-leaf fa-2x text-success mb-3"></i>
+                                <p class="mb-0">O resultado da identificação aparecerá aqui.</p>
+                            </div>
+                            <div id="cameraResult" class="camera-result d-none" aria-live="polite"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Calendário Agrícola -->
     <div class="row mt-4">
         <div class="col-12">
@@ -930,6 +1018,137 @@ const dadosClima = {
 let atividades = [];
 let gastos = [];
 let unidadeAtual = 'hectares';
+let cameraStream = null;
+let selectedPlantImage = null;
+
+// ===================== DIAGNÓSTICO POR CÂMERA =====================
+const cameraVideo = document.getElementById('cameraVideo');
+const cameraCanvas = document.getElementById('cameraCanvas');
+const cameraPhotoPreview = document.getElementById('cameraPhotoPreview');
+const plantImageInput = document.getElementById('plantImageInput');
+const startCameraBtn = document.getElementById('startCameraBtn');
+const captureAnalyzeBtn = document.getElementById('captureAnalyzeBtn');
+const cameraStatus = document.getElementById('cameraStatus');
+const cameraResult = document.getElementById('cameraResult');
+const cameraResultEmpty = document.getElementById('cameraResultEmpty');
+
+function atualizarEstadoCamera(mensagem, tipo = 'muted') {
+    cameraStatus.className = `camera-status small text-${tipo} mt-2`;
+    cameraStatus.textContent = mensagem;
+}
+
+async function iniciarCamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        atualizarEstadoCamera('Este navegador não permite acesso à câmera. Escolha uma foto do dispositivo.', 'warning');
+        return;
+    }
+
+    try {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+        }
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+                facingMode: { ideal: 'environment' },
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        });
+        cameraVideo.srcObject = cameraStream;
+        await cameraVideo.play();
+        captureAnalyzeBtn.disabled = false;
+        startCameraBtn.innerHTML = '<i class="fas fa-sync-alt me-1"></i>Trocar câmera';
+        atualizarEstadoCamera('Câmera traseira ligada. Enquadre a folha ou planta com boa luz.', 'success');
+    } catch (error) {
+        console.error('Não foi possível ligar a câmera:', error);
+        atualizarEstadoCamera('Não foi possível aceder à câmera. Permita o acesso ou escolha uma foto.', 'warning');
+    }
+}
+
+function mostrarPreviaImagem(blob) {
+    const previewUrl = URL.createObjectURL(blob);
+    cameraPhotoPreview.src = previewUrl;
+    cameraPhotoPreview.classList.remove('d-none');
+}
+
+function capturarFrame() {
+    if (!cameraVideo.videoWidth || !cameraVideo.videoHeight) {
+        return Promise.reject(new Error('A câmera ainda não está pronta.'));
+    }
+
+    const maxWidth = 1600;
+    const scale = Math.min(1, maxWidth / cameraVideo.videoWidth);
+    cameraCanvas.width = Math.round(cameraVideo.videoWidth * scale);
+    cameraCanvas.height = Math.round(cameraVideo.videoHeight * scale);
+    const context = cameraCanvas.getContext('2d');
+    context.drawImage(cameraVideo, 0, 0, cameraCanvas.width, cameraCanvas.height);
+
+    return new Promise((resolve, reject) => {
+        cameraCanvas.toBlob(blob => {
+            if (blob) resolve(blob);
+            else reject(new Error('Não foi possível preparar a fotografia.'));
+        }, 'image/jpeg', 0.86);
+    });
+}
+
+async function capturarEAnalisar() {
+    const originalLabel = '<i class="fas fa-camera me-1"></i>Capturar e Analisar';
+    captureAnalyzeBtn.disabled = true;
+    captureAnalyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>A analisar...';
+    atualizarEstadoCamera('A enviar a fotografia para análise. Aguarde alguns segundos...', 'info');
+
+    try {
+        let imageToAnalyze = selectedPlantImage;
+        if (!imageToAnalyze) {
+            imageToAnalyze = await capturarFrame();
+            mostrarPreviaImagem(imageToAnalyze);
+        }
+
+        const formData = new FormData();
+        formData.append('imagem', imageToAnalyze, imageToAnalyze.name || 'planta-camera.jpg');
+        formData.append('provincia', document.getElementById('cameraProvincia').value.trim());
+        formData.append('distrito', document.getElementById('cameraDistrito').value.trim());
+        formData.append('cultura', document.getElementById('cameraCultura').value.trim());
+
+        const response = await fetch('/api/identificar-planta', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.ok) {
+            throw new Error(data.erro || data.resposta || 'Não foi possível analisar a fotografia.');
+        }
+
+        cameraResult.textContent = data.analise;
+        cameraResult.classList.remove('d-none');
+        cameraResultEmpty.classList.add('d-none');
+        atualizarEstadoCamera('Análise concluída. Confirme a avaliação observando a planta no campo.', 'success');
+    } catch (error) {
+        cameraResult.textContent = error.message || 'Não foi possível analisar a fotografia.';
+        cameraResult.classList.remove('d-none');
+        cameraResultEmpty.classList.add('d-none');
+        atualizarEstadoCamera('A análise não foi concluída.', 'danger');
+    } finally {
+        captureAnalyzeBtn.disabled = !cameraStream && !selectedPlantImage;
+        captureAnalyzeBtn.innerHTML = originalLabel;
+    }
+}
+
+plantImageInput.addEventListener('change', function() {
+    const file = this.files && this.files[0];
+    if (!file) return;
+    selectedPlantImage = file;
+    captureAnalyzeBtn.disabled = false;
+    mostrarPreviaImagem(file);
+    atualizarEstadoCamera(`Foto selecionada: ${file.name}. Clique em “Capturar e Analisar”.`, 'success');
+});
+
+window.addEventListener('beforeunload', () => {
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+    }
+});
 
 // ===================== FORMULÁRIO CULTIVO =====================
 document.querySelectorAll('#unitToggle .btn').forEach(btn => {

@@ -257,6 +257,35 @@ class Database:
         conn.close()
         return produtos
 
+    def get_product_by_id(self, produto_id, include_inactive=False):
+        conn = self.get_connection()
+        c = conn.cursor()
+        query = "SELECT * FROM produtos WHERE id = ?"
+        if not include_inactive:
+            query += " AND ativo = 1"
+        c.execute(query, (produto_id,))
+        produto = c.fetchone()
+        conn.close()
+        return produto
+
+    def update_product(self, produto_id, nome, preco, descricao, localizacao, categoria, foto_url=None):
+        conn = self.get_connection()
+        c = conn.cursor()
+        if foto_url:
+            c.execute('''UPDATE produtos SET nome = ?, preco = ?, descricao = ?,
+                         localizacao = ?, categoria = ?, foto_url = ?
+                         WHERE id = ? AND ativo = 1''',
+                      (nome, preco, descricao, localizacao, categoria, foto_url, produto_id))
+        else:
+            c.execute('''UPDATE produtos SET nome = ?, preco = ?, descricao = ?,
+                         localizacao = ?, categoria = ?
+                         WHERE id = ? AND ativo = 1''',
+                      (nome, preco, descricao, localizacao, categoria, produto_id))
+        updated = c.rowcount > 0
+        conn.commit()
+        conn.close()
+        return updated
+
     def get_user_count(self, user_id):
         conn = self.get_connection()
         c = conn.cursor()

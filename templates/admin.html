@@ -1304,6 +1304,7 @@
                                 <th>Contato</th>
                                 <th>Tipo</th>
                                 <th>Premium</th>
+                                <th>Estado</th>
                                 <th>Cadastro</th>
                                 <th>Ações</th>
                             </tr>
@@ -1342,14 +1343,21 @@
                                         </a>
                                     {% endif %}
                                 </td>
+                                <td>
+                                    {% if u[8] %}
+                                    <span class="badge bg-success"><i class="fas fa-check me-1"></i>Activo</span>
+                                    {% else %}
+                                    <span class="badge bg-danger"><i class="fas fa-ban me-1"></i>Banido</span>
+                                    {% endif %}
+                                </td>
                                 <td><small class="text-muted">{{ u[6][:10] if u[6] else '' }}</small></td>
                                 <td>
-                                    {% if u[4] != 'admin' %}
+                                    {% if u[4] != 'admin' and u[8] %}
                                     <div class="d-flex gap-1 flex-wrap">
                                         <a href="{{ url_for('banir_usuario', user_id=u[0]) }}"
                                            class="btn btn-xs btn-outline-danger"
                                            onclick="return confirm('Banir {{ u[1] }}? Esta acção remove o utilizador e os seus produtos.')">
-                                            <i class="fas fa-ban"></i>
+                                             <i class="fas fa-ban me-1"></i>Banir
                                         </a>
                                         {% if admin_level == 'superadmin' %}
                                         <button class="btn btn-xs btn-outline-info"
@@ -1358,6 +1366,12 @@
                                         </button>
                                         {% endif %}
                                     </div>
+                                    {% elif u[4] != 'admin' %}
+                                    <a href="{{ url_for('reativar_usuario', user_id=u[0]) }}"
+                                       class="btn btn-xs btn-outline-success"
+                                       onclick="return confirm('Reactivar {{ u[1] }}?')">
+                                        <i class="fas fa-user-check me-1"></i>Reactivar
+                                    </a>
                                     {% else %}
                                     <span class="badge bg-light text-muted"><i class="fas fa-lock me-1"></i>Protegido</span>
                                     {% endif %}
@@ -1394,7 +1408,7 @@
                                 <th>Categoria</th>
                                 <th>Localização</th>
                                 <th>Data</th>
-                                <th>Acção</th>
+                                <th>Acções</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1417,11 +1431,21 @@
                                 <td><small class="text-muted">{{ p[5][:20] if p[5] else '—' }}</small></td>
                                 <td><small class="text-muted">{{ p[8][:10] if p[8] else '—' }}</small></td>
                                 <td>
+                                    <div class="d-flex gap-1 flex-wrap">
+                                    <a href="{{ url_for('ver_produto', produto_id=p[0]) }}"
+                                       class="btn btn-xs btn-outline-success" title="Ver produto">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('editar_produto', produto_id=p[0]) }}"
+                                       class="btn btn-xs btn-outline-primary" title="Editar produto">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                     <a href="{{ url_for('remover_produto', produto_id=p[0]) }}"
                                        class="btn btn-xs btn-outline-danger"
                                        onclick="return confirm('Remover o produto \'{{ p[2][:30] }}\'?')">
-                                        <i class="fas fa-trash me-1"></i>Remover
+                                         <i class="fas fa-trash"></i>
                                     </a>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% set form = dados or {
+    'nome': produto[2],
+    'preco': produto[3],
+    'descricao': produto[4],
+    'localizacao': produto[5],
+    'categoria': produto[7]
+} %}
+
+{% block title %}Editar Produto - AGRI.vendasMz{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container page-header-inner">
+        <h1><i class="fas fa-edit me-2"></i>Editar produto</h1>
+        <p class="mb-0">Atualize o anúncio sem perder a fotografia existente.</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="card border-0 shadow-sm mx-auto" style="max-width: 820px;">
+        <div class="card-body p-4 p-md-5">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold">Nome do produto</label>
+                        <input class="form-control" name="nome" required maxlength="100" value="{{ form.nome }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Preço (MT)</label>
+                        <input class="form-control" type="number" name="preco" min="0.01" max="999999.99" step="0.01" required value="{{ form.preco }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Categoria</label>
+                        <select class="form-select" name="categoria" required>
+                            {% for value, label in [('cereais','Cereais'),('horticolas','Hortícolas'),('frutas','Frutas'),('sementes','Sementes'),('fertilizantes','Fertilizantes'),('outros','Outros')] %}
+                            <option value="{{ value }}" {% if form.categoria == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Localização</label>
+                        <input class="form-control" name="localizacao" required maxlength="100" value="{{ form.localizacao }}">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Descrição</label>
+                        <textarea class="form-control" name="descricao" rows="5" required maxlength="1000">{{ form.descricao }}</textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Nova fotografia <span class="text-muted fw-normal">(opcional)</span></label>
+                        {% if produto[6] %}
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <img src="{{ url_for('static', filename=produto[6]) }}" alt="Fotografia atual" style="width:90px;height:70px;object-fit:cover;border-radius:10px;">
+                            <small class="text-muted">A fotografia atual será mantida se não escolher outra.</small>
+                        </div>
+                        {% endif %}
+                        <input class="form-control" type="file" name="foto" accept=".jpg,.jpeg,.png,.gif">
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <button class="btn btn-success px-4" type="submit"><i class="fas fa-save me-2"></i>Guardar alterações</button>
+                    <a class="btn btn-outline-secondary" href="{{ url_for('ver_produto', produto_id=produto[0]) }}"><i class="fas fa-eye me-2"></i>Ver anúncio</a>
+                    <a class="btn btn-link" href="{{ url_for('dashboard') }}">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
