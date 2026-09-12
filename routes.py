@@ -1375,6 +1375,36 @@ def ativar_premium_massa():
         flash('Não foi possível ativar o Premium em massa.')
     return redirect(url_for('admin_panel'))
 
+@app.route('/admin/desativar_premium_massa', methods=['POST'])
+@superadmin_required
+def desativar_premium_massa():
+    """Retira o Premium dos utilizadores selecionados pelo super admin."""
+    user_ids = request.form.getlist('user_ids')
+    if request.is_json:
+        data = request.get_json(silent=True) or {}
+        user_ids = data.get('user_ids', user_ids)
+
+    if not user_ids:
+        flash('Selecione pelo menos um utilizador para retirar o Premium.')
+        return redirect(url_for('admin_panel'))
+
+    try:
+        atualizados = db.deactivate_premium_bulk(user_ids)
+        db.audit_log('BULK_PREMIUM_DEACTIVATION', session.get('user_id'), {
+            'requested_user_ids': [str(user_id) for user_id in user_ids],
+            'updated_count': atualizados,
+        })
+        if atualizados:
+            flash(f'Premium retirado de {atualizados} utilizador(es) selecionado(s).')
+        else:
+            flash('Nenhum utilizador Premium foi encontrado na seleção.')
+    except (TypeError, ValueError):
+        flash('A seleção de utilizadores é inválida.')
+    except Exception as exc:
+        db.logger.error(f'Erro ao retirar Premium em massa: {str(exc)}')
+        flash('Não foi possível retirar o Premium em massa.')
+    return redirect(url_for('admin_panel'))
+
 @app.route('/admin/remover_produto/<int:produto_id>', methods=['GET', 'POST'])
 @nivel_admin_required('produtos')
 @with_error_handling

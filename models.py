@@ -549,6 +549,29 @@ class Database:
         conn.close()
         return atualizados
 
+    def deactivate_premium_bulk(self, user_ids):
+        """Retira o Premium de vários utilizadores numa só operação."""
+        ids = sorted({
+            int(user_id) for user_id in user_ids
+            if str(user_id).isdigit() and int(user_id) > 0
+        })
+        if not ids:
+            return 0
+
+        placeholders = ','.join('?' for _ in ids)
+        conn = self.get_connection()
+        c = conn.cursor()
+        c.execute(
+            f"""UPDATE usuarios
+                SET premium = 0, data_premium_expira = NULL
+                WHERE premium = 1 AND id IN ({placeholders})""",
+            ids
+        )
+        atualizados = c.rowcount
+        conn.commit()
+        conn.close()
+        return atualizados
+
     def deactivate_premium(self, user_id):
         conn = self.get_connection()
         c = conn.cursor()

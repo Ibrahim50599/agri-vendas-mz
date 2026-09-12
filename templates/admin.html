@@ -1305,14 +1305,17 @@
                             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="marcarUtilizadoresPremium(false)">
                                 Limpar seleção
                             </button>
-                            <button type="submit" class="btn btn-sm btn-warning">
+                            <button type="submit" class="btn btn-sm btn-warning" formaction="{{ url_for('ativar_premium_massa') }}" data-bulk-action="activate">
                                 <i class="fas fa-crown me-1"></i>Colocar no Premium
+                            </button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger" formaction="{{ url_for('desativar_premium_massa') }}" data-bulk-action="deactivate">
+                                <i class="fas fa-times-circle me-1"></i>Retirar do Premium
                             </button>
                         </div>
                     </div>
                     <div id="bulkPremiumSelectionSummary" class="alert alert-light border d-flex align-items-center gap-2 py-2 mb-3">
                         <i class="fas fa-info-circle text-muted"></i>
-                        <span>Nenhum utilizador selecionado para o Premium.</span>
+                        <span>Nenhum utilizador selecionado.</span>
                     </div>
                 {% endif %}
                 <div class="mb-3">
@@ -1339,11 +1342,8 @@
                             <tr>
                                 {% if admin_level == 'superadmin' %}
                                 <td class="text-center">
-                                    {% if not u[5] %}
-                                    <input type="checkbox" class="bulk-user-checkbox" name="user_ids" value="{{ u[0] }}" data-user-name="{{ u[1]|e }}" aria-label="Selecionar {{ u[1] }} para Premium">
-                                    {% else %}
-                                    <i class="fas fa-check text-success" title="Já é Premium"></i>
-                                    {% endif %}
+                                    <input type="checkbox" class="bulk-user-checkbox" name="user_ids" value="{{ u[0] }}" data-user-name="{{ u[1]|e }}" aria-label="Selecionar {{ u[1] }}">
+                                    {% if u[5] %}<i class="fas fa-crown text-warning ms-1" title="Já é Premium"></i>{% endif %}
                                 </td>
                                 {% endif %}
                                 <td><span class="badge bg-secondary">{{ u[0] }}</span></td>
@@ -2438,7 +2438,7 @@ function atualizarResumoPremium() {
     if (!selecionadas.length) {
         resumo.className = 'alert alert-light border d-flex align-items-center gap-2 py-2 mb-3';
         icone.className = 'fas fa-info-circle text-muted';
-        texto.textContent = 'Nenhum utilizador selecionado para o Premium.';
+        texto.textContent = 'Nenhum utilizador selecionado.';
         resumo.append(icone, texto);
         return;
     }
@@ -2449,9 +2449,9 @@ function atualizarResumoPremium() {
     const detalhe = nomes.length <= 3
         ? `: ${nomes.join(', ')}`
         : `: ${nomes.slice(0, 3).join(', ')} e mais ${nomes.length - 3}`;
-    resumo.className = 'alert alert-success border d-flex align-items-center gap-2 py-2 mb-3';
-    icone.className = 'fas fa-crown text-success';
-    texto.textContent = `${selecionadas.length} utilizador(es) serão colocados no Premium${detalhe}.`;
+    resumo.className = 'alert alert-info border d-flex align-items-center gap-2 py-2 mb-3';
+    icone.className = 'fas fa-check-square text-primary';
+    texto.textContent = `${selecionadas.length} utilizador(es) selecionado(s)${detalhe}. Escolha colocar ou retirar do Premium.`;
     resumo.append(icone, texto);
 }
 
@@ -2478,6 +2478,10 @@ function confirmarPremiumEmMassa(event) {
         event.preventDefault();
         alert('Selecione pelo menos um utilizador.');
         return false;
+    }
+    const acao = event.submitter && event.submitter.dataset.bulkAction;
+    if (acao === 'deactivate') {
+        return confirm(`Retirar o Premium de ${selecionados} utilizador(es) selecionado(s)?`);
     }
     return confirm(`Colocar ${selecionados} utilizador(es) no Premium por 30 dias?`);
 }
