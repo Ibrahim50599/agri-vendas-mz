@@ -1185,3 +1185,21 @@
 2026-09-12 15:46:09,902 - AUDIT - {"timestamp": "2026-09-12T15:46:09.902023", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
 2026-09-12 15:46:09,963 - AUDIT - {"timestamp": "2026-09-12T15:46:09.963683", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
 2026-09-12 15:46:09,974 - AUDIT - {"timestamp": "2026-09-12T15:46:09.974490", "action": "BULK_PREMIUM_ACTIVATION", "user_id": null, "details": {"requested_user_ids": ["14", "15", "16", "17"], "updated_count": 3}, "ip_address": null}
+2026-09-12 15:48:26,662 - AUDIT - {"timestamp": "2026-09-12T15:48:26.662658", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:48:26,662 - AUDIT - {"timestamp": "2026-09-12T15:48:26.662658", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:48:26,778 - AUDIT - {"timestamp": "2026-09-12T15:48:26.778512", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:48:26,778 - AUDIT - {"timestamp": "2026-09-12T15:48:26.778512", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:49:35,925 - AUDIT - {"timestamp": "2026-09-12T15:49:35.925332", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:49:35,925 - AUDIT - {"timestamp": "2026-09-12T15:49:35.925332", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:49:35,925 - AUDIT - {"timestamp": "2026-09-12T15:49:35.925332", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:49:35,929 - AUDIT - {"timestamp": "2026-09-12T15:49:35.929887", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:49:35,929 - AUDIT - {"timestamp": "2026-09-12T15:49:35.929887", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:49:35,929 - AUDIT - {"timestamp": "2026-09-12T15:49:35.929887", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:50:51,230 - AUDIT - {"timestamp": "2026-09-12T15:50:51.230585", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:50:51,230 - AUDIT - {"timestamp": "2026-09-12T15:50:51.230585", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:50:51,230 - AUDIT - {"timestamp": "2026-09-12T15:50:51.230585", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:50:51,230 - AUDIT - {"timestamp": "2026-09-12T15:50:51.230585", "action": "START_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:50:51,237 - AUDIT - {"timestamp": "2026-09-12T15:50:51.237012", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:50:51,237 - AUDIT - {"timestamp": "2026-09-12T15:50:51.237012", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:50:51,237 - AUDIT - {"timestamp": "2026-09-12T15:50:51.237012", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
+2026-09-12 15:50:51,237 - AUDIT - {"timestamp": "2026-09-12T15:50:51.237012", "action": "SUCCESS_ADMIN_PANEL_ACCESS", "user_id": null, "details": {}, "ip_address": null}
