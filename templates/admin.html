@@ -1296,7 +1296,7 @@
                     <div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                         <div>
                             <strong><i class="fas fa-crown me-1"></i>Premium em massa</strong>
-                            <div class="small">Marque vários utilizadores e ative o Premium numa só operação.</div>
+                            <div class="small">Marque vários utilizadores e coloque-os no Premium numa só operação.</div>
                         </div>
                         <div class="d-flex flex-wrap align-items-center gap-2">
                             <button type="button" class="btn btn-sm btn-outline-dark" onclick="marcarUtilizadoresPremium(true)">
@@ -1306,9 +1306,13 @@
                                 Limpar seleção
                             </button>
                             <button type="submit" class="btn btn-sm btn-warning">
-                                <i class="fas fa-crown me-1"></i>Ativar Premium selecionados
+                                <i class="fas fa-crown me-1"></i>Colocar no Premium
                             </button>
                         </div>
+                    </div>
+                    <div id="bulkPremiumSelectionSummary" class="alert alert-light border d-flex align-items-center gap-2 py-2 mb-3">
+                        <i class="fas fa-info-circle text-muted"></i>
+                        <span>Nenhum utilizador selecionado para o Premium.</span>
                     </div>
                 {% endif %}
                 <div class="mb-3">
@@ -1336,7 +1340,7 @@
                                 {% if admin_level == 'superadmin' %}
                                 <td class="text-center">
                                     {% if not u[5] %}
-                                    <input type="checkbox" class="bulk-user-checkbox" name="user_ids" value="{{ u[0] }}" aria-label="Selecionar {{ u[1] }} para Premium">
+                                    <input type="checkbox" class="bulk-user-checkbox" name="user_ids" value="{{ u[0] }}" data-user-name="{{ u[1]|e }}" aria-label="Selecionar {{ u[1] }} para Premium">
                                     {% else %}
                                     <i class="fas fa-check text-success" title="Já é Premium"></i>
                                     {% endif %}
@@ -2422,12 +2426,43 @@ function explorarParcerias() {
 }
 
 // PREMIUM EM MASSA — disponível apenas para o super administrador
+function atualizarResumoPremium() {
+    const selecionadas = Array.from(document.querySelectorAll('.bulk-user-checkbox:checked'));
+    const resumo = document.getElementById('bulkPremiumSelectionSummary');
+    if (!resumo) return;
+
+    resumo.replaceChildren();
+    const icone = document.createElement('i');
+    const texto = document.createElement('span');
+
+    if (!selecionadas.length) {
+        resumo.className = 'alert alert-light border d-flex align-items-center gap-2 py-2 mb-3';
+        icone.className = 'fas fa-info-circle text-muted';
+        texto.textContent = 'Nenhum utilizador selecionado para o Premium.';
+        resumo.append(icone, texto);
+        return;
+    }
+
+    const nomes = selecionadas
+        .map(caixa => caixa.dataset.userName)
+        .filter(Boolean);
+    const detalhe = nomes.length <= 3
+        ? `: ${nomes.join(', ')}`
+        : `: ${nomes.slice(0, 3).join(', ')} e mais ${nomes.length - 3}`;
+    resumo.className = 'alert alert-success border d-flex align-items-center gap-2 py-2 mb-3';
+    icone.className = 'fas fa-crown text-success';
+    texto.textContent = `${selecionadas.length} utilizador(es) serão colocados no Premium${detalhe}.`;
+    resumo.append(icone, texto);
+}
+
 function atualizarMarcadorPremium() {
     const caixas = Array.from(document.querySelectorAll('.bulk-user-checkbox'));
     const marcarTodos = document.getElementById('marcarTodosPremium');
-    if (!marcarTodos || !caixas.length) return;
-    marcarTodos.checked = caixas.every(caixa => caixa.checked);
-    marcarTodos.indeterminate = caixas.some(caixa => caixa.checked) && !marcarTodos.checked;
+    if (marcarTodos && caixas.length) {
+        marcarTodos.checked = caixas.every(caixa => caixa.checked);
+        marcarTodos.indeterminate = caixas.some(caixa => caixa.checked) && !marcarTodos.checked;
+    }
+    atualizarResumoPremium();
 }
 
 function marcarUtilizadoresPremium(marcar) {
@@ -2444,7 +2479,7 @@ function confirmarPremiumEmMassa(event) {
         alert('Selecione pelo menos um utilizador.');
         return false;
     }
-    return confirm(`Ativar o Premium para ${selecionados} utilizador(es) selecionado(s) por 30 dias?`);
+    return confirm(`Colocar ${selecionados} utilizador(es) no Premium por 30 dias?`);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2454,6 +2489,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.bulk-user-checkbox').forEach(caixa => {
         caixa.addEventListener('change', atualizarMarcadorPremium);
     });
+    atualizarResumoPremium();
 });
 </script>
 {% endblock %}
