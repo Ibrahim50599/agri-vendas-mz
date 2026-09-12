@@ -69,16 +69,32 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def _global_admin_session_valid():
+    """Confirma o acesso do super administrador sem depender de user_id."""
+    codigo = session.get('admin_access_code')
+    if not codigo:
+        return False
+    config = db.get_admin_config()
+    return bool(config and codigo == config[1])
+
+def login_or_global_admin_required(f):
+    """Permite acesso ao utilizador autenticado ou ao super admin global."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if _global_admin_session_valid():
+            session['admin_level'] = 'superadmin'
+            return f(*args, **kwargs)
+        return login_required(f)(*args, **kwargs)
+    return decorated_function
+
 # Decorador para verificar admin
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         # Permitir acesso com código especial (apenas super admin)
-        if session.get('admin_access_code'):
-            config = db.get_admin_config()
-            if config and session.get('admin_access_code') == config[1]:
-                session['admin_level'] = 'superadmin'
-                return f(*args, **kwargs)
+        if _global_admin_session_valid():
+            session['admin_level'] = 'superadmin'
+            return f(*args, **kwargs)
 
         if 'user_id' not in session:
             flash('Acesso negado. Faça login ou use o código de acesso.')
@@ -135,9 +151,14 @@ def nivel_admin_required(nivel_minimo):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
+            if _global_admin_session_valid():
+                session['admin_level'] = 'superadmin'
+                return f(*args, **kwargs)
+
             if session.get('admin_access_code'):
                 codigo = session.get('admin_access_code')
                 if check_admin_access(codigo, nivel_minimo):
+                    session['admin_level'] = CODIGOS_ADMIN.get(codigo, nivel_minimo)
                     return f(*args, **kwargs)
 
             if 'user_id' not in session:
@@ -161,6 +182,26 @@ def nivel_admin_required(nivel_minimo):
             return redirect(url_for('admin_panel'))
         return decorated_function
     return decorator
+
+def _admin_controls_products():
+    """Verifica no servidor se a sessão tem gestão de produtos."""
+    if _global_admin_session_valid():
+        return True
+
+    user_id = session.get('user_id')
+    if not user_id:
+        return False
+
+    conn = db.get_connection()
+    c = conn.cursor()
+    c.execute("""SELECT a.nivel_acesso
+                 FROM administradores a
+                 JOIN usuarios u ON u.id = a.usuario_id
+                 WHERE a.usuario_id = ? AND a.ativo = 1 AND u.ativo = 1""",
+              (user_id,))
+    admin = c.fetchone()
+    conn.close()
+    return bool(admin and admin[0] in ('superadmin', 'produtos'))
 
 # Rotas principais
 @app.before_request
@@ -571,14 +612,14 @@ def ver_produto(produto_id):
     return render_template('produto_detalhe.html', produto=produto, vendedor=vendedor)
 
 @app.route('/editar_produto/<int:produto_id>', methods=['GET', 'POST'])
-@login_required
+@login_or_global_admin_required
 def editar_produto(produto_id):
     produto = db.get_product_by_id(produto_id)
     if not produto:
         flash('Produto não encontrado ou já removido.')
         return redirect(url_for('dashboard'))
 
-    e_admin = session.get('user_type') == 'admin' or bool(session.get('admin_level'))
+    e_admin = _admin_controls_products()
     e_proprietario = session.get('user_id') == produto[1]
     if not e_admin and not e_proprietario:
         flash('Só o agricultor proprietário ou um administrador pode editar este produto.')
@@ -638,7 +679,7 @@ def editar_produto(produto_id):
 @login_required
 def remover_produto_proprio(produto_id):
     produto = db.get_product_by_id(produto_id)
-    e_admin = session.get('user_type') == 'admin' or bool(session.get('admin_level'))
+    e_admin = _admin_controls_products()
     if not produto:
         return jsonify({'success': False, 'error': 'Produto não encontrado'}), 404
     if produto[1] != session.get('user_id') and not e_admin:
@@ -1305,7 +1346,7 @@ def desativar_premium(user_id):
     return redirect(url_for('admin_panel'))
 
 @app.route('/admin/remover_produto/<int:produto_id>', methods=['GET', 'POST'])
-@admin_required
+@nivel_admin_required('produtos')
 @with_error_handling
 @with_performance_monitoring('product_removal')
 @with_audit_trail('ADMIN_PRODUCT_REMOVAL')
@@ -1314,7 +1355,7 @@ def remover_produto(produto_id):
         # Verificar se o produto existe e obter detalhes para auditoria
         conn = db.get_connection()
         c = conn.cursor()
-        c.execute("SELECT nome, usuario_id FROM produtos WHERE id = ?", (produto_id,))
+        c.execute("SELECT nome, vendedor_id FROM produtos WHERE id = ? AND ativo = 1", (produto_id,))
         produto = c.fetchone()
         conn.close()
 
