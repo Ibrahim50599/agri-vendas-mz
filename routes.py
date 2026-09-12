@@ -1847,7 +1847,12 @@ def admin_usuarios():
         'vendedores': vendedores,
         'usuarios_ativos': total_usuarios
     }
-    return render_template('admin_usuarios.html', usuarios=usuarios, stats=stats)
+    return render_template(
+        'admin_usuarios.html',
+        usuarios=usuarios,
+        stats=stats,
+        admin_level=session.get('admin_level', 'admin')
+    )
 
 @app.route('/loja')
 def loja_equipamentos():

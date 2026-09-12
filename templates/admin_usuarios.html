@@ -205,8 +205,8 @@
                 </button>
             </div>
             <div class="col-md-3">
-                <button class="btn btn-outline-warning w-100">
-                    <i class="fas fa-crown me-2"></i>Ativar Premium em Massa
+                <button type="button" class="btn btn-outline-warning w-100" onclick="document.getElementById('bulkPremiumForm')?.scrollIntoView({behavior: 'smooth'})">
+                    <i class="fas fa-crown me-2"></i>Gerir Premium em Massa
                 </button>
             </div>
             <div class="col-md-3">
@@ -223,6 +223,37 @@
     </div>
 </div>
 
+{% if admin_level == 'superadmin' %}
+<form method="POST" action="{{ url_for('ativar_premium_massa') }}" id="bulkPremiumForm"
+      onsubmit="return confirmarPremiumEmMassaUsuarios(event)">
+    <div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <div>
+            <strong><i class="fas fa-crown me-1"></i>Premium em massa</strong>
+            <div class="small">Selecione utilizadores e escolha colocar ou retirar o Premium.</div>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <button type="button" class="btn btn-sm btn-outline-dark" onclick="marcarUtilizadoresUsuarios(true)">
+                <i class="fas fa-check-double me-1"></i>Marcar todos
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="marcarUtilizadoresUsuarios(false)">
+                Limpar seleção
+            </button>
+            <button type="submit" class="btn btn-sm btn-warning"
+                    formaction="{{ url_for('ativar_premium_massa') }}" data-bulk-action="activate">
+                <i class="fas fa-crown me-1"></i>Colocar no Premium
+            </button>
+            <button type="submit" class="btn btn-sm btn-outline-danger"
+                    formaction="{{ url_for('desativar_premium_massa') }}" data-bulk-action="deactivate">
+                <i class="fas fa-times-circle me-1"></i>Retirar do Premium
+            </button>
+        </div>
+    </div>
+    <div id="bulkPremiumSelectionSummaryUsuarios" class="alert alert-light border d-flex align-items-center gap-2 py-2 mb-3">
+        <i class="fas fa-info-circle text-muted"></i>
+        <span>Nenhum utilizador selecionado.</span>
+    </div>
+{% endif %}
+
 <!-- Tabela de Usuários -->
 <div class="card shadow-sm">
     <div class="card-header bg-danger text-white">
@@ -233,6 +264,9 @@
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
+                        {% if admin_level == 'superadmin' %}
+                        <th class="text-center"><input type="checkbox" id="marcarTodosPremiumUsuarios" title="Marcar todos"></th>
+                        {% endif %}
                         <th>Avatar</th>
                         <th>Nome</th>
                         <th>Email</th>
@@ -247,6 +281,17 @@
                 <tbody>
                     {% for usuario in usuarios %}
                     <tr class="user-table-row">
+                        {% if admin_level == 'superadmin' %}
+                        <td class="text-center">
+                            <input type="checkbox" class="bulk-user-checkbox-usuarios"
+                                   name="user_ids" value="{{ usuario[0] }}"
+                                   data-user-name="{{ usuario[1]|e }}"
+                                   aria-label="Selecionar {{ usuario[1] }}">
+                            {% if usuario[5] == 1 %}
+                            <i class="fas fa-crown text-warning ms-1" title="Já é Premium"></i>
+                            {% endif %}
+                        </td>
+                        {% endif %}
                         <td>
                             <div class="user-avatar">
                                 {{ usuario[1][0].upper() }}
@@ -366,6 +411,9 @@
         </div>
     </div>
 </div>
+{% if admin_level == 'superadmin' %}
+</form>
+{% endif %}
 
 <div class="text-center mt-4">
     <a href="{{ url_for('admin_panel') }}" class="btn btn-outline-secondary">
@@ -392,6 +440,73 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 20);
     });
+});
+
+function atualizarResumoPremiumUsuarios() {
+    const selecionadas = Array.from(document.querySelectorAll('.bulk-user-checkbox-usuarios:checked'));
+    const resumo = document.getElementById('bulkPremiumSelectionSummaryUsuarios');
+    if (!resumo) return;
+
+    resumo.replaceChildren();
+    const icone = document.createElement('i');
+    const texto = document.createElement('span');
+    if (!selecionadas.length) {
+        resumo.className = 'alert alert-light border d-flex align-items-center gap-2 py-2 mb-3';
+        icone.className = 'fas fa-info-circle text-muted';
+        texto.textContent = 'Nenhum utilizador selecionado.';
+    } else {
+        const nomes = selecionadas.map(caixa => caixa.dataset.userName).filter(Boolean);
+        const detalhe = nomes.length <= 3
+            ? `: ${nomes.join(', ')}`
+            : `: ${nomes.slice(0, 3).join(', ')} e mais ${nomes.length - 3}`;
+        resumo.className = 'alert alert-info border d-flex align-items-center gap-2 py-2 mb-3';
+        icone.className = 'fas fa-check-square text-primary';
+        texto.textContent = `${selecionadas.length} utilizador(es) selecionado(s)${detalhe}. Escolha colocar ou retirar do Premium.`;
+    }
+    resumo.append(icone, texto);
+}
+
+function atualizarMarcadorPremiumUsuarios() {
+    const caixas = Array.from(document.querySelectorAll('.bulk-user-checkbox-usuarios'));
+    const marcarTodos = document.getElementById('marcarTodosPremiumUsuarios');
+    if (marcarTodos && caixas.length) {
+        marcarTodos.checked = caixas.every(caixa => caixa.checked);
+        marcarTodos.indeterminate = caixas.some(caixa => caixa.checked) && !marcarTodos.checked;
+    }
+    atualizarResumoPremiumUsuarios();
+}
+
+function marcarUtilizadoresUsuarios(marcar) {
+    document.querySelectorAll('.bulk-user-checkbox-usuarios').forEach(caixa => {
+        caixa.checked = marcar;
+    });
+    atualizarMarcadorPremiumUsuarios();
+}
+
+function confirmarPremiumEmMassaUsuarios(event) {
+    const selecionados = document.querySelectorAll('.bulk-user-checkbox-usuarios:checked').length;
+    if (!selecionados) {
+        event.preventDefault();
+        alert('Selecione pelo menos um utilizador.');
+        return false;
+    }
+    if (event.submitter && event.submitter.dataset.bulkAction === 'deactivate') {
+        return confirm(`Retirar o Premium de ${selecionados} utilizador(es) selecionado(s)?`);
+    }
+    return confirm(`Colocar ${selecionados} utilizador(es) no Premium por 30 dias?`);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const marcarTodos = document.getElementById('marcarTodosPremiumUsuarios');
+    if (marcarTodos) {
+        marcarTodos.addEventListener('change', function() {
+            marcarUtilizadoresUsuarios(marcarTodos.checked);
+        });
+    }
+    document.querySelectorAll('.bulk-user-checkbox-usuarios').forEach(caixa => {
+        caixa.addEventListener('change', atualizarMarcadorPremiumUsuarios);
+    });
+    atualizarResumoPremiumUsuarios();
 });
 </script>
 {% endblock %}
