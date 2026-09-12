@@ -1342,7 +1342,7 @@
                             <tr>
                                 {% if admin_level == 'superadmin' %}
                                 <td class="text-center">
-                                    <input type="checkbox" class="bulk-user-checkbox" name="user_ids" value="{{ u[0] }}" data-user-name="{{ u[1]|e }}" aria-label="Selecionar {{ u[1] }}">
+                                    <input type="checkbox" class="bulk-user-checkbox" value="{{ u[0] }}" data-user-name="{{ u[1]|e }}" aria-label="Selecionar {{ u[1] }}">
                                     {% if u[5] %}<i class="fas fa-crown text-warning ms-1" title="Já é Premium"></i>{% endif %}
                                 </td>
                                 {% endif %}
@@ -2473,12 +2473,27 @@ function marcarUtilizadoresPremium(marcar) {
 }
 
 function confirmarPremiumEmMassa(event) {
-    const selecionados = document.querySelectorAll('.bulk-user-checkbox:checked').length;
+    const form = event.currentTarget;
+    const caixasSelecionadas = Array.from(document.querySelectorAll('.bulk-user-checkbox:checked'));
+    const selecionados = caixasSelecionadas.length;
     if (!selecionados) {
         event.preventDefault();
         alert('Selecione pelo menos um utilizador.');
         return false;
     }
+
+    // Envia explicitamente todos os IDs, mesmo quando a tabela é reorganizada
+    // pelo navegador por causa das linhas e dos modais existentes.
+    form.querySelectorAll('.bulk-premium-hidden-id').forEach(campo => campo.remove());
+    caixasSelecionadas.forEach(caixa => {
+        const campo = document.createElement('input');
+        campo.type = 'hidden';
+        campo.name = 'user_ids';
+        campo.value = caixa.value;
+        campo.className = 'bulk-premium-hidden-id';
+        form.appendChild(campo);
+    });
+
     const acao = event.submitter && event.submitter.dataset.bulkAction;
     if (acao === 'deactivate') {
         return confirm(`Retirar o Premium de ${selecionados} utilizador(es) selecionado(s)?`);

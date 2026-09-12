@@ -284,7 +284,7 @@
                         {% if admin_level == 'superadmin' %}
                         <td class="text-center">
                             <input type="checkbox" class="bulk-user-checkbox-usuarios"
-                                   name="user_ids" value="{{ usuario[0] }}"
+                                   value="{{ usuario[0] }}"
                                    data-user-name="{{ usuario[1]|e }}"
                                    aria-label="Selecionar {{ usuario[1] }}">
                             {% if usuario[5] == 1 %}
@@ -484,12 +484,26 @@ function marcarUtilizadoresUsuarios(marcar) {
 }
 
 function confirmarPremiumEmMassaUsuarios(event) {
-    const selecionados = document.querySelectorAll('.bulk-user-checkbox-usuarios:checked').length;
+    const form = event.currentTarget;
+    const caixasSelecionadas = Array.from(document.querySelectorAll('.bulk-user-checkbox-usuarios:checked'));
+    const selecionados = caixasSelecionadas.length;
     if (!selecionados) {
         event.preventDefault();
         alert('Selecione pelo menos um utilizador.');
         return false;
     }
+
+    // Coloca todos os IDs selecionados dentro do formulário antes do envio.
+    form.querySelectorAll('.bulk-premium-hidden-id').forEach(campo => campo.remove());
+    caixasSelecionadas.forEach(caixa => {
+        const campo = document.createElement('input');
+        campo.type = 'hidden';
+        campo.name = 'user_ids';
+        campo.value = caixa.value;
+        campo.className = 'bulk-premium-hidden-id';
+        form.appendChild(campo);
+    });
+
     if (event.submitter && event.submitter.dataset.bulkAction === 'deactivate') {
         return confirm(`Retirar o Premium de ${selecionados} utilizador(es) selecionado(s)?`);
     }
