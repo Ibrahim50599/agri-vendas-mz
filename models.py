@@ -525,6 +525,30 @@ class Database:
         conn.commit()
         conn.close()
 
+    def activate_premium_bulk(self, user_ids):
+        """Ativa o Premium para vários utilizadores ativos numa só operação."""
+        ids = sorted({
+            int(user_id) for user_id in user_ids
+            if str(user_id).isdigit() and int(user_id) > 0
+        })
+        if not ids:
+            return 0
+
+        placeholders = ','.join('?' for _ in ids)
+        conn = self.get_connection()
+        c = conn.cursor()
+        data_expira = datetime.datetime.now() + datetime.timedelta(days=30)
+        c.execute(
+            f"""UPDATE usuarios
+                SET premium = 1, data_premium_expira = ?
+                WHERE ativo = 1 AND id IN ({placeholders})""",
+            (data_expira.date(), *ids)
+        )
+        atualizados = c.rowcount
+        conn.commit()
+        conn.close()
+        return atualizados
+
     def deactivate_premium(self, user_id):
         conn = self.get_connection()
         c = conn.cursor()

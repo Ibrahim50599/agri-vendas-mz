@@ -1290,6 +1290,27 @@
                 <span class="badge bg-light text-primary">{{ usuarios|length }} registos</span>
             </div>
             <div class="card-body">
+                {% if admin_level == 'superadmin' %}
+                <form method="POST" action="{{ url_for('ativar_premium_massa') }}" id="bulkPremiumForm"
+                      onsubmit="return confirmarPremiumEmMassa(event)">
+                    <div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                        <div>
+                            <strong><i class="fas fa-crown me-1"></i>Premium em massa</strong>
+                            <div class="small">Marque vários utilizadores e ative o Premium numa só operação.</div>
+                        </div>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-dark" onclick="marcarUtilizadoresPremium(true)">
+                                <i class="fas fa-check-double me-1"></i>Marcar todos
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="marcarUtilizadoresPremium(false)">
+                                Limpar seleção
+                            </button>
+                            <button type="submit" class="btn btn-sm btn-warning">
+                                <i class="fas fa-crown me-1"></i>Ativar Premium selecionados
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
                 <div class="mb-3">
                     <input type="text" class="search-box w-100" id="buscaUsuario"
                            placeholder="🔍  Buscar por nome, email ou telefone..." onkeyup="filtrarTabela('tabelaUsuarios', this.value)">
@@ -1298,6 +1319,7 @@
                     <table class="table table-hover table-admin mb-0" id="tabelaUsuarios">
                         <thead class="table-dark">
                             <tr>
+                                {% if admin_level == 'superadmin' %}<th class="text-center"><input type="checkbox" id="marcarTodosPremium" title="Marcar todos"></th>{% endif %}
                                 <th>#</th>
                                 <th>Nome</th>
                                 <th>Contato</th>
@@ -1311,6 +1333,15 @@
                         <tbody>
                             {% for u in usuarios %}
                             <tr>
+                                {% if admin_level == 'superadmin' %}
+                                <td class="text-center">
+                                    {% if not u[5] %}
+                                    <input type="checkbox" class="bulk-user-checkbox" name="user_ids" value="{{ u[0] }}" aria-label="Selecionar {{ u[1] }} para Premium">
+                                    {% else %}
+                                    <i class="fas fa-check text-success" title="Já é Premium"></i>
+                                    {% endif %}
+                                </td>
+                                {% endif %}
                                 <td><span class="badge bg-secondary">{{ u[0] }}</span></td>
                                 <td><strong>{{ u[1] }}</strong></td>
                                 <td>
@@ -1380,6 +1411,9 @@
                         </tbody>
                     </table>
                 </div>
+                {% if admin_level == 'superadmin' %}
+                </form>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -2385,5 +2419,41 @@ function agendarCapacitacao() {
 
 function explorarParcerias() {
     alert('🤝 Exploração de Parcerias Iniciada!\n\nCooperativas identificadas:\n• CoopAgri Sul\n• União de Produtores Norte\n• Rede de Agricultores Centro\n\nReuniões agendadas para as próximas semanas.');
-}</script>
+}
+
+// PREMIUM EM MASSA — disponível apenas para o super administrador
+function atualizarMarcadorPremium() {
+    const caixas = Array.from(document.querySelectorAll('.bulk-user-checkbox'));
+    const marcarTodos = document.getElementById('marcarTodosPremium');
+    if (!marcarTodos || !caixas.length) return;
+    marcarTodos.checked = caixas.every(caixa => caixa.checked);
+    marcarTodos.indeterminate = caixas.some(caixa => caixa.checked) && !marcarTodos.checked;
+}
+
+function marcarUtilizadoresPremium(marcar) {
+    document.querySelectorAll('.bulk-user-checkbox').forEach(caixa => {
+        caixa.checked = marcar;
+    });
+    atualizarMarcadorPremium();
+}
+
+function confirmarPremiumEmMassa(event) {
+    const selecionados = document.querySelectorAll('.bulk-user-checkbox:checked').length;
+    if (!selecionados) {
+        event.preventDefault();
+        alert('Selecione pelo menos um utilizador.');
+        return false;
+    }
+    return confirm(`Ativar o Premium para ${selecionados} utilizador(es) selecionado(s) por 30 dias?`);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const marcarTodos = document.getElementById('marcarTodosPremium');
+    if (!marcarTodos) return;
+    marcarTodos.addEventListener('change', () => marcarUtilizadoresPremium(marcarTodos.checked));
+    document.querySelectorAll('.bulk-user-checkbox').forEach(caixa => {
+        caixa.addEventListener('change', atualizarMarcadorPremium);
+    });
+});
+</script>
 {% endblock %}
