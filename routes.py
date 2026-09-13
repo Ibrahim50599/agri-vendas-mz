@@ -4,6 +4,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import datetime
+import json
 import math
 import os
 import re
@@ -1016,29 +1017,93 @@ def identificar_planta():
 Analisa cuidadosamente a fotografia agrícola anexada. O contexto fornecido pelo agricultor é:
 {contexto_texto}
 
-Responde em português de Moçambique, com linguagem simples e prática, usando exatamente estas secções:
-1. IDENTIFICAÇÃO: nome comum, nome científico e nível de confiança. Se a imagem não permitir identificar com segurança, diz isso claramente e apresenta no máximo três possibilidades.
-2. OBSERVAÇÕES: descreve apenas o que é visível na planta, nas folhas, no caule, nos frutos ou no solo.
-3. DOENÇAS OU PRAGAS: indica se há sinais compatíveis com doença, praga, deficiência nutricional ou stress. Não inventes um diagnóstico quando a evidência visual for insuficiente.
-4. MANEJO RECOMENDADO: apresenta passos práticos e seguros, priorizando isolamento das plantas afetadas, higiene, monitorização, manejo integrado e alternativas de baixo risco. Só menciona produtos fitossanitários de forma geral e recomenda seguir sempre o rótulo e a orientação dos serviços agrários locais.
-5. PRÓXIMO PASSO: diz que nova fotografia, informação ou observação o agricultor deve fornecer para confirmar a avaliação.
+Responde em português de Moçambique, com linguagem simples e prática. Preenche TODOS os cinco campos solicitados, mesmo quando a fotografia não permite uma identificação segura. Cada campo deve ter informação completa, com pelo menos duas frases quando houver evidência suficiente.
 
-Não apresentes a análise como substituto de um agrónomo no campo. Não inventes preços, nomes de produtos comerciais ou doses. Se a fotografia não for de uma planta ou estiver desfocada, explica a limitação e pede uma fotografia melhor."""
+- identificacao: nome comum, nome científico e nível de confiança. Se não for possível identificar com segurança, diz isso claramente e apresenta no máximo três possibilidades.
+- observacoes: descreve apenas o que é visível na planta, nas folhas, no caule, nos frutos ou no solo.
+- doencas_pragas: indica se há sinais compatíveis com doença, praga, deficiência nutricional ou stress. Não inventes um diagnóstico quando a evidência visual for insuficiente.
+- manejo_recomendado: apresenta passos práticos e seguros, priorizando isolamento das plantas afetadas, higiene, monitorização, manejo integrado e alternativas de baixo risco. Só menciona produtos fitossanitários de forma geral e recomenda seguir sempre o rótulo e a orientação dos serviços agrários locais.
+- proximo_passo: diz que nova fotografia, informação ou observação o agricultor deve fornecer para confirmar a avaliação.
+
+Não apresentes a análise como substituto de um agrónomo no campo. Não inventes preços, nomes de produtos comerciais ou doses. Se a fotografia não for de uma planta ou estiver desfocada, explica a limitação e pede uma fotografia melhor. Devolve apenas um objeto JSON válido com exatamente estas cinco chaves: identificacao, observacoes, doencas_pragas, manejo_recomendado e proximo_passo."""
 
     try:
         client = genai.Client(api_key=api_key)
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=[
-                types.Part.from_text(text=prompt),
-                types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
-            ],
-            config=types.GenerateContentConfig(
-                temperature=0.2,
-                max_output_tokens=1200,
-            ),
+        conteudo = [
+            types.Part.from_text(text=prompt),
+            types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
+        ]
+        configuracao = types.GenerateContentConfig(
+            temperature=0.2,
+            max_output_tokens=1800,
+            response_mime_type='application/json',
+            response_schema={
+                'type': 'object',
+                'properties': {
+                    'identificacao': {'type': 'string'},
+                    'observacoes': {'type': 'string'},
+                    'doencas_pragas': {'type': 'string'},
+                    'manejo_recomendado': {'type': 'string'},
+                    'proximo_passo': {'type': 'string'},
+                },
+                'required': [
+                    'identificacao',
+                    'observacoes',
+                    'doencas_pragas',
+                    'manejo_recomendado',
+                    'proximo_passo',
+                ],
+            },
         )
-        analise = (response.text or '').strip()
+
+        response = None
+        ultimo_erro = None
+        for modelo in ('gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-latest'):
+            try:
+                response = client.models.generate_content(
+                    model=modelo,
+                    contents=conteudo,
+                    config=configuracao,
+                )
+                break
+            except Exception as model_error:
+                ultimo_erro = model_error
+                erro_modelo = str(model_error).lower()
+                pode_tentar_alternativa = any(
+                    marcador in erro_modelo
+                    for marcador in ('503', 'unavailable', '429', 'resource_exhausted', 'not found')
+                )
+                if not pode_tentar_alternativa:
+                    raise
+                app.logger.warning(
+                    'Modelo Gemini indisponível para diagnóstico (%s); a tentar alternativa.',
+                    modelo,
+                )
+
+        if response is None:
+            raise ultimo_erro or RuntimeError('Nenhum modelo Gemini respondeu.')
+
+        resposta_texto = (response.text or '').strip()
+        try:
+            resposta_json = json.loads(resposta_texto)
+        except json.JSONDecodeError:
+            resposta_json = None
+
+        if isinstance(resposta_json, dict):
+            secoes = [
+                ('IDENTIFICAÇÃO', resposta_json.get('identificacao')),
+                ('OBSERVAÇÕES', resposta_json.get('observacoes')),
+                ('DOENÇAS OU PRAGAS', resposta_json.get('doencas_pragas')),
+                ('MANEJO RECOMENDADO', resposta_json.get('manejo_recomendado')),
+                ('PRÓXIMO PASSO', resposta_json.get('proximo_passo')),
+            ]
+            analise = '\n\n'.join(
+                f'{titulo}:\n{str(conteudo).strip() if conteudo else "Sem informação suficiente; observe novamente a planta."}'
+                for titulo, conteudo in secoes
+            )
+        else:
+            analise = resposta_texto
+
         if not analise:
             return jsonify({
                 'ok': False,
