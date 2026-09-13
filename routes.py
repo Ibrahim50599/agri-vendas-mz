@@ -1028,7 +1028,7 @@ Não apresentes a análise como substituto de um agrónomo no campo. Não invent
     try:
         client = genai.Client(api_key=api_key)
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-2.5-flash',
             contents=[
                 types.Part.from_text(text=prompt),
                 types.Part.from_bytes(data=image_bytes, mime_type=mime_type),

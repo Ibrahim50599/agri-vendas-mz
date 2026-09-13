@@ -1,0 +1,1 @@
+- [Gemini Vision compatibility](gemini-vision-compatibility.md) — use a currently listed Flash model for image analysis; older model IDs may return 404.
