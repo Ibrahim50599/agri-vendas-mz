@@ -532,13 +532,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        function toggleSidebar() {
+        window.toggleSidebar = function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.querySelector('.sidebar-overlay');
 
+            if (!sidebar || !overlay) return;
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
-        }
+        };
 
         function submitAdminAccess() {
             const codigo = document.getElementById('adminCodigoInput').value.trim();
@@ -566,9 +567,11 @@
             const sidebar = document.getElementById('sidebar');
             const menuToggle = document.querySelector('.menu-toggle');
 
+            if (!sidebar || !menuToggle) return;
             if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
                 sidebar.classList.remove('active');
-                document.querySelector('.sidebar-overlay').classList.remove('active');
+                const overlay = document.querySelector('.sidebar-overlay');
+                if (overlay) overlay.classList.remove('active');
             }
         });
     </script>
