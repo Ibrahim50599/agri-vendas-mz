@@ -907,13 +907,42 @@
                 </div>
                 <div class="card-body">
                     <p class="text-muted">
-                        Dimensione um sistema NFT, em substrato ou DWC, estime a solução nutritiva e interprete as medições da água.
+                        Introduza as medidas da sua instalação e leituras do medidor. O sistema calcula apenas a partir destes dados e de referências técnicas identificadas; não inventa doses de adubo nem consumo diário de água.
                     </p>
                     <form id="hydroponiaForm">
                         <div class="row g-3">
+                            <div class="col-12">
+                                <h6 class="mb-0 text-success">Medidas reais do espaço</h6>
+                                <small class="text-muted">Meça o comprimento e a largura úteis. A área será calculada a partir destas medidas.</small>
+                            </div>
                             <div class="col-6 col-lg-3">
-                                <label class="form-label" for="hydroArea">Área disponível (m²)</label>
-                                <input class="form-control" id="hydroArea" type="number" min="0.5" max="10000" step="0.1" value="10" required>
+                                <label class="form-label" for="hydroLength">Comprimento útil (m)</label>
+                                <input class="form-control" id="hydroLength" type="number" min="0.5" max="1000" step="0.01" placeholder="Ex.: 8" required>
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <label class="form-label" for="hydroWidth">Largura útil (m)</label>
+                                <input class="form-control" id="hydroWidth" type="number" min="0.5" max="1000" step="0.01" placeholder="Ex.: 4" required>
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <label class="form-label" for="hydroBenchWidth">Largura real da bancada (m)</label>
+                                <input class="form-control" id="hydroBenchWidth" type="number" min="0.2" max="20" step="0.01" placeholder="Ex.: 0,8" required>
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <label class="form-label" for="hydroAisle">Largura real do corredor (m)</label>
+                                <input class="form-control" id="hydroAisle" type="number" min="0" max="20" step="0.01" placeholder="Meça a largura real" required>
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <label class="form-label" for="hydroPlantSpacing">Espaçamento entre plantas (cm)</label>
+                                <input class="form-control" id="hydroPlantSpacing" type="number" min="1" max="500" step="0.1" placeholder="Meça conforme a cultura" required>
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <label class="form-label" for="hydroRowSpacing">Espaçamento entre linhas (cm)</label>
+                                <input class="form-control" id="hydroRowSpacing" type="number" min="1" max="500" step="0.1" placeholder="Meça conforme o sistema" required>
+                            </div>
+                            <div class="col-6 col-lg-3" id="hydroChannelWrap">
+                                <label class="form-label" for="hydroChannelLength">Comprimento real de cada canal NFT (m)</label>
+                                <input class="form-control" id="hydroChannelLength" type="number" min="0.5" max="3.66" step="0.01" placeholder="Meça cada canal">
+                                <small class="text-muted">Referência técnica para canais padrão: 1,2–3,66 m; introduza a medida instalada.</small>
                             </div>
                             <div class="col-6 col-lg-3">
                                 <label class="form-label" for="hydroCulture">Cultura</label>
@@ -940,23 +969,36 @@
                                 </select>
                             </div>
                             <div class="col-6 col-lg-3">
-                                <label class="form-label" for="hydroReservoir">Reservatório (L)</label>
-                                <input class="form-control" id="hydroReservoir" type="number" min="1" max="100000" step="1" value="100" required>
+                                <label class="form-label" for="hydroReservoir">Volume real de trabalho do reservatório (L)</label>
+                                <input class="form-control" id="hydroReservoir" type="number" min="1" max="100000" step="0.1" placeholder="Ex.: 100" required>
+                            </div>
+                            <div class="col-12" id="hydroSubstrateWrap" style="display:none;">
+                                <div class="row g-3 border rounded p-3 mx-0">
+                                    <div class="col-12"><h6 class="mb-0 text-success">Calibração real do gotejamento</h6><small class="text-muted">Sem vazão medida e volume definido por planta, o sistema não inventa minutos nem ciclos.</small></div>
+                                    <div class="col-6 col-lg-4">
+                                        <label class="form-label" for="hydroEmitterFlow">Vazão medida do emissor (L/h)</label>
+                                        <input class="form-control" id="hydroEmitterFlow" type="number" min="0.001" max="10000" step="0.001" placeholder="Meça com recipiente e cronómetro">
+                                    </div>
+                                    <div class="col-6 col-lg-4">
+                                        <label class="form-label" for="hydroVolumeCycle">Volume por planta em cada ciclo (L)</label>
+                                        <input class="form-control" id="hydroVolumeCycle" type="number" min="0.001" max="1000" step="0.001" placeholder="Valor definido após avaliação do substrato">
+                                    </div>
+                                    <div class="col-6 col-lg-4">
+                                        <label class="form-label" for="hydroCycles">Ciclos configurados por dia</label>
+                                        <input class="form-control" id="hydroCycles" type="number" min="1" max="100" step="1" placeholder="Opcional">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <h6 class="mb-0 text-success">Medições da solução e da água de origem</h6>
+                                <small class="text-muted">Use instrumentos calibrados e unidades indicadas no medidor ou na análise laboratorial.</small>
                             </div>
                             <div class="col-6 col-lg-3">
-                                <label class="form-label" for="hydroAirTemp">Temperatura ambiente (°C)</label>
-                                <input class="form-control" id="hydroAirTemp" type="number" min="0" max="55" step="0.1" value="28">
+                                <label class="form-label" for="hydroPh">pH medido da solução</label>
+                                <input class="form-control" id="hydroPh" type="number" min="0" max="14" step="0.01" placeholder="Opcional">
                             </div>
                             <div class="col-6 col-lg-3">
-                                <label class="form-label" for="hydroPh">pH medido</label>
-                                <input class="form-control" id="hydroPh" type="number" min="0" max="14" step="0.01" placeholder="Ex.: 6,0">
-                            </div>
-                            <div class="col-6 col-lg-3">
-                                <label class="form-label" for="hydroWaterTemp">Temperatura da água (°C)</label>
-                                <input class="form-control" id="hydroWaterTemp" type="number" min="0" max="55" step="0.1" placeholder="Ex.: 22">
-                            </div>
-                            <div class="col-6 col-lg-3">
-                                <label class="form-label" for="hydroReading">Leitura de nutrientes</label>
+                                <label class="form-label" for="hydroReading">CE/TDS medido da solução</label>
                                 <input class="form-control" id="hydroReading" type="number" min="0" max="10000" step="0.01" placeholder="Opcional">
                             </div>
                             <div class="col-6 col-lg-3">
@@ -973,6 +1015,52 @@
                                     <option value="700">700</option>
                                 </select>
                             </div>
+                            <div class="col-6 col-lg-3">
+                                <label class="form-label" for="hydroSourceEc">CE da água de origem (mS/cm)</label>
+                                <input class="form-control" id="hydroSourceEc" type="number" min="0" max="100" step="0.01" placeholder="Opcional; antes de adicionar adubo">
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <label class="form-label" for="hydroAlkalinity">Alcalinidade (ppm CaCO₃)</label>
+                                <input class="form-control" id="hydroAlkalinity" type="number" min="0" max="10000" step="1" placeholder="Resultado da análise da água">
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <label class="form-label" for="hydroOxygen">Oxigénio dissolvido (mg/L)</label>
+                                <input class="form-control" id="hydroOxygen" type="number" min="0" max="30" step="0.1" placeholder="Opcional; medidor DO">
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <label class="form-label" for="hydroWaterTemp">Temperatura da solução (°C)</label>
+                                <input class="form-control" id="hydroWaterTemp" type="number" min="0" max="55" step="0.1" placeholder="Opcional">
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <label class="form-label" for="hydroAirTemp">Temperatura ambiente (°C)</label>
+                                <input class="form-control" id="hydroAirTemp" type="number" min="-5" max="55" step="0.1" placeholder="Opcional">
+                            </div>
+                            <div class="col-12">
+                                <h6 class="mb-0 text-success">Produtos conforme o rótulo (opcional)</h6>
+                                <small class="text-muted">Informe a dose e o volume de água exatos indicados no rótulo. O cálculo só escala essa dose para o volume do reservatório; não cria uma receita nutricional. A fase da cultura é registada, mas não altera a dose do rótulo.</small>
+                            </div>
+                            {% for i in range(1, 5) %}
+                            <div class="col-12">
+                                <div class="row g-2 align-items-end border rounded p-2 mx-0">
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label" for="hydroProductName{{ i }}">Produto {{ i }} (opcional)</label>
+                                        <input class="form-control" id="hydroProductName{{ i }}" type="text" maxlength="80" placeholder="Nome como aparece no rótulo">
+                                    </div>
+                                    <div class="col-4 col-md-2">
+                                        <label class="form-label" for="hydroProductDose{{ i }}">Dose do rótulo</label>
+                                        <input class="form-control hydro-product-dose" id="hydroProductDose{{ i }}" type="number" min="0" max="100000" step="0.01" placeholder="Ex.: 5">
+                                    </div>
+                                    <div class="col-4 col-md-2">
+                                        <label class="form-label" for="hydroProductUnit{{ i }}">Unidade</label>
+                                        <select class="form-select" id="hydroProductUnit{{ i }}"><option value="g">g</option><option value="ml">mL</option></select>
+                                    </div>
+                                    <div class="col-4 col-md-4">
+                                        <label class="form-label" for="hydroProductVolume{{ i }}">Para quantos litros?</label>
+                                        <input class="form-control hydro-product-volume" id="hydroProductVolume{{ i }}" type="number" min="0.001" max="100000" step="0.01" placeholder="Ex.: 10">
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
                             <div class="col-12 col-lg-6">
                                 <label class="form-label" for="hydroSymptom">Sintoma observado (opcional)</label>
                                 <select class="form-select" id="hydroSymptom">
@@ -985,6 +1073,11 @@
                                     <option value="murcha">Planta murcha apesar de haver água</option>
                                     <option value="crescimento_lento">Crescimento lento ou folhas pequenas</option>
                                 </select>
+                            </div>
+                            <div class="col-12">
+                                <div class="alert alert-warning small mb-0">
+                                    Estes cálculos usam as medidas e leituras que introduzir. Faixas publicadas não substituem análise laboratorial, recomendação do fabricante nem validação para a variedade e condições locais em Moçambique.
+                                </div>
                             </div>
                             <div class="col-12 d-flex flex-wrap align-items-center gap-3">
                                 <button type="submit" class="btn btn-success" id="hydroCalculateBtn">
@@ -1275,6 +1368,10 @@ const hydroStatus = document.getElementById('hydroStatus');
 const hydroCalculateBtn = document.getElementById('hydroCalculateBtn');
 const hydroReadingUnit = document.getElementById('hydroReadingUnit');
 const hydroTdsScaleWrap = document.getElementById('hydroTdsScaleWrap');
+const hydroSystem = document.getElementById('hydroSystem');
+const hydroChannelWrap = document.getElementById('hydroChannelWrap');
+const hydroSubstrateWrap = document.getElementById('hydroSubstrateWrap');
+const hydroChannelLength = document.getElementById('hydroChannelLength');
 
 function escaparHydroHtml(valor) {
     return String(valor ?? '').replace(/[&<>"']/g, caractere => ({
@@ -1287,7 +1384,10 @@ function escaparHydroHtml(valor) {
 }
 
 function formatarHydroNumero(valor, casas = 1) {
-    return Number(valor).toLocaleString('pt-MZ', {
+    if (valor === null || valor === undefined || valor === '') return '—';
+    const numero = Number(valor);
+    if (!Number.isFinite(numero)) return '—';
+    return numero.toLocaleString('pt-MZ', {
         minimumFractionDigits: 0,
         maximumFractionDigits: casas
     });
@@ -1297,71 +1397,68 @@ function renderizarResultadoHidroponia(resultado) {
     const dimensionamento = resultado.dimensionamento;
     const nutrientes = resultado.nutrientes;
     const irrigacao = resultado.irrigacao;
-    const monitorizacao = resultado.monitorizacao;
     const diagnostico = resultado.diagnostico;
-    const linhasReceita = Object.entries(nutrientes.receita_inicial_g).map(([nome, gramas]) => {
-        const nomes = {
-            nitrato_calcio: 'Nitrato de cálcio',
-            nitrato_potassio: 'Nitrato de potássio',
-            fosfato_monopotassico: 'Fosfato monopotássico (MKP)',
-            sulfato_magnesio: 'Sulfato de magnésio',
-            micronutrientes: 'Mistura de micronutrientes'
-        };
-        return `<tr><td>${escaparHydroHtml(nomes[nome] || nome)}</td><td class="text-end fw-semibold">${formatarHydroNumero(gramas, 2)} g</td></tr>`;
-    }).join('');
-    const linhasCorrecao = Object.entries(nutrientes.dose_correcao_parcial_g).map(([nome, gramas]) => {
-        const nomes = {
-            nitrato_calcio: 'Nitrato de cálcio',
-            nitrato_potassio: 'Nitrato de potássio',
-            fosfato_monopotassico: 'Fosfato monopotássico (MKP)',
-            sulfato_magnesio: 'Sulfato de magnésio',
-            micronutrientes: 'Mistura de micronutrientes'
-        };
-        return `<li>${escaparHydroHtml(nomes[nome] || nome)}: ${formatarHydroNumero(gramas, 2)} g</li>`;
-    }).join('');
-    const linhasProgramacao = irrigacao.programacao_tabela.map(linha => `
+    const linhasProdutos = (nutrientes.produtos_rotulo || []).map(produto => `
+        <tr>
+            <td>${escaparHydroHtml(produto.nome)}</td>
+            <td>${formatarHydroNumero(produto.dose_rotulo, 2)} ${escaparHydroHtml(produto.unidade)} / ${formatarHydroNumero(produto.volume_rotulo_l, 2)} L</td>
+            <td class="text-end fw-semibold">${formatarHydroNumero(produto.dose_calculada, 4)} ${escaparHydroHtml(produto.unidade)}</td>
+        </tr>`).join('');
+    const linhasProgramacao = (irrigacao.programacao_tabela || []).map(linha => `
         <tr>
             <td>${escaparHydroHtml(linha.periodo)}</td>
             <td>${escaparHydroHtml(linha.funcionamento)}</td>
             <td>${escaparHydroHtml(linha.temporizador)}</td>
         </tr>`).join('');
-    const inclinacao = dimensionamento.inclinacao_percentual !== null
-        ? `<p class="mb-1"><strong>Inclinação NFT:</strong> ${formatarHydroNumero(dimensionamento.inclinacao_percentual)}% (diferença estimada de ${formatarHydroNumero(dimensionamento.diferenca_altura_cm)} cm ao longo do perfil).</p>`
+    const inclinacao = dimensionamento.inclinacao_minima_percentual !== null
+        ? `<p class="mb-1"><strong>Inclinação mínima publicada:</strong> ${formatarHydroNumero(dimensionamento.inclinacao_minima_percentual)}% · queda mínima calculada para o canal informado (${formatarHydroNumero(dimensionamento.comprimento_canal_m, 2)} m): ${formatarHydroNumero(dimensionamento.queda_minima_cm_canal)} cm.</p>`
         : '';
-    const caudal = dimensionamento.caudal_total_l_min !== null
-        ? `<p class="mb-1"><strong>Caudal:</strong> ${formatarHydroNumero(dimensionamento.caudal_l_min_por_canal)} L/min por canal; cerca de ${formatarHydroNumero(dimensionamento.caudal_total_l_min)} L/min no total.</p>`
+    const caudal = dimensionamento.caudal_minimo_total_l_h !== null
+        ? `<p class="mb-1"><strong>Vazão de referência NFT:</strong> ${formatarHydroNumero(dimensionamento.caudal_minimo_l_h_canal)}–${formatarHydroNumero(dimensionamento.caudal_maximo_l_h_canal)} L/h por canal; ${formatarHydroNumero(dimensionamento.caudal_minimo_total_l_h)}–${formatarHydroNumero(dimensionamento.caudal_maximo_total_l_h)} L/h no total para ${formatarHydroNumero(dimensionamento.canais_ou_linhas, 0)} canais.</p>`
         : '';
+    const tabelaProdutos = linhasProdutos
+        ? `<div class="table-responsive"><table class="table table-sm mb-2"><thead><tr><th>Produto indicado</th><th>Dose/volume do rótulo</th><th class="text-end">Quantidade escalada</th></tr></thead><tbody>${linhasProdutos}</tbody></table></div>`
+        : '<p class="mb-2">Não foram introduzidas doses de rótulo; por isso não é apresentada uma receita em gramas ou mililitros.</p>';
+    const fontes = (resultado.fontes || []).map(fonte => {
+        const url = String(fonte.url || '');
+        const href = /^https:\/\/[a-z0-9.-]+(?:\/[^\s]*)?$/i.test(url)
+            ? escaparHydroHtml(url)
+            : '#';
+        return `<li><a href="${href}" target="_blank" rel="noopener noreferrer">${escaparHydroHtml(fonte.nome)}</a></li>`;
+    }).join('');
 
     hydroResults.innerHTML = `
         <div class="alert alert-success">
             <strong>${escaparHydroHtml(resultado.cultura)} · ${escaparHydroHtml(resultado.sistema)} · ${escaparHydroHtml(resultado.fase)}</strong>
-            <span class="d-block small">Valores estimados para planeamento inicial. Confirme as medidas reais do local.</span>
+            <span class="d-block small">Área calculada a partir das medidas informadas. A capacidade de plantas é uma estimativa geométrica: confirme margens, posições de plantio e obstáculos na instalação.</span>
         </div>
         <div class="row g-3">
             <div class="col-12 col-xl-6">
                 <section class="hydro-result-card">
                     <h6><i class="fas fa-ruler-combined me-2"></i>Dimensionamento</h6>
                     <div class="row g-2 mb-3">
-                        <div class="col-6"><div class="hydro-stat"><strong>${formatarHydroNumero(dimensionamento.plantas_estimadas, 0)}</strong><span class="small">plantas estimadas</span></div></div>
+                        <div class="col-6"><div class="hydro-stat"><strong>${formatarHydroNumero(dimensionamento.plantas_estimadas, 0)}</strong><span class="small">posições geométricas estimadas</span></div></div>
                         <div class="col-6"><div class="hydro-stat"><strong>${formatarHydroNumero(dimensionamento.bancadas, 0)}</strong><span class="small">bancada(s)</span></div></div>
                     </div>
-                    <p class="mb-1"><strong>Área/modelo:</strong> ${formatarHydroNumero(dimensionamento.area_m2)} m² · ${escaparHydroHtml(dimensionamento.formato_estimado)} (layout aproximado).</p>
+                    <p class="mb-1"><strong>Espaço medido:</strong> ${formatarHydroNumero(dimensionamento.comprimento_m, 2)} m × ${formatarHydroNumero(dimensionamento.largura_m, 2)} m = ${formatarHydroNumero(dimensionamento.area_m2, 2)} m².</p>
+                    <p class="mb-1"><strong>Layout informado:</strong> bancada ${formatarHydroNumero(dimensionamento.largura_bancada_m, 2)} m; corredor ${formatarHydroNumero(dimensionamento.corredor_m, 2)} m.</p>
                     <p class="mb-1"><strong>Espaçamento:</strong> ${formatarHydroNumero(dimensionamento.espacamento_planta_cm, 0)} cm entre plantas e ${formatarHydroNumero(dimensionamento.espacamento_linha_cm, 0)} cm entre linhas.</p>
-                    <p class="mb-1"><strong>Linhas por bancada:</strong> ${formatarHydroNumero(dimensionamento.linhas_por_bancada, 0)} · <strong>plantas por linha:</strong> ${formatarHydroNumero(dimensionamento.plantas_por_linha, 0)}.</p>
+                    <p class="mb-1"><strong>Linhas:</strong> ${formatarHydroNumero(dimensionamento.linhas_por_bancada, 0)} por bancada; ${formatarHydroNumero(dimensionamento.linhas_total, 0)} no total · <strong>plantas por canal/linha:</strong> ${formatarHydroNumero(dimensionamento.plantas_por_linha, 0)}.</p>
+                    ${dimensionamento.canais_por_linha !== null ? `<p class="mb-1"><strong>Canais NFT por linha:</strong> ${formatarHydroNumero(dimensionamento.canais_por_linha, 0)} · <strong>total de canais:</strong> ${formatarHydroNumero(dimensionamento.canais_ou_linhas, 0)} · <strong>comprimento real informado:</strong> ${formatarHydroNumero(dimensionamento.comprimento_canal_m, 2)} m.</p>` : ''}
                     ${inclinacao}${caudal}
                 </section>
             </div>
             <div class="col-12 col-xl-6">
                 <section class="hydro-result-card">
-                    <h6><i class="fas fa-flask me-2"></i>Receita inicial para ${formatarHydroNumero(nutrientes.volume_l, 0)} L</h6>
-                    <div class="table-responsive">
-                        <table class="table table-sm mb-2"><thead><tr><th>Sal/adubo</th><th class="text-end">Quantidade</th></tr></thead><tbody>${linhasReceita}</tbody></table>
-                    </div>
-                    <p class="small mb-1"><strong>CE alvo inicial:</strong> ${formatarHydroNumero(nutrientes.faixa_ec_min)}–${formatarHydroNumero(nutrientes.faixa_ec_max)} mS/cm; centro ${formatarHydroNumero(nutrientes.ec_alvo)} mS/cm.</p>
-                    <details class="small mt-2">
-                        <summary class="fw-semibold">Ver correção gradual se a CE estiver baixa (¼ da receita)</summary>
-                        <ul class="mb-2 mt-2">${linhasCorrecao}</ul>
-                    </details>
+                    <h6><i class="fas fa-flask me-2"></i>Solução nutritiva · reservatório ${formatarHydroNumero(nutrientes.volume_l, 1)} L</h6>
+                    ${tabelaProdutos}
+                    <p class="small mb-2">${escaparHydroHtml(nutrientes.estado_dose)}</p>
+                    <p class="small mb-1"><strong>Faixa de CE publicada para a cultura:</strong> ${formatarHydroNumero(nutrientes.faixa_ec_min)}–${formatarHydroNumero(nutrientes.faixa_ec_max)} mS/cm.</p>
+                    <p class="small mb-1"><strong>Faixa de pH de referência:</strong> ${formatarHydroNumero(nutrientes.faixa_ph_min)}–${formatarHydroNumero(nutrientes.faixa_ph_max)}.</p>
+                    <p class="small mb-1">${escaparHydroHtml(nutrientes.estado_ec)}</p>
+                    <p class="small mb-1">${escaparHydroHtml(nutrientes.estado_ph)}</p>
+                    <p class="small mb-1">${escaparHydroHtml(nutrientes.estado_alcalinidade)}</p>
+                    <p class="small mb-0">${escaparHydroHtml(nutrientes.estado_agua_fonte)}</p>
                     <div class="alert alert-warning small mt-2 mb-0">${escaparHydroHtml(nutrientes.nota)}</div>
                 </section>
             </div>
@@ -1375,23 +1472,23 @@ function renderizarResultadoHidroponia(resultado) {
                             <tbody>${linhasProgramacao}</tbody>
                         </table>
                     </div>
-                    <p class="mb-1"><strong>Reposição diária estimada:</strong> ${formatarHydroNumero(irrigacao.reposicao_estimada_l_dia)} L/dia.</p>
-                    <p class="small text-muted mb-0">${escaparHydroHtml(irrigacao.nota_reposicao)}</p>
+                    <p class="small mb-2">${escaparHydroHtml(irrigacao.estado_oxigenio)}</p>
+                    <p class="small mb-2">${escaparHydroHtml(irrigacao.estado_temperatura)}</p>
+                    <p class="small mb-2">${escaparHydroHtml(irrigacao.nota_reposicao)}</p>
+                    <p class="small text-muted mb-0">${escaparHydroHtml(irrigacao.nota_clima)}</p>
                 </section>
             </div>
             <div class="col-12 col-xl-6">
                 <section class="hydro-result-card">
-                    <h6><i class="fas fa-vial me-2"></i>Leitura e diagnóstico da água</h6>
-                    <p class="mb-2">${escaparHydroHtml(monitorizacao.estado_ph)}</p>
-                    <p class="mb-2">${escaparHydroHtml(monitorizacao.estado_ec)}</p>
-                    <p class="mb-0">${escaparHydroHtml(monitorizacao.estado_temperatura)}</p>
+                    <h6><i class="fas fa-leaf me-2"></i>Guia de sintomas</h6>
+                    <p class="mb-1"><strong>${escaparHydroHtml(diagnostico.sintoma)}:</strong> ${escaparHydroHtml(diagnostico.possivel_causa)}</p>
+                    <p class="mb-0"><strong>Ação recomendada:</strong> ${escaparHydroHtml(diagnostico.acao)}</p>
                 </section>
             </div>
             <div class="col-12">
                 <section class="hydro-result-card">
-                    <h6><i class="fas fa-leaf me-2"></i>Guia de sintomas</h6>
-                    <p class="mb-1"><strong>${escaparHydroHtml(diagnostico.sintoma)}:</strong> ${escaparHydroHtml(diagnostico.possivel_causa)}</p>
-                    <p class="mb-0"><strong>Ação recomendada:</strong> ${escaparHydroHtml(diagnostico.acao)}</p>
+                    <h6><i class="fas fa-book me-2"></i>Fontes técnicas</h6>
+                    <ul class="small mb-0">${fontes}</ul>
                 </section>
             </div>
         </div>
@@ -1401,6 +1498,16 @@ function renderizarResultadoHidroponia(resultado) {
 hydroReadingUnit.addEventListener('change', function() {
     hydroTdsScaleWrap.style.display = this.value === 'tds' ? '' : 'none';
 });
+
+function atualizarCamposDoSistema() {
+    const sistemaSelecionado = hydroSystem.value;
+    hydroChannelWrap.style.display = sistemaSelecionado === 'nft' ? '' : 'none';
+    hydroChannelLength.required = sistemaSelecionado === 'nft';
+    hydroSubstrateWrap.style.display = sistemaSelecionado === 'substrato' ? '' : 'none';
+}
+
+hydroSystem.addEventListener('change', atualizarCamposDoSistema);
+atualizarCamposDoSistema();
 
 hydroponiaForm.addEventListener('submit', async function(event) {
     event.preventDefault();
@@ -1414,19 +1521,53 @@ hydroponiaForm.addEventListener('submit', async function(event) {
         const valor = document.getElementById(id).value;
         return valor === '' ? null : Number(valor);
     };
+    const produtosRotulo = [];
+    for (let i = 1; i <= 4; i += 1) {
+        const nome = document.getElementById(`hydroProductName${i}`).value.trim();
+        const dose = lerNumeroOuNulo(`hydroProductDose${i}`);
+        const volumeRotulo = lerNumeroOuNulo(`hydroProductVolume${i}`);
+        if (nome || dose !== null || volumeRotulo !== null) {
+            if (dose === null || volumeRotulo === null) {
+                hydroStatus.textContent = `Preencha a dose e o volume indicados no rótulo do produto ${i}, ou deixe essa linha vazia.`;
+                hydroStatus.className = 'small text-danger';
+                hydroCalculateBtn.disabled = false;
+                hydroCalculateBtn.innerHTML = '<i class="fas fa-calculator me-2"></i>Calcular e diagnosticar';
+                return;
+            }
+            produtosRotulo.push({
+                nome,
+                dose_rotulo: dose,
+                volume_rotulo_l: volumeRotulo,
+                unidade: document.getElementById(`hydroProductUnit${i}`).value
+            });
+        }
+    }
     const dados = {
-        area_m2: lerNumeroOuNulo('hydroArea'),
+        comprimento_m: lerNumeroOuNulo('hydroLength'),
+        largura_m: lerNumeroOuNulo('hydroWidth'),
         cultura: document.getElementById('hydroCulture').value,
         sistema: document.getElementById('hydroSystem').value,
         fase: document.getElementById('hydroPhase').value,
+        largura_bancada_m: lerNumeroOuNulo('hydroBenchWidth'),
+        corredor_m: lerNumeroOuNulo('hydroAisle'),
+        espacamento_planta_cm: lerNumeroOuNulo('hydroPlantSpacing'),
+        espacamento_linha_cm: lerNumeroOuNulo('hydroRowSpacing'),
+        comprimento_canal_m: lerNumeroOuNulo('hydroChannelLength'),
         volume_l: lerNumeroOuNulo('hydroReservoir'),
         temperatura_ar: lerNumeroOuNulo('hydroAirTemp'),
         ph: lerNumeroOuNulo('hydroPh'),
         temperatura_agua: lerNumeroOuNulo('hydroWaterTemp'),
+        oxigenio_dissolvido: lerNumeroOuNulo('hydroOxygen'),
         leitura_nutrientes: lerNumeroOuNulo('hydroReading'),
         unidade_leitura: hydroReadingUnit.value,
         fator_tds: document.getElementById('hydroTdsScale').value,
-        sintoma: document.getElementById('hydroSymptom').value
+        ec_agua_fonte: lerNumeroOuNulo('hydroSourceEc'),
+        alcalinidade_ppm: lerNumeroOuNulo('hydroAlkalinity'),
+        vazao_emissor_l_h: lerNumeroOuNulo('hydroEmitterFlow'),
+        volume_por_planta_ciclo_l: lerNumeroOuNulo('hydroVolumeCycle'),
+        ciclos_dia: lerNumeroOuNulo('hydroCycles'),
+        sintoma: document.getElementById('hydroSymptom').value,
+        produtos_rotulo: produtosRotulo
     };
 
     try {
