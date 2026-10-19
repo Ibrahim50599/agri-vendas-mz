@@ -15,6 +15,7 @@ from google.genai import types
 from config import Config
 from models import Database
 from utils import validate_email, validate_phone, allowed_file, save_uploaded_file, CODIGOS_ADMIN, NIVEIS_HIERARQUIA, get_nivel_hierarquia, check_admin_access, DADOS_CULTURAS
+from hidroponia import calcular_hidroponia
 
 # Importar sistema robusto
 from robust_system import with_error_handling, with_performance_monitoring, with_audit_trail, SecurityManager, RobustDatabase
@@ -698,6 +699,18 @@ def remover_produto_proprio(produto_id):
 @login_required
 def consultoria():
     return render_template('consultoria.html')
+
+@app.route('/api/hidroponia/calcular', methods=['POST'])
+@login_required
+def api_calcular_hidroponia():
+    dados = request.get_json(silent=True)
+    if not isinstance(dados, dict):
+        return jsonify({'ok': False, 'erro': 'Envie os dados do sistema hidropónico.'}), 400
+    try:
+        resultado = calcular_hidroponia(dados)
+        return jsonify({'ok': True, 'resultado': resultado})
+    except ValueError as exc:
+        return jsonify({'ok': False, 'erro': str(exc)}), 400
 
 GEMINI_SYSTEM_PROMPT = """És o Assistente Agrícola Virtual da plataforma AGRI.vendasMz, especializado em agricultura de Moçambique.
 
