@@ -165,6 +165,190 @@ SINTOMAS = {
 }
 
 
+def _gerar_interpretacao(
+    cultura,
+    sistema,
+    ec_medido,
+    ph,
+    ec_agua_fonte,
+    alcalinidade,
+    oxigenio,
+    sintoma_id,
+):
+    """Relaciona leituras e sintomas sem afirmar uma causa não confirmada."""
+    alertas = []
+    dados_em_falta = []
+
+    def adicionar(nivel, titulo, observacao, proxima_acao):
+        alertas.append({
+            'nivel': nivel,
+            'titulo': titulo,
+            'observacao': observacao,
+            'proxima_acao': proxima_acao,
+        })
+
+    ec_fora = ec_medido is not None and not cultura['ec_min'] <= ec_medido <= cultura['ec_max']
+    ph_fora = ph is not None and not cultura['ph_min'] <= ph <= cultura['ph_max']
+
+    if ec_medido is None:
+        dados_em_falta.append('CE/TDS da solução nutritiva')
+    elif ec_fora:
+        adicionar(
+            'atencao',
+            'CE fora da referência da cultura',
+            f'A CE medida ({ec_medido:.2f} mS/cm) não está na faixa publicada '
+            f'{cultura["ec_min"]:.1f}–{cultura["ec_max"]:.1f} mS/cm para {cultura["nome"].lower()}.',
+            'Confira a calibração, a água e a receita completa do rótulo; ajuste gradualmente '
+            'e volte a medir. CE não identifica qual nutriente está em falta ou excesso.',
+        )
+
+    if ph is None:
+        dados_em_falta.append('pH da solução nutritiva')
+    elif ph_fora:
+        adicionar(
+            'atencao',
+            'pH fora da referência da cultura',
+            f'O pH medido ({ph:.2f}) está fora da faixa publicada '
+            f'{cultura["ph_min"]:.1f}–{cultura["ph_max"]:.1f}.',
+            'Confirme com medidor calibrado. Não calcule uma dose de corretor só pelo pH; '
+            'considere a alcalinidade e siga o rótulo do produto em pequenas etapas.',
+        )
+
+    if ec_agua_fonte is None:
+        dados_em_falta.append('CE da água de origem/reposição')
+    elif ec_agua_fonte > 0.8:
+        adicionar(
+            'atencao',
+            'Água de origem com CE elevada',
+            f'A CE da água de origem ({ec_agua_fonte:.2f} mS/cm) ultrapassa a referência '
+            'de 0,2–0,8 mS/cm usada neste módulo.',
+            'Peça análise dos minerais/íons da água antes de acrescentar fertilizante ou '
+            'escolher água para diluição.',
+        )
+    elif ec_agua_fonte < 0.2:
+        adicionar(
+            'informacao',
+            'CE da água de origem baixa',
+            f'A CE medida ({ec_agua_fonte:.2f} mS/cm) está abaixo da referência de 0,2–0,8 mS/cm; '
+            'isso não confirma que a água seja inadequada.',
+            'Confirme a composição mineral numa análise de água antes de formular a solução.',
+        )
+
+    if alcalinidade is None:
+        if ph_fora:
+            dados_em_falta.append('alcalinidade da água (análise em ppm CaCO₃)')
+    elif alcalinidade > 160 or alcalinidade < 40:
+        adicionar(
+            'atencao',
+            'Alcalinidade fora da referência informada',
+            f'A alcalinidade medida ({alcalinidade:.1f} ppm CaCO₃) está fora de 40–160 ppm.',
+            'Confirme o resultado laboratorial e procure orientação para gerir o pH; '
+            'este módulo não calcula dose de ácido ou base.',
+        )
+
+    if oxigenio is None:
+        dados_em_falta.append('oxigénio dissolvido')
+    elif oxigenio <= 6:
+        adicionar(
+            'prioridade',
+            'Oxigénio dissolvido abaixo da referência',
+            f'A leitura ({oxigenio:.2f} mg/L) não ultrapassa a referência de >6 mg/L usada neste módulo.',
+            'Verifique já aeração, circulação e bomba; repita a medição com instrumento calibrado. '
+            'Em DWC, mantenha o aerador ligado continuamente.',
+        )
+
+    if sintoma_id in {'raizes_escuras', 'murcha'}:
+        if oxigenio is not None and oxigenio <= 6:
+            adicionar(
+                'prioridade',
+                'Sintoma e leitura de oxigénio merecem verificação conjunta',
+                'Raízes escuras/murcha e oxigénio no limite ou baixo podem ocorrer em conjunto, mas não confirmam '
+                'doença radicular nem identificam sozinhos a causa.',
+                'Inspecione fluxo e raízes, corrija primeiro a aeração/circulação e isole plantas '
+                'afetadas para avaliação.',
+            )
+        elif oxigenio is None:
+            adicionar(
+                'atencao',
+                'Falta uma leitura para interpretar o sintoma radicular',
+                'Sem oxigénio dissolvido medido, não é possível avaliar se a solução está pouco oxigenada.',
+                'Meça oxigénio dissolvido e verifique também bomba, caudal e raízes.',
+            )
+
+    if sintoma_id == 'pontas_amarelas_queimadas' and ec_medido is not None and ec_medido > cultura['ec_max']:
+        adicionar(
+            'atencao',
+            'CE elevada pode estar relacionada com as pontas queimadas',
+            'A combinação é compatível com stress por sais, mas não confirma a causa do sintoma.',
+            'Verifique a CE da água de origem e siga a orientação de diluição gradual; examine também '
+            'temperatura, circulação e estado das raízes.',
+        )
+    elif sintoma_id == 'folhas_novas_amarelas' and ph is not None and ph > cultura['ph_max']:
+        adicionar(
+            'atencao',
+            'pH acima da referência pode afetar a disponibilidade de nutrientes',
+            'O sintoma pode ter várias causas; pH elevado não comprova deficiência de ferro.',
+            'Confirme pH e alcalinidade e verifique a composição do fertilizante antes de corrigir.',
+        )
+    elif sintoma_id == 'folhas_velhas_amarelas' and ec_medido is not None and ec_medido < cultura['ec_min']:
+        adicionar(
+            'atencao',
+            'CE baixa não identifica a causa do amarelecimento',
+            'A leitura indica menos sais dissolvidos que a referência, mas não demonstra falta de azoto.',
+            'Confira a receita completa do produto e a análise da água; não adicione um nutriente isolado '
+            'com base apenas no sintoma.',
+        )
+    elif sintoma_id == 'crescimento_lento' and not ec_fora and not ph_fora and ec_medido is not None and ph is not None:
+        adicionar(
+            'informacao',
+            'CE e pH não explicam, por si só, o crescimento lento',
+            'As duas leituras estão dentro das referências introduzidas, mas isso não confirma o equilíbrio '
+            'de cada nutriente nem a saúde da planta.',
+            'Verifique luz, temperatura, raízes, circulação e pragas antes de aumentar fertilizante.',
+        )
+    elif sintoma_id == 'manchas_furos':
+        adicionar(
+            'informacao',
+            'Manchas e furos não são diagnosticados por CE ou pH',
+            'Pragas, doença e dano físico podem produzir sinais parecidos.',
+            'Examine os dois lados das folhas e os pontos de crescimento; use controlo integrado e siga '
+            'os rótulos dos produtos.',
+        )
+
+    ordem_alertas = {'prioridade': 0, 'atencao': 1, 'informacao': 2}
+    alertas.sort(key=lambda alerta: ordem_alertas.get(alerta['nivel'], 3))
+
+    if any(alerta['nivel'] == 'prioridade' for alerta in alertas):
+        estado = 'Verificação prioritária'
+        resumo = 'Há uma leitura que deve ser verificada primeiro. Comece pela ação prioritária e volte a medir.'
+    elif any(alerta['nivel'] == 'atencao' for alerta in alertas):
+        estado = 'Rever medições'
+        resumo = 'Uma ou mais leituras/sinais merecem atenção. Verifique os instrumentos e siga as ações por ordem.'
+    elif ec_medido is None or ph is None:
+        estado = 'Medições incompletas'
+        resumo = 'Faltam leituras de CE e/ou pH para comparar a solução com as referências da cultura.'
+    elif alertas:
+        estado = 'Verificar outros fatores'
+        resumo = 'As leituras de CE e pH não explicam sozinhas o sinal observado; verifique as outras causas indicadas.'
+    else:
+        estado = 'CE e pH dentro das referências'
+        resumo = (
+            f'As leituras fornecidas de CE e pH estão nas referências publicadas para {cultura["nome"].lower()}. '
+            'Isso não confirma que cada nutriente esteja equilibrado ou que a planta esteja saudável.'
+        )
+
+    return {
+        'estado': estado,
+        'resumo': resumo,
+        'alertas': alertas,
+        'dados_em_falta': list(dict.fromkeys(dados_em_falta)),
+        'nota': (
+            f'Interpretação por regras baseada nas leituras fornecidas, nas referências da cultura e no sistema '
+            f'{sistema.upper()}; não é diagnóstico laboratorial nem confirmação de doença.'
+        ),
+    }
+
+
 def _numero(dados, campo, nome, minimo, maximo, obrigatorio=False):
     valor = dados.get(campo)
     if valor in (None, ''):
@@ -395,6 +579,7 @@ def calcular_hidroponia(dados):
 
     faixa_ec = (cultura['ec_min'], cultura['ec_max'])
     ec_alvo = (faixa_ec[0] + faixa_ec[1]) / 2
+    ec_medido = None
     if leitura is not None:
         unidade = str(dados.get('unidade_leitura', 'ec')).lower()
         if unidade == 'tds':
@@ -525,9 +710,9 @@ def calcular_hidroponia(dados):
             'Oxigénio dissolvido não medido. A University of Missouri recomenda mais de '
             '6 mg/L; a temperatura da água, sozinha, não revela a concentração de oxigénio.'
         )
-    elif oxigenio < 6:
+    elif oxigenio <= 6:
         estado_oxigenio = (
-            f'Oxigénio dissolvido {oxigenio:.2f} mg/L, abaixo da referência >6 mg/L. '
+            f'Oxigénio dissolvido {oxigenio:.2f} mg/L, no limite ou abaixo da referência >6 mg/L. '
             'Verifique aeração, circulação e temperatura da solução.'
         )
     else:
@@ -558,6 +743,17 @@ def calcular_hidroponia(dados):
             'possivel_causa': 'Selecione um sintoma para receber hipóteses iniciais; não é um diagnóstico laboratorial.',
             'acao': 'Registe pH, CE, temperatura e oxigénio dissolvido; examine raízes e folhas.',
         }
+
+    interpretacao = _gerar_interpretacao(
+        cultura,
+        sistema,
+        ec_medido,
+        ph,
+        ec_agua_fonte,
+        alcalinidade,
+        oxigenio,
+        sintoma_id,
+    )
 
     produtos_rotulo = _calcular_produtos_rotulo(dados, volume)
     if produtos_rotulo:
@@ -639,6 +835,7 @@ def calcular_hidroponia(dados):
             'nota_clima': nota_clima,
         },
         'diagnostico': diagnostico,
+        'interpretacao': interpretacao,
         'fontes': FONTES,
         'aviso': (
             'Referências técnicas de extensão universitária são faixas de orientação, '

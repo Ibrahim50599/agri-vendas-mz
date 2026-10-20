@@ -1405,6 +1405,7 @@ function renderizarResultadoHidroponia(resultado) {
     const nutrientes = resultado.nutrientes;
     const irrigacao = resultado.irrigacao;
     const diagnostico = resultado.diagnostico;
+    const interpretacao = resultado.interpretacao;
     const linhasProdutos = (nutrientes.produtos_rotulo || []).map(produto => `
         <tr>
             <td>${escaparHydroHtml(produto.nome)}</td>
@@ -1433,6 +1434,23 @@ function renderizarResultadoHidroponia(resultado) {
             : '#';
         return `<li><a href="${href}" target="_blank" rel="noopener noreferrer">${escaparHydroHtml(fonte.nome)}</a></li>`;
     }).join('');
+    const classesAlerta = {prioridade: 'danger', atencao: 'warning', informacao: 'info'};
+    const classesEstado = {
+        'Verificação prioritária': 'bg-danger',
+        'Rever medições': 'bg-warning text-dark',
+        'Medições incompletas': 'bg-secondary',
+        'Verificar outros fatores': 'bg-info text-dark',
+        'CE e pH dentro das referências': 'bg-success'
+    };
+    const alertasInterpretacao = (interpretacao.alertas || []).map(alerta => `
+        <div class="alert alert-${classesAlerta[alerta.nivel] || 'secondary'} py-2 mb-2">
+            <strong>${escaparHydroHtml(alerta.titulo)}</strong>
+            <div>${escaparHydroHtml(alerta.observacao)}</div>
+            <div class="small mt-1"><strong>Próximo passo:</strong> ${escaparHydroHtml(alerta.proxima_acao)}</div>
+        </div>`).join('');
+    const dadosEmFalta = (interpretacao.dados_em_falta || []).map(item =>
+        `<li>${escaparHydroHtml(item)}</li>`
+    ).join('');
 
     hydroResults.innerHTML = `
         <div class="alert alert-success">
@@ -1490,6 +1508,18 @@ function renderizarResultadoHidroponia(resultado) {
                     <h6><i class="fas fa-leaf me-2"></i>Guia de sintomas</h6>
                     <p class="mb-1"><strong>${escaparHydroHtml(diagnostico.sintoma)}:</strong> ${escaparHydroHtml(diagnostico.possivel_causa)}</p>
                     <p class="mb-0"><strong>Ação recomendada:</strong> ${escaparHydroHtml(diagnostico.acao)}</p>
+                </section>
+            </div>
+            <div class="col-12">
+                <section class="hydro-result-card">
+                    <h6><i class="fas fa-stethoscope me-2"></i>Análise conjunta de medições e sintomas</h6>
+                    <div class="mb-2"><span class="badge ${classesEstado[interpretacao.estado] || 'bg-secondary'}">${escaparHydroHtml(interpretacao.estado)}</span></div>
+                    <p>${escaparHydroHtml(interpretacao.resumo)}</p>
+                    ${alertasInterpretacao || (interpretacao.estado === 'CE e pH dentro das referências'
+                        ? '<p class="small mb-2">Não foi encontrado um desvio nas leituras comparadas. Isso não garante, por si só, que a planta esteja saudável.</p>'
+                        : '<p class="small mb-2">As leituras disponíveis não permitem confirmar desvios; introduza os dados em falta para uma análise melhor.</p>')}
+                    ${dadosEmFalta ? `<div class="small"><strong>Leituras que podem melhorar a análise:</strong><ul class="mb-2">${dadosEmFalta}</ul></div>` : ''}
+                    <p class="small text-muted mb-0">${escaparHydroHtml(interpretacao.nota)}</p>
                 </section>
             </div>
             <div class="col-12">
