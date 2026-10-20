@@ -58,6 +58,69 @@ CULTURAS = {
         'ph_max': 6.5,
         'ph_nota': 'A Oklahoma State indica pH próximo de 6,0; a faixa 5,5–6,5 é a regra geral da University of Missouri.',
     },
+    'manjericao': {
+        'nome': 'Manjericão',
+        'espacamento_nft_cm_referencia': None,
+        'ec_min': 1.0,
+        'ec_max': 1.6,
+        'ph_min': 5.5,
+        'ph_max': 6.0,
+        'ph_nota': 'A tabela da Oklahoma State indica pH 5,5–6,0 para manjericão.',
+    },
+    'pepino': {
+        'nome': 'Pepino',
+        'espacamento_nft_cm_referencia': None,
+        'ec_min': 1.7,
+        'ec_max': 2.0,
+        'ph_min': 5.0,
+        'ph_max': 5.5,
+        'ph_nota': 'A tabela da Oklahoma State indica pH 5,0–5,5 para pepino.',
+    },
+    'pimento': {
+        'nome': 'Pimento',
+        'espacamento_nft_cm_referencia': None,
+        'ec_min': 0.8,
+        'ec_max': 1.8,
+        'ph_min': 5.5,
+        'ph_max': 6.0,
+        'ph_nota': 'A tabela da Oklahoma State indica pH 5,5–6,0 para pimentos.',
+    },
+    'espinafre': {
+        'nome': 'Espinafre',
+        'espacamento_nft_cm_referencia': None,
+        'ec_min': 1.8,
+        'ec_max': 2.3,
+        'ph_min': 6.0,
+        'ph_max': 7.0,
+        'ph_nota': 'A tabela da Oklahoma State indica pH 6,0–7,0 para espinafre.',
+    },
+    'repolho': {
+        'nome': 'Repolho',
+        'espacamento_nft_cm_referencia': None,
+        'ec_min': 2.5,
+        'ec_max': 3.0,
+        'ph_min': 6.5,
+        'ph_max': 7.0,
+        'ph_nota': 'A tabela da Oklahoma State indica pH 6,5–7,0 para repolho.',
+    },
+    'brocolos': {
+        'nome': 'Brócolos',
+        'espacamento_nft_cm_referencia': None,
+        'ec_min': 2.8,
+        'ec_max': 3.5,
+        'ph_min': 6.0,
+        'ph_max': 6.8,
+        'ph_nota': 'A tabela da Oklahoma State indica pH 6,0–6,8 para brócolos.',
+    },
+    'salsa': {
+        'nome': 'Salsa',
+        'espacamento_nft_cm_referencia': None,
+        'ec_min': 1.8,
+        'ec_max': 2.2,
+        'ph_min': 6.0,
+        'ph_max': 6.5,
+        'ph_nota': 'A tabela da Oklahoma State indica pH 6,0–6,5 para salsa.',
+    },
 }
 
 SISTEMAS = {'nft', 'substrato', 'dwc'}
@@ -167,7 +230,7 @@ def calcular_hidroponia(dados):
     sistema = str(dados.get('sistema', 'nft')).strip().lower()
     fase = str(dados.get('fase', 'vegetativo')).strip().lower()
     if cultura_id not in CULTURAS:
-        raise ValueError('Escolha alface, tomate ou morango.')
+        raise ValueError('Escolha uma das culturas hidropónicas disponíveis.')
     if sistema not in SISTEMAS:
         raise ValueError('Escolha NFT, substrato ou DWC.')
     if fase not in FASES:
